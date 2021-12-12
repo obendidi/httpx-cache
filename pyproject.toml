@@ -6,14 +6,17 @@ authors = ["Ouail Bendidi <ouail.bendidi@gmail.com>"]
 license = "BSD 3"
 readme = "README.md"
 repository = "https://github.com/bendidi/httpx-cache"
+homepage = "https://github.com/bendidi/httpx-cache"
 keywords = ["httpx", "cache", "cache-control"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Web Environment",
   "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Topic :: Internet :: WWW/HTTP",
-  "Framework :: Httpx",
+  "Framework :: AsyncIO",
+  "Framework :: Trio",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.6",
   "Programming Language :: Python :: 3.7",
@@ -21,6 +24,9 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3 :: Only",
+]
+include = [
+    "LICENSE",
 ]
 
 [tool.poetry.dependencies]
