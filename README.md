@@ -13,12 +13,19 @@ It is is heavily insipired by:
 
 This project supports the latest version of httpx (at of the time of writing): `httpx@0.21.1`, when `httpx` releases a v1 version, the update should be straithforward for this project.
 
-## TODO
+## Installation
 
-- [ ] support etags
-- [ ] support cache expiry dates
-- [ ] support file cach
-- [ ] support redis (sync/async) cache
+Using pip:
+
+```sh
+pip install httpx-cache
+```
+
+Using poetry:
+
+```sh
+poetry add httpx-cache
+```
 
 ## Features
 
@@ -64,3 +71,10 @@ with httpx.Client(transport=CacheControlTransport(transport=my_transport)) as cl
 ## Examples
 
  more examples in [./examples](./examples).
+
+## TODO
+
+- [ ] support etags
+- [ ] support cache expiry dates
+- [ ] support file cach
+- [ ] support redis (sync/async) cache
