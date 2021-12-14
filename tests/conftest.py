@@ -268,10 +268,10 @@ def httpx_async_stream_response(response: httpx.Response) -> httpx.Response:
 
 
 class DummySerializer(BaseSerializer):
-    def dumps(self, *, response: httpx.Response, content: bytes) -> httpx.Response:
-        return response
+    def dumps(self, *, response, content):
+        return content
 
-    def loads(self, *, data: httpx.Response, request: httpx.Request) -> httpx.Response:
+    def loads(self, *, data, request):
         return data
 
 
