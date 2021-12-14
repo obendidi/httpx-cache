@@ -12,7 +12,8 @@ from httpx_cache.serializer.base import BaseSerializer
 class BaseCacheMixin:
     serializer: BaseSerializer = attr.ib(kw_only=True, factory=Serializer, repr=False)
 
-    def _gen_key(self, request: httpx.Request) -> str:
+    @classmethod
+    def gen_key(cls, request: httpx.Request) -> str:
         return str(request.url)
 
 
