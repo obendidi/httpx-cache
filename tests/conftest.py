@@ -1,7 +1,10 @@
 import typing as tp
 
 import httpx
+import pytest
 from pytest_cases import case, fixture, parametrize_with_cases
+
+from httpx_cache.serializer import BaseSerializer
 
 
 class StreamingBody:
@@ -262,3 +265,16 @@ def httpx_stream_response(response: httpx.Response) -> httpx.Response:
 @parametrize_with_cases("response", cases=ResponseCases, has_tag="async_stream")
 def httpx_async_stream_response(response: httpx.Response) -> httpx.Response:
     return response
+
+
+class DummySerializer(BaseSerializer):
+    def dumps(self, *, response, content):
+        return content
+
+    def loads(self, *, data, request):
+        return data
+
+
+@pytest.fixture
+def dummy_serializer():
+    return DummySerializer()

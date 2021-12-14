@@ -2,65 +2,133 @@ import httpx
 import pytest
 
 from httpx_cache.cache import AsyncDictCache, DictCache
-from httpx_cache.serializer import BaseSerializer
 
-# This is the same as using the @pytest.mark.anyio on all test functions in the module
 pytestmark = pytest.mark.anyio
 
 
-class _DummySerializer(BaseSerializer):
-    def dumps(self, *, response: httpx.Response, content: bytes) -> httpx.Response:
-        return response
-
-    def loads(self, *, data: httpx.Response, request: httpx.Request) -> httpx.Response:
-        return data
+def test_dict_cache_invalid_data_init():
+    with pytest.raises(TypeError):
+        DictCache(data=[])
 
 
-def test_dict_cache():
-    cache = DictCache(serializer=_DummySerializer())
+def test_async_dict_cache_invalid_data_init():
+    with pytest.raises(TypeError):
+        AsyncDictCache(data=())
 
+
+def test_dict_cache_get_not_found(dummy_serializer):
     request = httpx.Request("GET", "http://testurl")
-    response = httpx.Response(200, content=b"Hello, World", request=request)
+    cache = DictCache(serializer=dummy_serializer)
 
-    # set inside the dict cache
-    cache.set(request=request, response=response, content=b"Hello, World")
+    cached = cache.get(request)
+    assert cached is None
 
-    # get the object
-    cached_response = cache.get(request=request)
 
-    assert cached_response is response  # same id since it should be exactly the same
+def test_dict_cache_get(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = DictCache(
+        serializer=dummy_serializer,
+        data={DictCache.gen_key(request): b"some-random-response"},
+    )
 
-    # delete the cached response
+    cached = cache.get(request)
+    assert cached == b"some-random-response"
+
+
+def test_dict_cache_set(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = DictCache(serializer=dummy_serializer)
+    response = httpx.Response(200, content=b"some-random-response")
+
+    cache.set(request=request, response=response, content=response.content)
+    assert cache.data[DictCache.gen_key(request)] == b"some-random-response"
+
+
+def test_dict_cache_update_existing(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = DictCache(
+        serializer=dummy_serializer,
+        data={DictCache.gen_key(request): b"some-random-response"},
+    )
+    response = httpx.Response(200, content=b"the-updated-response")
+
+    cache.set(request=request, response=response, content=response.content)
+    assert cache.data[DictCache.gen_key(request)] == b"the-updated-response"
+
+
+def test_dict_cache_delete(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = DictCache(
+        serializer=dummy_serializer,
+        data={DictCache.gen_key(request): b"some-random-response"},
+    )
+
     cache.delete(request)
-
-    # try to get the same request again
-    cached_response = cache.get(request=request)
-    assert cached_response is None
-
-    # check that the cache is empty
     assert len(cache.data) == 0
 
 
-async def test_async_dict_cache():
-    cache = AsyncDictCache(serializer=_DummySerializer())
-
+def test_dict_cache_delete_not_found(dummy_serializer):
     request = httpx.Request("GET", "http://testurl")
-    response = httpx.Response(200, content=b"Hello, World", request=request)
+    cache = DictCache(serializer=dummy_serializer)
 
-    # set inside the dict cache
-    await cache.aset(request=request, response=response, content=b"Hello, World")
+    cache.delete(request)
+    assert len(cache.data) == 0
 
-    # get the object
-    cached_response = await cache.aget(request=request)
 
-    assert cached_response is response  # same id since it should be exactly the same
+async def test_async_dict_cache_get_not_found(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = AsyncDictCache(serializer=dummy_serializer)
 
-    # delete the cached response
+    cached = await cache.aget(request)
+    assert cached is None
+
+
+async def test_async_dict_cache_get(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = AsyncDictCache(
+        serializer=dummy_serializer,
+        data={AsyncDictCache.gen_key(request): b"some-random-response"},
+    )
+
+    cached = await cache.aget(request)
+    assert cached == b"some-random-response"
+
+
+async def test_async_dict_cache_set(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = AsyncDictCache(serializer=dummy_serializer)
+    response = httpx.Response(200, content=b"some-random-response")
+
+    await cache.aset(request=request, response=response, content=response.content)
+    assert cache.data[AsyncDictCache.gen_key(request)] == b"some-random-response"
+
+
+async def test_async_dict_cache_update_existing(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = AsyncDictCache(
+        serializer=dummy_serializer,
+        data={DictCache.gen_key(request): b"some-random-response"},
+    )
+    response = httpx.Response(200, content=b"the-updated-response")
+
+    await cache.aset(request=request, response=response, content=response.content)
+    assert cache.data[DictCache.gen_key(request)] == b"the-updated-response"
+
+
+async def test_async_dict_cache_delete(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = AsyncDictCache(
+        serializer=dummy_serializer,
+        data={AsyncDictCache.gen_key(request): b"some-random-response"},
+    )
+
     await cache.adelete(request)
+    assert len(cache.data) == 0
 
-    # try to get the same request again
-    cached_response = await cache.aget(request=request)
-    assert cached_response is None
 
-    # check that the cache is empty
+async def test_async_dict_cache_delete_not_found(dummy_serializer):
+    request = httpx.Request("GET", "http://testurl")
+    cache = AsyncDictCache(serializer=dummy_serializer)
+
+    await cache.adelete(request)
     assert len(cache.data) == 0
