@@ -18,7 +18,7 @@ class DictCache(BaseCache):
     )
 
     def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        key = self._gen_key(request)
+        key = self.gen_key(request)
         cached = self.data.get(key)
         if cached is not None:
             return self.serializer.loads(request=request, data=cached)
@@ -27,13 +27,13 @@ class DictCache(BaseCache):
     def set(
         self, *, request: httpx.Request, response: httpx.Response, content: bytes
     ) -> None:
-        key = self._gen_key(request)
+        key = self.gen_key(request)
         to_cache = self.serializer.dumps(response=response, content=content)
         with self.lock:
             self.data.update({key: to_cache})
 
     def delete(self, request: httpx.Request) -> None:
-        key = self._gen_key(request)
+        key = self.gen_key(request)
         with self.lock:
             self.data.pop(key, None)
 
@@ -48,7 +48,7 @@ class AsyncDictCache(AsyncBaseCache):
     )
 
     async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        key = self._gen_key(request)
+        key = self.gen_key(request)
         cached = self.data.get(key)
         if cached is not None:
             return self.serializer.loads(request=request, data=cached)
@@ -57,12 +57,12 @@ class AsyncDictCache(AsyncBaseCache):
     async def aset(
         self, *, request: httpx.Request, response: httpx.Response, content: bytes
     ) -> None:
-        key = self._gen_key(request)
+        key = self.gen_key(request)
         to_cache = self.serializer.dumps(response=response, content=content)
         async with self.lock:
             self.data.update({key: to_cache})
 
     async def adelete(self, request: httpx.Request) -> None:
-        key = self._gen_key(request)
+        key = self.gen_key(request)
         async with self.lock:
             self.data.pop(key, None)
