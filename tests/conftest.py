@@ -2,25 +2,7 @@ import typing as tp
 
 import httpx
 import pytest
-from pytest_cases import case, fixture, parametrize_with_cases
-
-from httpx_cache.serializer import BaseSerializer
-
-
-class StreamingBody:
-    def __iter__(self):
-        yield b"Hello, "
-        yield b"world!"
-
-
-def streaming_body():
-    yield b"Hello, "
-    yield b"world!"
-
-
-async def async_streaming_body():
-    yield b"Hello, "
-    yield b"world!"
+from pytest_cases import fixture, parametrize_with_cases
 
 
 class HeadersCases:
@@ -132,149 +114,23 @@ def httpx_headers(
     return headers
 
 
-class ResponseCases:
-    """httpx Response test cases:
+class DummySerializer:
+    def dumps(
+        self, *, response: httpx.Response, content: tp.Optional[bytes] = None
+    ) -> tp.Tuple[httpx.Response, tp.Optional[bytes]]:
+        return response, content
 
-    Mostly copied from:
-    https://github.com/encode/httpx/blob/1.0.0.beta0/tests/models/test_responses.py
-
-    """
-
-    @case(tags=["sync", "async"])
-    def case_response_content(self) -> httpx.Response:
-        return httpx.Response(200, content=b"Hello, world!")
-
-    @case(tags=["sync", "async"])
-    def case_response_text(self) -> httpx.Response:
-        return httpx.Response(200, text="Hello, world!")
-
-    @case(tags=["sync", "async"])
-    def case_response_html(self) -> httpx.Response:
-        return httpx.Response(200, html="<html><body>Hello, world!</html></body>")
-
-    @case(tags=["sync", "async"])
-    def case_response_json(self) -> httpx.Response:
-        return httpx.Response(200, json={"hello": "world"})
-
-    @case(tags=["sync", "async"])
-    def case_response_content_type_encoding(self) -> httpx.Response:
-        headers = {"Content-Type": "text-plain; charset=latin-1"}
-        content = "Latin 1: ÿ".encode("latin-1")
-        return httpx.Response(200, content=content, headers=headers)
-
-    @case(tags=["sync", "async"])
-    def case_response_autodetect_encoding(self) -> httpx.Response:
-        content = "おはようございます。".encode("utf-8")
-        return httpx.Response(200, content=content)
-
-    @case(tags=["sync", "async"])
-    def case_response_fallback_to_autodetect(self) -> httpx.Response:
-        headers = {"Content-Type": "text-plain; charset=invalid-codec-name"}
-        content = "おはようございます。".encode("utf-8")
-        return httpx.Response(200, content=content, headers=headers)
-
-    @case(tags=["sync", "async"])
-    def case_response_no_charset_with_ascii_content(self) -> httpx.Response:
-        content = b"Hello, world!"
-        headers = {"Content-Type": "text/plain"}
-        return httpx.Response(200, content=content, headers=headers)
-
-    @case(tags=["sync", "async"])
-    def case_response_no_charset_with_utf8_content(self) -> httpx.Response:
-        content = "Unicode Snowman: ☃".encode("utf-8")
-        headers = {"Content-Type": "text/plain"}
-        return httpx.Response(200, content=content, headers=headers)
-
-    @case(tags=["sync", "async"])
-    def case_response_no_charset_with_iso_8859_1_content(self) -> httpx.Response:
-        content = "Accented: Österreich abcdefghijklmnopqrstuzwxyz".encode("iso-8859-1")
-        headers = {"Content-Type": "text/plain"}
-        return httpx.Response(200, content=content, headers=headers)
-
-    @case(tags=["sync", "async"])
-    def case_response_no_charset_with_cp_1252_content(self) -> httpx.Response:
-        content = "Euro Currency: € abcdefghijklmnopqrstuzwxyz".encode("cp1252")
-        headers = {"Content-Type": "text/plain"}
-        return httpx.Response(200, content=content, headers=headers)
-
-    @case(tags=["sync", "async"])
-    def case_response_non_text_encoding(self) -> httpx.Response:
-        headers = {"Content-Type": "image/png"}
-        return httpx.Response(200, content=b"xyz", headers=headers)
-
-    @case(tags=["sync", "async"])
-    def case_response_set_explicit_encoding(self) -> httpx.Response:
-        # Deliberately incorrect charset
-        headers = {"Content-Type": "text-plain; charset=utf-8"}
-        response = httpx.Response(
-            200, content="Latin 1: ÿ".encode("latin-1"), headers=headers
-        )
-        response.encoding = "latin-1"
-        return response
-
-    @case(tags=["sync", "async"])
-    def case_response_force_encoding(self) -> httpx.Response:
-        response = httpx.Response(200, content="Snowman: ☃".encode("utf-8"))
-        response.encoding = "iso-8859-1"
-        return response
-
-    @case(tags=["sync", "async"])
-    def case_empty_read(self) -> httpx.Response:
-        return httpx.Response(200)
-
-    # TODO: check why it does not work with `test_cache_control_transport`
-    @case(tags=["stream_sync"])
-    def case_iter_raw(self) -> httpx.Response:
-        return httpx.Response(200, content=streaming_body())
-
-    @case(tags=["stream_sync", "sync"])
-    def case_iter_raw_on_iterable(self) -> httpx.Response:
-        return httpx.Response(200, content=StreamingBody())
-
-    # TODO: check why it does not work with `test_async_cache_control_transport`
-    @case(tags=["async_stream"])
-    def case_aiter_raw(self) -> httpx.Response:
-        return httpx.Response(200, content=async_streaming_body())
+    def loads(
+        self,
+        *,
+        data: tp.Tuple[httpx.Response, tp.Optional[bytes]],
+        request: tp.Optional[httpx.Request] = None
+    ) -> httpx.Response:
+        response, content = data
+        if not hasattr(response, "_content"):
+            pass
 
 
-@fixture
-@parametrize_with_cases("response", cases=ResponseCases)
-def httpx_response(response: httpx.Response) -> httpx.Response:
-    return response
-
-
-@fixture
-@parametrize_with_cases("response", cases=ResponseCases, has_tag="sync")
-def httpx_sync_response(response: httpx.Response) -> httpx.Response:
-    return response
-
-
-@fixture
-@parametrize_with_cases("response", cases=ResponseCases, has_tag="async")
-def httpx_async_response(response: httpx.Response) -> httpx.Response:
-    return response
-
-
-@fixture
-@parametrize_with_cases("response", cases=ResponseCases, has_tag="stream_sync")
-def httpx_stream_response(response: httpx.Response) -> httpx.Response:
-    return response
-
-
-@fixture
-@parametrize_with_cases("response", cases=ResponseCases, has_tag="async_stream")
-def httpx_async_stream_response(response: httpx.Response) -> httpx.Response:
-    return response
-
-
-class DummySerializer(BaseSerializer):
-    def dumps(self, *, response, content):
-        return content
-
-    def loads(self, *, data, request):
-        return data
-
-
-@pytest.fixture
+@pytest.fixture(scope="session")
 def dummy_serializer():
     return DummySerializer()

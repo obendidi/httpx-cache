@@ -1,2 +1,2 @@
-from httpx_cache.serializer.base import BaseSerializer
-from httpx_cache.serializer.default import Serializer
+from httpx_cache.serializer.base import BaseSerializer, IdentitySerializer
+from httpx_cache.serializer.common import MsgPackSerializer
