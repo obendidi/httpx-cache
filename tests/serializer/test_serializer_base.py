@@ -22,16 +22,6 @@ class StreamingBody:
         yield b"world!"
 
 
-def streaming_body():
-    yield b"Hello, "
-    yield b"world!"
-
-
-async def async_streaming_body():
-    yield b"Hello, "
-    yield b"world!"
-
-
 @pytest.fixture(scope="module")
 def serializer() -> httpx_cache.IdentitySerializer:
     return httpx_cache.IdentitySerializer()
@@ -365,15 +355,17 @@ async def test_empty_aread(serializer: httpx_cache.IdentitySerializer):
     assert content == cached_content == cached.content == b""
 
 
-def test_iter_raw_request_not_read_error(serializer: httpx_cache.IdentitySerializer):
-    response = httpx.Response(200, content=streaming_body())
+def test_iter_raw_request_not_read_error(
+    serializer: httpx_cache.IdentitySerializer, streaming_body
+):
+    response = httpx.Response(200, content=streaming_body)
     with pytest.raises(httpx.ResponseNotRead):
         serializer.loads(data=serializer.dumps(response=response))
 
 
-def test_iter_raw(serializer: httpx_cache.IdentitySerializer):
+def test_iter_raw(serializer: httpx_cache.IdentitySerializer, streaming_body):
     # We create a response with a streamig body response
-    response = httpx.Response(200, content=streaming_body())
+    response = httpx.Response(200, content=streaming_body)
     # as long as we don't run the .read() method, we will have no content
     # in the response above
     with pytest.raises(httpx.ResponseNotRead):
@@ -425,9 +417,11 @@ def test_iter_raw(serializer: httpx_cache.IdentitySerializer):
     assert cached_content == original_content
 
 
-def test_iter_raw_with_chunksize(serializer: httpx_cache.IdentitySerializer):
+def test_iter_raw_with_chunksize(
+    serializer: httpx_cache.IdentitySerializer, streaming_body
+):
     # same as test above but we skip most of the checks since already done
-    response = httpx.Response(200, content=streaming_body())
+    response = httpx.Response(200, content=streaming_body)
     store = {}
 
     def callback(content: bytes) -> None:
@@ -480,8 +474,10 @@ def test_iter_raw_on_iterable(serializer: httpx_cache.IdentitySerializer):
     assert cached_content == original_content
 
 
-async def test_aiter_raw(serializer: httpx_cache.IdentitySerializer):
-    response = httpx.Response(200, content=async_streaming_body())
+async def test_aiter_raw(
+    serializer: httpx_cache.IdentitySerializer, async_streaming_body
+):
+    response = httpx.Response(200, content=async_streaming_body)
     store = {}
 
     async def callback(content: bytes) -> None:
@@ -508,9 +504,11 @@ async def test_aiter_raw(serializer: httpx_cache.IdentitySerializer):
     assert cached_content == original_content
 
 
-async def test_aiter_raw_with_chunksize(serializer: httpx_cache.IdentitySerializer):
+async def test_aiter_raw_with_chunksize(
+    serializer: httpx_cache.IdentitySerializer, async_streaming_body
+):
     # same as test above but we skip most of the checks since already done
-    response = httpx.Response(200, content=async_streaming_body())
+    response = httpx.Response(200, content=async_streaming_body)
     store = {}
 
     async def callback(content: bytes) -> None:
@@ -545,8 +543,10 @@ def test_iter_bytes(serializer: httpx_cache.IdentitySerializer):
     assert content == b"Hello, world!"
 
 
-def test_iter_bytes_with_chunk_size(serializer: httpx_cache.IdentitySerializer):
-    response = httpx.Response(200, content=streaming_body())
+def test_iter_bytes_with_chunk_size(
+    serializer: httpx_cache.IdentitySerializer, streaming_body
+):
+    response = httpx.Response(200, content=streaming_body)
     store = {}
 
     def callback(content: bytes) -> None:
@@ -588,8 +588,10 @@ async def test_aiter_bytes(serializer: httpx_cache.IdentitySerializer):
     assert content == b"Hello, world!"
 
 
-async def test_aiter_bytes_with_chunk_size(serializer: httpx_cache.IdentitySerializer):
-    response = httpx.Response(200, content=async_streaming_body())
+async def test_aiter_bytes_with_chunk_size(
+    serializer: httpx_cache.IdentitySerializer, async_streaming_body
+):
+    response = httpx.Response(200, content=async_streaming_body)
     store = {}
 
     async def callback(content: bytes) -> None:
@@ -614,8 +616,10 @@ async def test_aiter_bytes_with_chunk_size(serializer: httpx_cache.IdentitySeria
     assert original_parts == cached_parts == [b"Hello", b", wor", b"ld!"]
 
 
-def test_sync_streaming_response(serializer: httpx_cache.IdentitySerializer):
-    response = httpx.Response(200, content=streaming_body())
+def test_sync_streaming_response(
+    serializer: httpx_cache.IdentitySerializer, streaming_body
+):
+    response = httpx.Response(200, content=streaming_body)
     store = {}
 
     def callback(content: bytes) -> None:
@@ -636,8 +640,10 @@ def test_sync_streaming_response(serializer: httpx_cache.IdentitySerializer):
     assert cached.is_closed
 
 
-async def test_async_streaming_response(serializer: httpx_cache.IdentitySerializer):
-    response = httpx.Response(200, content=async_streaming_body())
+async def test_async_streaming_response(
+    serializer: httpx_cache.IdentitySerializer, async_streaming_body
+):
+    response = httpx.Response(200, content=async_streaming_body)
     store = {}
 
     async def callback(content: bytes) -> None:

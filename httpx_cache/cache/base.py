@@ -4,13 +4,11 @@ from abc import ABC, abstractmethod
 import httpx
 
 
-class BaseCacheMixin:
-    @classmethod
-    def gen_key(cls, request: httpx.Request) -> str:
-        return str(request.url)
+def gen_cache_key(request: httpx.Request) -> str:
+    return str(request.url)
 
 
-class BaseCache(ABC, BaseCacheMixin):
+class BaseCache(ABC):
     @abstractmethod
     def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
         """Get response from cache if available else None."""
@@ -33,7 +31,7 @@ class BaseCache(ABC, BaseCacheMixin):
         """Close cache."""
 
 
-class AsyncBaseCache(ABC, BaseCacheMixin):
+class AsyncBaseCache(ABC):
     @abstractmethod
     async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
         """Get response from cache if available else None."""

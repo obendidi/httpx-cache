@@ -5,7 +5,7 @@ import anyio
 import attr
 import httpx
 
-from httpx_cache.cache.base import AsyncBaseCache, BaseCache
+from httpx_cache.cache.base import AsyncBaseCache, BaseCache, gen_cache_key
 from httpx_cache.serializer.base import BaseSerializer
 from httpx_cache.serializer.common import MsgPackSerializer
 
@@ -23,7 +23,7 @@ class DictCache(BaseCache):
     )
 
     def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        key = self.gen_key(request)
+        key = gen_cache_key(request)
         cached = self.data.get(key)
         if cached is not None:
             return self.serializer.loads(data=cached, request=request)
@@ -36,13 +36,13 @@ class DictCache(BaseCache):
         response: httpx.Response,
         content: tp.Optional[bytes] = None
     ) -> None:
-        key = self.gen_key(request)
+        key = gen_cache_key(request)
         to_cache = self.serializer.dumps(response=response, content=content)
         with self.lock:
             self.data.update({key: to_cache})
 
     def delete(self, request: httpx.Request) -> None:
-        key = self.gen_key(request)
+        key = gen_cache_key(request)
         with self.lock:
             self.data.pop(key, None)
 
@@ -60,7 +60,7 @@ class AsyncDictCache(AsyncBaseCache):
     )
 
     async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        key = self.gen_key(request)
+        key = gen_cache_key(request)
         cached = self.data.get(key)
         if cached is not None:
             return self.serializer.loads(data=cached)
@@ -73,12 +73,12 @@ class AsyncDictCache(AsyncBaseCache):
         response: httpx.Response,
         content: tp.Optional[bytes] = None
     ) -> None:
-        key = self.gen_key(request)
+        key = gen_cache_key(request)
         to_cache = self.serializer.dumps(response=response, content=content)
         async with self.lock:
             self.data.update({key: to_cache})
 
     async def adelete(self, request: httpx.Request) -> None:
-        key = self.gen_key(request)
+        key = gen_cache_key(request)
         async with self.lock:
             self.data.pop(key, None)

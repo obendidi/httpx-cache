@@ -40,8 +40,9 @@ class BaseSerializer(ABC):
             state.pop("_num_bytes_downloaded", None)
 
         # get state of headers
-        if "headers" in state and isinstance(state["headers"], httpx.Headers):
-            state["headers"] = state["headers"].raw
+        headers = state.get("headers")
+        assert isinstance(headers, httpx.Headers)
+        state["headers"] = state["headers"].raw
         return self.serialize(state)
 
     def loads(

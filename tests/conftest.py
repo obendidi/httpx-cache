@@ -117,20 +117,33 @@ def httpx_headers(
 class DummySerializer:
     def dumps(
         self, *, response: httpx.Response, content: tp.Optional[bytes] = None
-    ) -> tp.Tuple[httpx.Response, tp.Optional[bytes]]:
-        return response, content
+    ) -> httpx.Response:
+        return response
 
     def loads(
-        self,
-        *,
-        data: tp.Tuple[httpx.Response, tp.Optional[bytes]],
-        request: tp.Optional[httpx.Request] = None
+        self, *, data: httpx.Response, request: tp.Optional[httpx.Request] = None
     ) -> httpx.Response:
-        response, content = data
-        if not hasattr(response, "_content"):
-            pass
+        return data
 
 
 @pytest.fixture(scope="session")
 def dummy_serializer():
     return DummySerializer()
+
+
+@pytest.fixture
+def streaming_body():
+    def _streaming_body():
+        yield b"Hello, "
+        yield b"world!"
+
+    return _streaming_body()
+
+
+@pytest.fixture
+async def async_streaming_body():
+    async def _async_streaming_body():
+        yield b"Hello, "
+        yield b"world!"
+
+    return _async_streaming_body()

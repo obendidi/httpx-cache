@@ -1,4 +1,5 @@
 import os
+import shutil
 import uuid
 from unittest import mock
 
@@ -16,43 +17,17 @@ ENCODED_REQ_URL = "e60261b34e117e33a1e985ac506a7a9076f92e7033082750ce20c80a"
 TEST_RESPONSE = httpx.Response(status_code=200, content=str(uuid.uuid4()).encode())
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def file_cache_dir() -> str:
-    return os.path.abspath("test_cache")
-
-
-@pytest.fixture
-def serializer():
-    return httpx_cache.IdentitySerializer()
+    cache_dir = os.path.join(os.path.dirname(__file__), "__cache__")
+    yield cache_dir
+    if os.path.isdir(cache_dir):
+        shutil.rmtree(cache_dir)
 
 
 @pytest.fixture
 def mock_os_makedirs():
     with mock.patch("os.makedirs") as _fixture:
-        yield _fixture
-
-
-@pytest.fixture
-def mock_os_is_file():
-    with mock.patch("os.path.isfile", return_value=True) as _fixture:
-        yield _fixture
-
-
-@pytest.fixture
-def mock_os_is_not_file():
-    with mock.patch("os.path.isfile", return_value=False) as _fixture:
-        yield _fixture
-
-
-@pytest.fixture
-def mock_anyio_path_is_file():
-    with mock.patch.object(anyio.Path, "is_file", return_value=True) as _fixture:
-        yield _fixture
-
-
-@pytest.fixture
-def mock_anyio_path_is_not_file():
-    with mock.patch.object(anyio.Path, "is_file", return_value=False) as _fixture:
         yield _fixture
 
 
