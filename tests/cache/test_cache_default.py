@@ -13,17 +13,22 @@ TEST_REQUEST_KEY = gen_cache_key(TEST_REQUEST)
 TEST_RESPONSE = httpx.Response(status_code=200, content=str(uuid.uuid4()).encode())
 
 
+@pytest.fixture(scope="module")
+def null_serializer():
+    return httpx_cache.NullSerializer()
+
+
 @pytest.fixture
-def cache(dummy_serializer: httpx_cache.BaseSerializer):
+def cache(null_serializer: httpx_cache.BaseSerializer):
     return httpx_cache.DictCache(
-        serializer=dummy_serializer, data={TEST_REQUEST_KEY: TEST_RESPONSE}
+        serializer=null_serializer, data={TEST_REQUEST_KEY: TEST_RESPONSE}
     )
 
 
 @pytest.fixture
-def async_cache(dummy_serializer: httpx_cache.BaseSerializer):
+def async_cache(null_serializer: httpx_cache.BaseSerializer):
     return httpx_cache.AsyncDictCache(
-        serializer=dummy_serializer, data={TEST_REQUEST_KEY: TEST_RESPONSE}
+        serializer=null_serializer, data={TEST_REQUEST_KEY: TEST_RESPONSE}
     )
 
 
@@ -123,8 +128,20 @@ async def test_async_dict_cache_delete_not_found(
 
 @pytest.mark.parametrize(
     "serializer",
-    [httpx_cache.IdentitySerializer(), httpx_cache.MsgPackSerializer()],
-    ids=["IdentitySerializer", "MsgPackSerializer"],
+    [
+        httpx_cache.DictSerializer(),
+        httpx_cache.MsgPackSerializer(),
+        httpx_cache.StringSerializer(),
+        httpx_cache.BytesSerializer(),
+        httpx_cache.NullSerializer(),
+    ],
+    ids=[
+        "DictSerializer",
+        "MsgPackSerializer",
+        "StringSerializer",
+        "BytesSerializer",
+        "NullSerializer",
+    ],
 )
 def test_dict_cache_with_serializer(serializer: httpx_cache.BaseSerializer):
 
@@ -157,8 +174,20 @@ def test_dict_cache_with_serializer(serializer: httpx_cache.BaseSerializer):
 
 @pytest.mark.parametrize(
     "serializer",
-    [httpx_cache.IdentitySerializer(), httpx_cache.MsgPackSerializer()],
-    ids=["IdentitySerializer", "MsgPackSerializer"],
+    [
+        httpx_cache.DictSerializer(),
+        httpx_cache.MsgPackSerializer(),
+        httpx_cache.StringSerializer(),
+        httpx_cache.BytesSerializer(),
+        httpx_cache.NullSerializer(),
+    ],
+    ids=[
+        "DictSerializer",
+        "MsgPackSerializer",
+        "StringSerializer",
+        "BytesSerializer",
+        "NullSerializer",
+    ],
 )
 async def test_async_dict_cache_with_serializer(serializer: httpx_cache.BaseSerializer):
 
@@ -191,8 +220,20 @@ async def test_async_dict_cache_with_serializer(serializer: httpx_cache.BaseSeri
 
 @pytest.mark.parametrize(
     "serializer",
-    [httpx_cache.IdentitySerializer(), httpx_cache.MsgPackSerializer()],
-    ids=["IdentitySerializer", "MsgPackSerializer"],
+    [
+        httpx_cache.DictSerializer(),
+        httpx_cache.MsgPackSerializer(),
+        httpx_cache.StringSerializer(),
+        httpx_cache.BytesSerializer(),
+        httpx_cache.NullSerializer(),
+    ],
+    ids=[
+        "DictSerializer",
+        "MsgPackSerializer",
+        "StringSerializer",
+        "BytesSerializer",
+        "NullSerializer",
+    ],
 )
 def test_dict_cache_streaming_response_with_serializer(
     serializer: httpx_cache.BaseSerializer, streaming_body
@@ -236,8 +277,20 @@ def test_dict_cache_streaming_response_with_serializer(
 
 @pytest.mark.parametrize(
     "serializer",
-    [httpx_cache.IdentitySerializer(), httpx_cache.MsgPackSerializer()],
-    ids=["IdentitySerializer", "MsgPackSerializer"],
+    [
+        httpx_cache.DictSerializer(),
+        httpx_cache.MsgPackSerializer(),
+        httpx_cache.StringSerializer(),
+        httpx_cache.BytesSerializer(),
+        httpx_cache.NullSerializer(),
+    ],
+    ids=[
+        "DictSerializer",
+        "MsgPackSerializer",
+        "StringSerializer",
+        "BytesSerializer",
+        "NullSerializer",
+    ],
 )
 async def test_async_dict_cache_streaming_response_with_serializer(
     serializer: httpx_cache.BaseSerializer, async_streaming_body

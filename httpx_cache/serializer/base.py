@@ -39,6 +39,9 @@ class BaseSerializer(ABC):
             state.pop("is_stream_consumed", None)
             state.pop("_num_bytes_downloaded", None)
 
+        # remove request if in state
+        state.pop("_request", None)
+
         # get state of headers
         headers = state.get("headers")
         assert isinstance(headers, httpx.Headers)
@@ -64,7 +67,11 @@ class BaseSerializer(ABC):
         status_code = state.pop("status_code")
         headers = state.pop("headers", None)
         stream_content = state.pop("stream_content", None)
+        if isinstance(stream_content, str):
+            stream_content = stream_content.encode("utf-8")
         stream = None if stream_content is None else httpx.ByteStream(stream_content)
+        if isinstance(state.get("_content"), str):
+            state["_content"] = state["_content"].encode("utf-8")
 
         response = httpx.Response(status_code, stream=stream, headers=headers)
         for name, value in state.items():
@@ -100,9 +107,19 @@ class BaseSerializer(ABC):
         """
 
 
-class IdentitySerializer(BaseSerializer):
-    def serialize(self, data: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
+class NullSerializer(BaseSerializer):
+    def dumps(
+        self, *, response: httpx.Response, content: tp.Optional[bytes] = None
+    ) -> httpx.Response:
+        return response
+
+    def loads(
+        self, *, data: httpx.Response, request: tp.Optional[httpx.Request] = None
+    ) -> httpx.Response:
         return data
 
+    def serialize(self, data: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
+        """Do Nothing."""
+
     def deserialize(self, data: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
-        return data
+        """Do Nothing."""

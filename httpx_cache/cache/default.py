@@ -12,9 +12,7 @@ from httpx_cache.serializer.common import MsgPackSerializer
 
 @attr.s
 class DictCache(BaseCache):
-    lock: threading.Lock = attr.ib(
-        init=False, factory=threading.Lock, repr=False, eq=False, order=False
-    )
+    lock = threading.Lock()
     data: tp.Dict[str, tp.Any] = attr.ib(
         kw_only=True, factory=dict, validator=attr.validators.instance_of(dict)
     )
@@ -49,9 +47,7 @@ class DictCache(BaseCache):
 
 @attr.s
 class AsyncDictCache(AsyncBaseCache):
-    lock: anyio.Lock = attr.ib(
-        init=False, factory=anyio.Lock, repr=False, eq=False, order=False
-    )
+    lock = anyio.Lock()
     data: tp.Dict[str, tp.Any] = attr.ib(
         kw_only=True, factory=dict, validator=attr.validators.instance_of(dict)
     )

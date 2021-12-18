@@ -4,15 +4,6 @@ import pytest
 from httpx_cache.transport.base import CacheControlTransportMixin
 
 
-def test_cache_control_transport_mixin_is_request_cacheable_with_headers(
-    httpx_headers_cacheable,
-):
-    headers, expected = httpx_headers_cacheable
-    request = httpx.Request("GET", "http://testurl", headers=headers)
-    mixin = CacheControlTransportMixin()
-    assert mixin.is_request_cacheable(request) is expected
-
-
 def test_cache_control_transport_mixin_is_request_cacheable_with_relative_url():
     request = httpx.Request("GET", "/items")
     mixin = CacheControlTransportMixin()
@@ -30,13 +21,28 @@ def test_cache_control_transport_mixin_is_request_cacheable_with_method(
     assert mixin.is_request_cacheable(request) is expected
 
 
-def test_cache_control_transport_mixin_is_response_cacheable_with_headers(
-    httpx_headers: httpx.Headers,
-):
-    expected = False if any(v == "no-store" for _, v in httpx_headers.items()) else True
-    request = httpx.Response(200, headers=httpx_headers)
+def test_cache_control_transport_mixin_is_request_cacheable_with_no_cache_headers():
+    request = httpx.Request(
+        "GET", "http://testurl", headers={"cache-control": "no-cache"}
+    )
     mixin = CacheControlTransportMixin()
-    assert mixin.is_response_cacheable(request) is expected
+    assert mixin.is_request_cacheable(request) is False
+
+
+def test_cache_control_transport_mixin_is_request_cacheable_with_no_store_headers():
+    request = httpx.Request(
+        "GET", "http://testurl", headers={"cache-control": "no-store"}
+    )
+    mixin = CacheControlTransportMixin()
+    assert mixin.is_request_cacheable(request) is False
+
+
+def test_cache_control_transport_mixin_is_request_cacheable_with_max_age_0_headers():
+    request = httpx.Request(
+        "GET", "http://testurl", headers={"cache-control": "max-age=0"}
+    )
+    mixin = CacheControlTransportMixin()
+    assert mixin.is_request_cacheable(request) is False
 
 
 @pytest.mark.parametrize(
@@ -46,6 +52,12 @@ def test_cache_control_transport_mixin_is_response_cacheable_with_headers(
 def test_cache_control_transport_mixin_is_response_cacheable_with_status_code(
     status_code, cacheable_status_codes, expected
 ):
-    request = httpx.Response(status_code)
+    response = httpx.Response(status_code)
     mixin = CacheControlTransportMixin(cacheable_status_codes=cacheable_status_codes)
-    assert mixin.is_response_cacheable(request) is expected
+    assert mixin.is_response_cacheable(response) is expected
+
+
+def test_cache_control_transport_mixin_is_response_cacheable_with_no_store_headers():
+    response = httpx.Response(200, headers={"cache-control": "no-store"})
+    mixin = CacheControlTransportMixin()
+    assert mixin.is_response_cacheable(response) is False

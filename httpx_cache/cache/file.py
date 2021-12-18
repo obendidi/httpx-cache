@@ -28,13 +28,7 @@ def gen_cache_filepath(cache_dir: str, request: httpx.Request) -> str:
 
 @attr.s
 class FileCache(BaseCache):
-    lock: fasteners.ReaderWriterLock = attr.ib(
-        init=False,
-        factory=fasteners.ReaderWriterLock,
-        repr=False,
-        eq=False,
-        order=False,
-    )
+    lock = fasteners.ReaderWriterLock()
     serializer: BaseSerializer = attr.ib(
         kw_only=True,
         factory=MsgPackSerializer,
@@ -77,13 +71,7 @@ class FileCache(BaseCache):
 
 @attr.s
 class AsyncFileCache(AsyncBaseCache):
-    lock: anyio.Lock = attr.ib(
-        init=False,
-        factory=anyio.Lock,
-        repr=False,
-        eq=False,
-        order=False,
-    )
+    lock = anyio.Lock()
     serializer: BaseSerializer = attr.ib(
         kw_only=True,
         factory=MsgPackSerializer,

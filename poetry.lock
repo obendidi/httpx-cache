@@ -215,17 +215,6 @@ optional = false
 python-versions = ">=3.6, <3.7"
 
 [[package]]
-name = "decopatch"
-version = "1.4.8"
-description = "Create decorators easily in python."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-makefun = ">=1.5.0"
-
-[[package]]
 name = "distlib"
 version = "0.3.4"
 description = "Distribution utilities"
@@ -441,14 +430,6 @@ docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)", "jaraco.tide
 testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [[package]]
-name = "makefun"
-version = "1.12.1"
-description = "Small library to dynamically create python functions."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "mccabe"
 version = "0.6.1"
 description = "McCabe checker, plugin for flake8"
@@ -658,18 +639,6 @@ toml = "*"
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
-name = "pytest-cases"
-version = "3.6.5"
-description = "Separate test code from test cases in pytest."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-decopatch = "*"
-makefun = ">=1.9.5"
-
-[[package]]
 name = "pytest-cov"
 version = "3.0.0"
 description = "Pytest plugin for measuring coverage."
@@ -683,6 +652,17 @@ pytest = ">=4.6"
 
 [package.extras]
 testing = ["fields", "hunter", "process-tests", "six", "pytest-xdist", "virtualenv"]
+
+[[package]]
+name = "pytest-lazy-fixture"
+version = "0.6.3"
+description = "It helps to use fixtures in pytest.mark.parametrize"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+pytest = ">=3.2.5"
 
 [[package]]
 name = "pywin32-ctypes"
@@ -967,7 +947,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<4.0"
-content-hash = "f84cd72f1bd9990e5e097bfb6b77328fbbff6e957d4c714264bb4027d164b7ac"
+content-hash = "24489f9ba865c6412499389364aa0fd304d26824c9610b4c4e65d844ee5570ad"
 
 [metadata.files]
 anyio = [
@@ -1148,10 +1128,6 @@ dataclasses = [
     {file = "dataclasses-0.8-py3-none-any.whl", hash = "sha256:0201d89fa866f68c8ebd9d08ee6ff50c0b255f8ec63a71c16fda7af82bb887bf"},
     {file = "dataclasses-0.8.tar.gz", hash = "sha256:8479067f342acf957dc82ec415d355ab5edb7e7646b90dc6e2fd1d96ad084c97"},
 ]
-decopatch = [
-    {file = "decopatch-1.4.8-py2.py3-none-any.whl", hash = "sha256:29a74d5d753423b188d5b537532da4f4b88e33ddccb95a8a20a5eff5b13265d4"},
-    {file = "decopatch-1.4.8.tar.gz", hash = "sha256:c66b0815f15db04de7bb52b0b276432b76b7346fe7046f28033f48a14340d144"},
-]
 distlib = [
     {file = "distlib-0.3.4-py2.py3-none-any.whl", hash = "sha256:6564fe0a8f51e734df6333d08b8b94d4ea8ee6b99b5ed50613f731fd4089f34b"},
     {file = "distlib-0.3.4.zip", hash = "sha256:e4b58818180336dc9c529bfb9a0b58728ffc09ad92027a3f30b7cd91e3458579"},
@@ -1244,10 +1220,6 @@ jeepney = [
 keyring = [
     {file = "keyring-23.4.0-py3-none-any.whl", hash = "sha256:3dc0f66062a4f8f6f2ce30d6a516e6e623e6c3c2e76864204ceaf64695408f07"},
     {file = "keyring-23.4.0.tar.gz", hash = "sha256:88f206024295e3c6fb16bb0a60fb4bb7ec1185629dc5a729f12aa7c236d01387"},
-]
-makefun = [
-    {file = "makefun-1.12.1-py2.py3-none-any.whl", hash = "sha256:639ac01a68ddd76ab156ca435bcd89dab25c717fb09af23f1563dc26362b4dcc"},
-    {file = "makefun-1.12.1.tar.gz", hash = "sha256:4d0e90ca3fdbdeb6a4a0891e2da7d4b8e80386e19e6db91ce29b8aa5c876ecfe"},
 ]
 mccabe = [
     {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
@@ -1378,13 +1350,13 @@ pytest = [
     {file = "pytest-6.2.5-py3-none-any.whl", hash = "sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134"},
     {file = "pytest-6.2.5.tar.gz", hash = "sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89"},
 ]
-pytest-cases = [
-    {file = "pytest-cases-3.6.5.tar.gz", hash = "sha256:2597d023a7606051d651b08cb870fbf1e062f6cbe8579ce45fcf3b57dc452cdc"},
-    {file = "pytest_cases-3.6.5-py2.py3-none-any.whl", hash = "sha256:19dc38fb83bd1597d627b2c52b993a27d6b56f30d66297aec314033d81703b47"},
-]
 pytest-cov = [
     {file = "pytest-cov-3.0.0.tar.gz", hash = "sha256:e7f0f5b1617d2210a2cabc266dfe2f4c75a8d32fb89eafb7ad9d06f6d076d470"},
     {file = "pytest_cov-3.0.0-py3-none-any.whl", hash = "sha256:578d5d15ac4a25e5f961c938b85a05b09fdaae9deef3bb6de9a6e766622ca7a6"},
+]
+pytest-lazy-fixture = [
+    {file = "pytest-lazy-fixture-0.6.3.tar.gz", hash = "sha256:0e7d0c7f74ba33e6e80905e9bfd81f9d15ef9a790de97993e34213deb5ad10ac"},
+    {file = "pytest_lazy_fixture-0.6.3-py3-none-any.whl", hash = "sha256:e0b379f38299ff27a653f03eaa69b08a6fd4484e46fd1c9907d984b9f9daeda6"},
 ]
 pywin32-ctypes = [
     {file = "pywin32-ctypes-0.2.0.tar.gz", hash = "sha256:24ffc3b341d457d48e8922352130cf2644024a4ff09762a2261fd34c36ee5942"},

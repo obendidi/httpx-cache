@@ -1,3 +1,4 @@
+import json
 import typing as tp
 
 import attr
@@ -94,3 +95,12 @@ class ByteStreamWrapper(httpx.ByteStream):
             self.content.extend(chunk)
             yield chunk
         await self.callback(bytes(self.content))
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    """Custom json encoder to decode bytes."""
+
+    def default(self, obj: tp.Any) -> tp.Any:
+        if isinstance(obj, bytes):
+            return obj.decode("utf-8")
+        return super().default(obj)

@@ -1,5 +1,5 @@
 """
-We run a suite of tests on the IdentitySerializer to make sure we are able to
+We run a suite of tests on the DictSerializer to make sure we are able to
 reconstruct exactly the same response from the serialized dict, and that bot original
 and cached response behave similiary.
 
@@ -23,21 +23,21 @@ class StreamingBody:
 
 
 @pytest.fixture(scope="module")
-def serializer() -> httpx_cache.IdentitySerializer:
-    return httpx_cache.IdentitySerializer()
+def serializer() -> httpx_cache.DictSerializer:
+    return httpx_cache.DictSerializer()
 
 
-def test_indentity_serializer_serialize(serializer: httpx_cache.IdentitySerializer):
+def test_indentity_serializer_serialize(serializer: httpx_cache.DictSerializer):
     data = {"some-key": "some-value"}
     assert serializer.serialize(data) == data
 
 
-def test_indentity_serializer_deserialize(serializer: httpx_cache.IdentitySerializer):
+def test_indentity_serializer_deserialize(serializer: httpx_cache.DictSerializer):
     data = {"some-key": "some-value"}
     assert serializer.deserialize(data) == data
 
 
-def test_response_content(serializer: httpx_cache.IdentitySerializer):
+def test_response_content(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, content=b"Hello, world!")
     cached = serializer.loads(data=serializer.dumps(response=response))
     assert response.status_code == cached.status_code
@@ -48,14 +48,14 @@ def test_response_content(serializer: httpx_cache.IdentitySerializer):
     assert response.is_closed and cached.is_closed
 
 
-def test_response_content_with_request(serializer: httpx_cache.IdentitySerializer):
+def test_response_content_with_request(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, content=b"Hello, world!")
     request = httpx.Request("GET", "http://testurl")
     cached = serializer.loads(data=serializer.dumps(response=response), request=request)
     assert cached.request is request
 
 
-def test_response_text(serializer: httpx_cache.IdentitySerializer):
+def test_response_text(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, text="Hello, world!")
     cached = serializer.loads(data=serializer.dumps(response=response))
     expected_headers = {
@@ -69,7 +69,7 @@ def test_response_text(serializer: httpx_cache.IdentitySerializer):
     assert response.headers == cached.headers == expected_headers
 
 
-def test_response_html(serializer: httpx_cache.IdentitySerializer):
+def test_response_html(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, html="<html><body>Hello, world!</html></body>")
     cached = serializer.loads(data=serializer.dumps(response=response))
     expected_headers = {
@@ -82,7 +82,7 @@ def test_response_html(serializer: httpx_cache.IdentitySerializer):
     assert response.headers == cached.headers == expected_headers
 
 
-def test_response_json(serializer: httpx_cache.IdentitySerializer):
+def test_response_json(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, json={"hello": "world"})
     cached = serializer.loads(data=serializer.dumps(response=response))
     expected_headers = {
@@ -95,7 +95,7 @@ def test_response_json(serializer: httpx_cache.IdentitySerializer):
     assert response.headers == cached.headers == expected_headers
 
 
-def test_response_content_type_encoding(serializer: httpx_cache.IdentitySerializer):
+def test_response_content_type_encoding(serializer: httpx_cache.DictSerializer):
     headers = {"Content-Type": "text-plain; charset=latin-1"}
     content = "Latin 1: ÿ".encode("latin-1")
     response = httpx.Response(
@@ -108,7 +108,7 @@ def test_response_content_type_encoding(serializer: httpx_cache.IdentitySerializ
     assert response.encoding == cached.encoding
 
 
-def test_response_autodetect_encoding(serializer: httpx_cache.IdentitySerializer):
+def test_response_autodetect_encoding(serializer: httpx_cache.DictSerializer):
     content = "おはようございます。".encode("utf-8")
     response = httpx.Response(
         200,
@@ -119,7 +119,7 @@ def test_response_autodetect_encoding(serializer: httpx_cache.IdentitySerializer
     assert response.encoding is cached.encoding is None
 
 
-def test_response_fallback_to_autodetect(serializer: httpx_cache.IdentitySerializer):
+def test_response_fallback_to_autodetect(serializer: httpx_cache.DictSerializer):
     headers = {"Content-Type": "text-plain; charset=invalid-codec-name"}
     content = "おはようございます。".encode("utf-8")
     response = httpx.Response(
@@ -133,7 +133,7 @@ def test_response_fallback_to_autodetect(serializer: httpx_cache.IdentitySeriali
 
 
 def test_response_no_charset_with_ascii_content(
-    serializer: httpx_cache.IdentitySerializer,
+    serializer: httpx_cache.DictSerializer,
 ):
     content = b"Hello, world!"
     headers = {"Content-Type": "text/plain"}
@@ -148,7 +148,7 @@ def test_response_no_charset_with_ascii_content(
 
 
 def test_response_no_charset_with_utf8_content(
-    serializer: httpx_cache.IdentitySerializer,
+    serializer: httpx_cache.DictSerializer,
 ):
     content = "Unicode Snowman: ☃".encode("utf-8")
     headers = {"Content-Type": "text/plain"}
@@ -163,7 +163,7 @@ def test_response_no_charset_with_utf8_content(
 
 
 def test_response_no_charset_with_iso_8859_1_content(
-    serializer: httpx_cache.IdentitySerializer,
+    serializer: httpx_cache.DictSerializer,
 ):
     content = "Accented: Österreich abcdefghijklmnopqrstuzwxyz".encode("iso-8859-1")
     headers = {"Content-Type": "text/plain"}
@@ -179,7 +179,7 @@ def test_response_no_charset_with_iso_8859_1_content(
 
 
 def test_response_no_charset_with_cp_1252_content(
-    serializer: httpx_cache.IdentitySerializer,
+    serializer: httpx_cache.DictSerializer,
 ):
     content = "Euro Currency: € abcdefghijklmnopqrstuzwxyz".encode("cp1252")
     headers = {"Content-Type": "text/plain"}
@@ -194,7 +194,7 @@ def test_response_no_charset_with_cp_1252_content(
     assert response.apparent_encoding is cached.apparent_encoding is not None
 
 
-def test_response_non_text_encoding(serializer: httpx_cache.IdentitySerializer):
+def test_response_non_text_encoding(serializer: httpx_cache.DictSerializer):
     headers = {"Content-Type": "image/png"}
     response = httpx.Response(
         200,
@@ -206,7 +206,7 @@ def test_response_non_text_encoding(serializer: httpx_cache.IdentitySerializer):
     assert response.encoding is cached.encoding is None
 
 
-def test_response_set_explicit_encoding(serializer: httpx_cache.IdentitySerializer):
+def test_response_set_explicit_encoding(serializer: httpx_cache.DictSerializer):
     headers = {
         "Content-Type": "text-plain; charset=utf-8"
     }  # Deliberately incorrect charset
@@ -221,7 +221,7 @@ def test_response_set_explicit_encoding(serializer: httpx_cache.IdentitySerializ
     assert response.encoding == cached.encoding == "latin-1"
 
 
-def test_response_force_encoding(serializer: httpx_cache.IdentitySerializer):
+def test_response_force_encoding(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(
         200,
         content="Snowman: ☃".encode("utf-8"),
@@ -232,7 +232,7 @@ def test_response_force_encoding(serializer: httpx_cache.IdentitySerializer):
     assert response.encoding == cached.encoding == "iso-8859-1"
 
 
-def test_json_with_specified_encoding(serializer: httpx_cache.IdentitySerializer):
+def test_json_with_specified_encoding(serializer: httpx_cache.DictSerializer):
     data = {"greeting": "hello", "recipient": "world"}
     content = json.dumps(data).encode("utf-16")
     headers = {"Content-Type": "application/json, charset=utf-16"}
@@ -245,7 +245,7 @@ def test_json_with_specified_encoding(serializer: httpx_cache.IdentitySerializer
     assert cached.json() == data
 
 
-def test_json_with_options(serializer: httpx_cache.IdentitySerializer):
+def test_json_with_options(serializer: httpx_cache.DictSerializer):
     data = {"greeting": "hello", "recipient": "world", "amount": 1}
     content = json.dumps(data).encode("utf-16")
     headers = {"Content-Type": "application/json, charset=utf-16"}
@@ -272,7 +272,7 @@ def test_json_with_options(serializer: httpx_cache.IdentitySerializer):
     ],
 )
 def test_json_without_specified_charset(
-    encoding: str, serializer: httpx_cache.IdentitySerializer
+    encoding: str, serializer: httpx_cache.DictSerializer
 ):
     data = {"greeting": "hello", "recipient": "world"}
     content = json.dumps(data).encode(encoding)
@@ -300,7 +300,7 @@ def test_json_without_specified_charset(
     ],
 )
 def test_json_with_specified_charset(
-    encoding: str, serializer: httpx_cache.IdentitySerializer
+    encoding: str, serializer: httpx_cache.DictSerializer
 ):
     data = {"greeting": "hello", "recipient": "world"}
     content = json.dumps(data).encode(encoding)
@@ -314,7 +314,7 @@ def test_json_with_specified_charset(
     assert cached.json() == data
 
 
-def test_read(serializer: httpx_cache.IdentitySerializer):
+def test_read(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(
         200,
         content=b"Hello, world!",
@@ -325,7 +325,7 @@ def test_read(serializer: httpx_cache.IdentitySerializer):
     assert content == cached_content
 
 
-def test_empty_read(serializer: httpx_cache.IdentitySerializer):
+def test_empty_read(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200)
     cached = serializer.loads(data=serializer.dumps(response=response))
     assert response.text == cached.text == ""
@@ -334,7 +334,7 @@ def test_empty_read(serializer: httpx_cache.IdentitySerializer):
     assert content == cached_content == cached.content == b""
 
 
-async def test_aread(serializer: httpx_cache.IdentitySerializer):
+async def test_aread(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(
         200,
         content=b"Hello, world!",
@@ -346,7 +346,7 @@ async def test_aread(serializer: httpx_cache.IdentitySerializer):
     assert content == cached_content == cached.content == b"Hello, world!"
 
 
-async def test_empty_aread(serializer: httpx_cache.IdentitySerializer):
+async def test_empty_aread(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200)
     cached = serializer.loads(data=serializer.dumps(response=response))
     assert response.text == cached.text == ""
@@ -356,14 +356,14 @@ async def test_empty_aread(serializer: httpx_cache.IdentitySerializer):
 
 
 def test_iter_raw_request_not_read_error(
-    serializer: httpx_cache.IdentitySerializer, streaming_body
+    serializer: httpx_cache.DictSerializer, streaming_body
 ):
     response = httpx.Response(200, content=streaming_body)
     with pytest.raises(httpx.ResponseNotRead):
         serializer.loads(data=serializer.dumps(response=response))
 
 
-def test_iter_raw(serializer: httpx_cache.IdentitySerializer, streaming_body):
+def test_iter_raw(serializer: httpx_cache.DictSerializer, streaming_body):
     # We create a response with a streamig body response
     response = httpx.Response(200, content=streaming_body)
     # as long as we don't run the .read() method, we will have no content
@@ -418,7 +418,7 @@ def test_iter_raw(serializer: httpx_cache.IdentitySerializer, streaming_body):
 
 
 def test_iter_raw_with_chunksize(
-    serializer: httpx_cache.IdentitySerializer, streaming_body
+    serializer: httpx_cache.DictSerializer, streaming_body
 ):
     # same as test above but we skip most of the checks since already done
     response = httpx.Response(200, content=streaming_body)
@@ -446,7 +446,7 @@ def test_iter_raw_with_chunksize(
     assert original_parts == cached_parts == [b"Hello", b", wor", b"ld!"]
 
 
-def test_iter_raw_on_iterable(serializer: httpx_cache.IdentitySerializer):
+def test_iter_raw_on_iterable(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, content=StreamingBody())
     store = {}
 
@@ -474,9 +474,7 @@ def test_iter_raw_on_iterable(serializer: httpx_cache.IdentitySerializer):
     assert cached_content == original_content
 
 
-async def test_aiter_raw(
-    serializer: httpx_cache.IdentitySerializer, async_streaming_body
-):
+async def test_aiter_raw(serializer: httpx_cache.DictSerializer, async_streaming_body):
     response = httpx.Response(200, content=async_streaming_body)
     store = {}
 
@@ -505,7 +503,7 @@ async def test_aiter_raw(
 
 
 async def test_aiter_raw_with_chunksize(
-    serializer: httpx_cache.IdentitySerializer, async_streaming_body
+    serializer: httpx_cache.DictSerializer, async_streaming_body
 ):
     # same as test above but we skip most of the checks since already done
     response = httpx.Response(200, content=async_streaming_body)
@@ -533,7 +531,7 @@ async def test_aiter_raw_with_chunksize(
     assert original_parts == cached_parts == [b"Hello", b", wor", b"ld!"]
 
 
-def test_iter_bytes(serializer: httpx_cache.IdentitySerializer):
+def test_iter_bytes(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, content=b"Hello, world!")
     cached = serializer.loads(data=serializer.dumps(response=response))
 
@@ -544,7 +542,7 @@ def test_iter_bytes(serializer: httpx_cache.IdentitySerializer):
 
 
 def test_iter_bytes_with_chunk_size(
-    serializer: httpx_cache.IdentitySerializer, streaming_body
+    serializer: httpx_cache.DictSerializer, streaming_body
 ):
     response = httpx.Response(200, content=streaming_body)
     store = {}
@@ -571,14 +569,14 @@ def test_iter_bytes_with_chunk_size(
     assert original_parts == cached_parts == [b"Hello", b", wor", b"ld!"]
 
 
-def test_iter_bytes_with_empty_response(serializer: httpx_cache.IdentitySerializer):
+def test_iter_bytes_with_empty_response(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, content=b"")
     cached = serializer.loads(data=serializer.dumps(response=response))
     parts = [part for part in cached.iter_bytes()]
     assert parts == []
 
 
-async def test_aiter_bytes(serializer: httpx_cache.IdentitySerializer):
+async def test_aiter_bytes(serializer: httpx_cache.DictSerializer):
     response = httpx.Response(200, content=b"Hello, world!")
     cached = serializer.loads(data=serializer.dumps(response=response))
 
@@ -589,7 +587,7 @@ async def test_aiter_bytes(serializer: httpx_cache.IdentitySerializer):
 
 
 async def test_aiter_bytes_with_chunk_size(
-    serializer: httpx_cache.IdentitySerializer, async_streaming_body
+    serializer: httpx_cache.DictSerializer, async_streaming_body
 ):
     response = httpx.Response(200, content=async_streaming_body)
     store = {}
@@ -617,7 +615,7 @@ async def test_aiter_bytes_with_chunk_size(
 
 
 def test_sync_streaming_response(
-    serializer: httpx_cache.IdentitySerializer, streaming_body
+    serializer: httpx_cache.DictSerializer, streaming_body
 ):
     response = httpx.Response(200, content=streaming_body)
     store = {}
@@ -641,7 +639,7 @@ def test_sync_streaming_response(
 
 
 async def test_async_streaming_response(
-    serializer: httpx_cache.IdentitySerializer, async_streaming_body
+    serializer: httpx_cache.DictSerializer, async_streaming_body
 ):
     response = httpx.Response(200, content=async_streaming_body)
     store = {}
@@ -680,7 +678,7 @@ async def test_async_streaming_response(
         ),
     ],
 )
-def test_link_headers(headers, expected, serializer: httpx_cache.IdentitySerializer):
+def test_link_headers(headers, expected, serializer: httpx_cache.DictSerializer):
     response = httpx.Response(
         200,
         content=None,
@@ -691,7 +689,7 @@ def test_link_headers(headers, expected, serializer: httpx_cache.IdentitySeriali
 
 
 def test_generator_with_transfer_encoding_header(
-    serializer: httpx_cache.IdentitySerializer,
+    serializer: httpx_cache.DictSerializer,
 ):
     def content():
         yield b"test 123"
@@ -714,7 +712,7 @@ def test_generator_with_transfer_encoding_header(
 
 
 def test_generator_with_content_length_header(
-    serializer: httpx_cache.IdentitySerializer,
+    serializer: httpx_cache.DictSerializer,
 ):
     def content():
         yield b"test 123"
