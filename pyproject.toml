@@ -47,6 +47,7 @@ trio = "^0.19.0"
 trio-typing = "^0.6.0"
 respx = "^0.19.0"
 twine = "^3.7.1"
+mock = { version = "^4.0.3", python = "<3.8" }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
