@@ -885,6 +885,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "types-mock"
+version = "4.0.4"
+description = "Typing stubs for mock"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "typing-extensions"
 version = "4.0.1"
 description = "Backported and Experimental Type Hints for Python 3.6+"
@@ -949,7 +957,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<4.0"
-content-hash = "e8f5c978a686cb95f82017bd60edddba566ee61c8505894ee69a9c357651db29"
+content-hash = "92587bfc8ddf8073e113df9b52d46ba4f5840e3e340fd1b256794405e78811c7"
 
 [metadata.files]
 anyio = [
@@ -1490,6 +1498,10 @@ typed-ast = [
     {file = "typed_ast-1.4.3-cp39-cp39-win32.whl", hash = "sha256:209596a4ec71d990d71d5e0d312ac935d86930e6eecff6ccc7007fe54d703808"},
     {file = "typed_ast-1.4.3-cp39-cp39-win_amd64.whl", hash = "sha256:9c6d1a54552b5330bc657b7ef0eae25d00ba7ffe85d9ea8ae6540d2197a3788c"},
     {file = "typed_ast-1.4.3.tar.gz", hash = "sha256:fb1bbeac803adea29cedd70781399c99138358c26d05fcbd23c13016b7f5ec65"},
+]
+types-mock = [
+    {file = "types-mock-4.0.4.tar.gz", hash = "sha256:b29a0d14b167ec83842b4c7c59201a1cc2eed7e603e894d0ccfeafc9a2646e31"},
+    {file = "types_mock-4.0.4-py3-none-any.whl", hash = "sha256:d51f75ea6732355cb400c3146adb4472d33203430639230c2ceac8816b9734ab"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.0.1-py3-none-any.whl", hash = "sha256:7f001e5ac290a0c0401508864c7ec868be4e701886d5b573a9528ed3973d9d3b"},
