@@ -13,6 +13,10 @@ It is is heavily insipired by:
 
 This project supports the latest version of httpx (at of the time of writing): `httpx@0.21.1`, when `httpx` releases a v1 version, the update should be straithforward for this project.
 
+## Documentation
+
+Full documentation is available at [https://obendidi.github.io/httpx-cache/](https://obendidi.github.io/httpx-cache/)
+
 ## Installation
 
 Using pip:
@@ -20,19 +24,6 @@ Using pip:
 ```sh
 pip install httpx-cache
 ```
-
-Using poetry:
-
-```sh
-poetry add httpx-cache
-```
-
-## Features
-
-- In memory dict cache store
-- Support for cache-controle headers
-- Sync cache transport for httpx
-- Async cache transport for httpx
 
 ## Quickstart
 
