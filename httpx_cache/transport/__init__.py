@@ -1,4 +1,2 @@
-from httpx_cache.transport.default import (
-    AsyncCacheControlTransport,
-    CacheControlTransport,
-)
+from httpx_cache.transport._async import AsyncCacheControlTransport
+from httpx_cache.transport._sync import CacheControlTransport

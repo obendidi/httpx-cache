@@ -1,57 +1,54 @@
 import typing as tp
 from abc import ABC, abstractmethod
 
-import attr
 import httpx
 
-from httpx_cache.serializer import Serializer
-from httpx_cache.serializer.base import BaseSerializer
+
+def gen_cache_key(request: httpx.Request) -> str:
+    return str(request.url)
 
 
-@attr.s
-class BaseCacheMixin:
-    serializer: BaseSerializer = attr.ib(kw_only=True, factory=Serializer, repr=False)
-
-    @classmethod
-    def gen_key(cls, request: httpx.Request) -> str:
-        return str(request.url)
-
-
-@attr.s
-class BaseCache(ABC, BaseCacheMixin):
+class BaseCache(ABC):
     @abstractmethod
     def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        pass
+        """Get response from cache if available else None."""
 
     @abstractmethod
     def set(
-        self, *, request: httpx.Request, response: httpx.Response, content: bytes
+        self,
+        *,
+        request: httpx.Request,
+        response: httpx.Response,
+        content: tp.Optional[bytes] = None
     ) -> None:
-        pass
+        """Set a response in cache."""
 
     @abstractmethod
     def delete(self, request: httpx.Request) -> None:
-        pass
+        """Delete a Respnse form cache."""
 
     def close(self) -> None:
-        pass
+        """Close cache."""
 
 
-@attr.s
-class AsyncBaseCache(ABC, BaseCacheMixin):
+class AsyncBaseCache(ABC):
     @abstractmethod
     async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        pass
+        """Get response from cache if available else None."""
 
     @abstractmethod
     async def aset(
-        self, *, request: httpx.Request, response: httpx.Response, content: bytes
+        self,
+        *,
+        request: httpx.Request,
+        response: httpx.Response,
+        content: tp.Optional[bytes] = None
     ) -> None:
-        pass
+        """Set a response in cache."""
 
     @abstractmethod
     async def adelete(self, request: httpx.Request) -> None:
-        pass
+        """Delete a Respnse form cache."""
 
     async def aclose(self) -> None:
-        pass
+        """Close cache."""

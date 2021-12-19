@@ -43,11 +43,12 @@ flake8 = "^4.0.1"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 pre-commit = "^2.15.0"
-pytest-cases = "^3.6.5"
 trio = "^0.19.0"
 trio-typing = "^0.6.0"
 respx = "^0.19.0"
 twine = "^3.7.1"
+mock = "^4.0.3"
+types-mock = "^4.0.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
