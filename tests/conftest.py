@@ -1,17 +1,4 @@
-import os
-import shutil
-import typing as tp
-
 import pytest
-
-TEST_CACHE_DIR = os.path.join(os.path.dirname(__file__), "__cache__")
-
-
-@pytest.fixture(scope="session")
-def cache_dir() -> tp.Generator[str, None, None]:
-    yield TEST_CACHE_DIR
-    if os.path.isdir(TEST_CACHE_DIR):
-        shutil.rmtree(TEST_CACHE_DIR)
 
 
 @pytest.fixture

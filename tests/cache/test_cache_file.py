@@ -1,4 +1,6 @@
 import os
+import shutil
+import typing as tp
 import uuid
 from unittest import mock
 
@@ -18,6 +20,15 @@ pytestmark = pytest.mark.anyio
 TEST_REQUEST = httpx.Request("GET", "http://testurl")
 ENCODED_REQ_URL = "e60261b34e117e33a1e985ac506a7a9076f92e7033082750ce20c80a"
 TEST_RESPONSE = httpx.Response(status_code=200, content=str(uuid.uuid4()).encode())
+
+TEST_CACHE_DIR = os.path.join(os.path.dirname(__file__), "__cache__")
+
+
+@pytest.fixture(scope="module")
+def cache_dir() -> tp.Generator[str, None, None]:
+    yield TEST_CACHE_DIR
+    if os.path.isdir(TEST_CACHE_DIR):
+        shutil.rmtree(TEST_CACHE_DIR)
 
 
 @pytest.fixture(scope="module")
