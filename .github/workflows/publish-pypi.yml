@@ -1,5 +1,8 @@
 name: Publish Python 🐍 distributions 📦 to PyPI
-on: push
+on:
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build-n-publish:
@@ -32,7 +35,6 @@ jobs:
       #              Publish to Pypi
       #----------------------------------------------
       - name: Publish to PyPI
-        if: startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
