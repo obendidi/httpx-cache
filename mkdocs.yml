@@ -1,0 +1,24 @@
+site_name: HTTPX-CACHE
+site_description: Simple caching transport for httpx.
+site_url: https://obendidi.github.io/httpx-cache/
+
+repo_name: obendidi/httpx-cache
+repo_url: https://github.com/obendidi/httpx-cache
+edit_uri: ""
+
+theme:
+  name: "material"
+
+nav:
+  - Introduction: "index.md"
+  - User Guide: "guide.md"
+  - Developper Interface: "api.md"
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      css_class: highlight
+  - mkautodoc
+
+extra_css:
+  - css/custom.css
