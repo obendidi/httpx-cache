@@ -6,15 +6,7 @@
     :docstring:
     :members:
 
-::: httpx_cache.AsyncDictCache
-    :docstring:
-    :members:
-
 ::: httpx_cache.FileCache
-    :docstring:
-    :members:
-
-::: httpx_cache.AsyncFileCache
     :docstring:
     :members:
 
@@ -22,15 +14,7 @@
 
 ## Serializer
 
-::: httpx_cache.NullSerializer
-    :docstring:
-    :members:
-
-::: httpx_cache.StringSerializer
-    :docstring:
-    :members:
-
-::: httpx_cache.BytesSerializer
+::: httpx_cache.MsgPackSerializer
     :docstring:
     :members:
 
@@ -38,16 +22,20 @@
     :docstring:
     :members:
 
-::: httpx_cache.MsgPackSerializer
+::: httpx_cache.StringJsonSerializer
+    :docstring:
+    :members:
+
+::: httpx_cache.BytesJsonSerializer
     :docstring:
     :members:
 
 ## Transports
 
-::: httpx_cache.CacheControlTransport
+<!-- ::: httpx_cache.CacheControlTransport
     :docstring:
     :members:
 
 ::: httpx_cache.AsyncCacheControlTransport
     :docstring:
-    :members:
+    :members: -->

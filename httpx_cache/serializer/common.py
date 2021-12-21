@@ -1,41 +1,169 @@
 import json
 import typing as tp
 
+import httpx
 import msgpack
 
 from httpx_cache.serializer.base import BaseSerializer
-from httpx_cache.utils import CustomJSONEncoder
-
-
-class MsgPackSerializer(BaseSerializer):
-    """Simple serializer to bytes using msgpack."""
-
-    def serialize(self, data: tp.Dict[str, tp.Any]) -> str:
-        return msgpack.dumps(data, use_bin_type=True)
-
-    def deserialize(self, data: str) -> tp.Dict[str, tp.Any]:
-        return msgpack.loads(data, raw=False)
 
 
 class DictSerializer(BaseSerializer):
-    def serialize(self, data: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
-        return data
+    """Dumps and loads and httpx.Response into/from a python dict.
 
-    def deserialize(self, data: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
-        return data
+    The dict contains the state of the response, with all necessary info to recreate it.
+    """
+
+    def dumps(
+        self, *, response: httpx.Response, content: tp.Optional[bytes] = None
+    ) -> tp.Dict[str, tp.Any]:
+        """Converts and httpx.Response into a dict with it's state.
+
+        The goal is that this state we are able later to reconstruct the same
+        response later on.
+
+        In case the response does not yet have a '_content' property, content should
+        be provided in the optional 'content' kwarg (usually using a callback)
+
+        Args:
+            response: httpx.Response
+            content (bytes, optional): Defaults to None, should be provided in case
+                response that not have yet content.
+
+        Raises:
+            httpx.ResponseNotRead: if response does not have content and no content
+                is provided
+
+        Returns:
+            Dict[str, Any]
+        """
+        state = response.__getstate__()
+        if "_content" not in state:
+            if content is None:
+                raise httpx.ResponseNotRead()
+            state["stream_content"] = content
+            # remove info related to content if present
+            # will be populated automatically by httpx
+            # when the response will be recreated.
+            state.pop("is_stream_consumed", None)
+            state.pop("_num_bytes_downloaded", None)
+
+        # remove request if in state
+        state.pop("_request", None)
+
+        # get state of headers
+        headers = state.get("headers")
+        assert isinstance(headers, httpx.Headers)
+        state["headers"] = headers.multi_items()
+        if response.encoding:
+            state["encoding"] = response.encoding
+        return state
+
+    def loads(
+        self,
+        *,
+        cached: tp.Dict[str, tp.Any],
+        request: tp.Optional[httpx.Request] = None
+    ) -> httpx.Response:
+        """Convert a dict (contains response state) to an httpx.Response instance.
+
+        Args:
+            state: Dict of the state of teh response to create
+            request (httpx.Request, optional): Defaults to None, request to optionally
+                attach to the response
+
+        Returns:
+            httpx.Response
+        """
+        status_code = cached.pop("status_code")
+        headers = cached.pop("headers", None)
+        stream_content = cached.pop("stream_content", None)
+
+        stream = None if stream_content is None else httpx.ByteStream(stream_content)
+        response = httpx.Response(status_code, stream=stream, headers=headers)
+        for name, value in cached.items():
+            setattr(response, name, value)
+
+        if request is not None:
+            response.request = request
+        return response
 
 
-class StringSerializer(BaseSerializer):
-    def serialize(self, data: tp.Dict[str, tp.Any]) -> str:
-        return json.dumps(data, cls=CustomJSONEncoder)
+class StringJsonSerializer(DictSerializer):
+    """Serialize an httpx.Response using python Json Encoder.
 
-    def deserialize(self, data: str) -> tp.Dict[str, tp.Any]:
-        return json.loads(data)
+    Serialized data is returned as a JSON string.
+
+    The serialized data contains the state of the response, with all necessary
+    info to recreate it.
+
+    NB: bytes are automatically parsed as strings when using this serializer, when
+    recreating response the loader is smart enough to know which key/value need to
+    be bytes and not strings (like: _content/stream)
+    """
+
+    def dumps(  # type: ignore
+        self, *, response: httpx.Response, content: tp.Optional[bytes] = None
+    ) -> str:
+        """Dump an httpx.Response to json string."""
+        state = super().dumps(response=response, content=content)
+        encoding = state.get("encoding", "utf-8")
+        if isinstance(state.get("_content"), bytes):
+            state["_content"] = state["_content"].decode(encoding)
+        if isinstance(state.get("stream_content"), bytes):
+            state["stream_content"] = state["stream_content"].decode(encoding)
+
+        return json.dumps(state)
+
+    def loads(  # type: ignore
+        self, *, cached: str, request: tp.Optional[httpx.Request] = None
+    ) -> httpx.Response:
+        """Load an httpx.Response from a json string"""
+        state = json.loads(cached)
+        encoding = state.get("encoding", "utf-8")
+        if isinstance(state.get("_content"), str):
+            state["_content"] = state["_content"].encode(encoding)
+        if isinstance(state.get("stream_content"), str):
+            state["stream_content"] = state["stream_content"].encode(encoding)
+        return super().loads(cached=state, request=request)
 
 
-class BytesSerializer(StringSerializer):
-    def serialize(self, data: tp.Dict[str, tp.Any]) -> bytes:  # type: ignore[override]
-        return super().serialize(data).encode("utf-8")
+class BytesJsonSerializer(StringJsonSerializer):
+    """Same as httpx_cache.StringJsonSerializer, but converts the dumped strings
+    into bytes (encoded/decode with utf-8).
+    """
 
-    def deserialize(self, data: bytes) -> tp.Dict[str, tp.Any]:  # type: ignore[override] # noqa
-        return super().deserialize(data.decode("utf-8"))
+    def dumps(  # type: ignore
+        self, *, response: httpx.Response, content: tp.Optional[bytes] = None
+    ) -> bytes:
+        """Dump an httpx.Response to an utf-8 encoded bytes string."""
+        return super().dumps(response=response, content=content).encode("utf-8")
+
+    def loads(  # type: ignore
+        self, *, cached: bytes, request: tp.Optional[httpx.Request] = None
+    ) -> httpx.Response:
+        """Load an httpx.Response to an utf-8 encoded bytes string."""
+        return super().loads(cached=cached.decode("utf-8"), request=request)
+
+
+class MsgPackSerializer(DictSerializer):
+    """Serialize an httpx.Response using msgpack.
+
+    Serialized data is returned as a bytes.
+
+    The serialized data contains the state of the response, with all necessary
+    info to recreate it.
+    """
+
+    def dumps(  # type: ignore
+        self, *, response: httpx.Response, content: tp.Optional[bytes] = None
+    ) -> bytes:
+        """Dump an httpx.Response to msgapck bytes."""
+        return msgpack.dumps(
+            super().dumps(response=response, content=content), use_bin_type=True
+        )
+
+    def loads(  # type: ignore
+        self, *, cached: bytes, request: tp.Optional[httpx.Request] = None
+    ) -> httpx.Response:
+        """Load an httpx.Response from a msgapck bytes."""
+        return super().loads(cached=msgpack.loads(cached, raw=False), request=request)

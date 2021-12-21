@@ -1,5 +1,6 @@
-import json
+import hashlib
 import typing as tp
+from pathlib import Path
 
 import attr
 import httpx
@@ -24,9 +25,37 @@ KNOWN_DIRECTIVES = {
 }
 
 
+def get_cache_key(request: httpx.Request) -> str:
+    """Get the cache key from a request.
+
+    The cache key is the str request url.
+
+    Args:
+        request: httpx.Request
+
+    Returns:
+        str: httpx.Request.url
+    """
+    return str(request.url)
+
+
+def get_cache_filepath(cache_dir: Path, request: httpx.Request) -> Path:
+    """Get the cache filepath from a request.
+
+    Args:
+        cache_dir: pathlib.Path, path to the cache_dir
+        request: httpx.Request
+
+    Returns:
+        pathlib.Path of the cache filepath
+    """
+    filename = hashlib.sha224(get_cache_key(request).encode()).hexdigest()
+    return cache_dir / filename
+
+
 def parse_cache_control_headers(
     headers: httpx.Headers,
-) -> tp.Dict[str, tp.Union[None, int]]:
+) -> tp.Dict[str, tp.Optional[int]]:
     """Parse cache-control headers.
 
     Args:
@@ -95,12 +124,3 @@ class ByteStreamWrapper(httpx.ByteStream):
             self.content.extend(chunk)
             yield chunk
         await self.callback(bytes(self.content))
-
-
-class CustomJSONEncoder(json.JSONEncoder):
-    """Custom json encoder to decode bytes."""
-
-    def default(self, obj: tp.Any) -> tp.Any:
-        if isinstance(obj, bytes):
-            return obj.decode("utf-8")
-        return super().default(obj)

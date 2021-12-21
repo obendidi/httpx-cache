@@ -30,7 +30,6 @@ include = ["LICENSE"]
 [tool.poetry.dependencies]
 python = ">=3.6.2,<4.0"
 httpx = "^0.21.1"
-attrs = "^21.2.0"
 anyio = "^3.4.0"
 msgpack = "^1.0.3"
 fasteners = "^0.16.3"
@@ -80,7 +79,7 @@ known_first_party = ["httpx_cache"]
 known_third_party = ["httpx", "attrs", "msgpack", "anyio"]
 
 [tool.pytest.ini_options]
-addopts = "-ra -q -vv --cov=httpx_cache --cov-report=term --cov-report=xml"
+addopts = "-ra -q -x -vv --cov=httpx_cache --cov-report=term --cov-report=xml"
 
 
 [tool.coverage.run]

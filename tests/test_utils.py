@@ -1,19 +1,12 @@
-import json
 import uuid
 
 import httpx
 import pytest
 
 import httpx_cache
-from httpx_cache.utils import CustomJSONEncoder, parse_cache_control_headers
+from httpx_cache.utils import parse_cache_control_headers
 
 pytestmark = pytest.mark.anyio
-
-
-def test_custom_json_encoder():
-    data = {"key1": "str", "key2": 42, "key3": b"bytes"}
-    dumped = json.dumps(data, cls=CustomJSONEncoder)
-    assert dumped == '{"key1": "str", "key2": 42, "key3": "bytes"}'
 
 
 def test_parse_cache_control_headers_no_cache():

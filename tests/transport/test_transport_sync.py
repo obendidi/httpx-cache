@@ -1,7 +1,7 @@
 import uuid
-import mock
 
 import httpx
+import mock
 
 import httpx_cache
 

@@ -1,4 +1,15 @@
+import httpx
 import pytest
+
+
+@pytest.fixture(scope="session")
+def httpx_request():
+    return httpx.Request("GET", "http://httpx-cache")
+
+
+@pytest.fixture(scope="session")
+def httpx_response():
+    return httpx.Response(200, content=b"httpx-cache-is-awesome")
 
 
 @pytest.fixture
