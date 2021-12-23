@@ -79,7 +79,7 @@ known_first_party = ["httpx_cache"]
 known_third_party = ["httpx", "attrs", "msgpack", "anyio"]
 
 [tool.pytest.ini_options]
-addopts = "-ra -q -x -vv --cov=httpx_cache --cov-report=term --cov-report=xml"
+addopts = "-ra -q -vv --cov=httpx_cache --cov-report=term --cov-report=xml"
 
 
 [tool.coverage.run]

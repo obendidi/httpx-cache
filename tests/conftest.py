@@ -2,6 +2,11 @@ import httpx
 import pytest
 
 
+@pytest.fixture
+def tmp_path(request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory):
+    return tmp_path_factory.mktemp(request.node.name)
+
+
 @pytest.fixture(scope="session")
 def httpx_request():
     return httpx.Request("GET", "http://httpx-cache")
