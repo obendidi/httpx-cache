@@ -89,8 +89,9 @@ class FileCache(BaseCache):
 
     def delete(self, request: httpx.Request) -> None:
         filepath = get_cache_filepath(self.cache_dir, request)
-        with self.lock.write_lock():
-            filepath.unlink(missing_ok=True)
+        if filepath.is_file():
+            with self.lock.write_lock():
+                filepath.unlink()
 
     async def adelete(self, request: httpx.Request) -> None:
         filepath = anyio.Path(get_cache_filepath(self.cache_dir, request))

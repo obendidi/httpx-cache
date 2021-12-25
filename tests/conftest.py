@@ -6,12 +6,15 @@ import pytest
 from pytest_cases import case, fixture, fixture_union, parametrize_with_cases
 
 import httpx_cache
+import shutil
 
 
 @pytest.fixture
 def tmp_path(request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory):
     name = re.sub(r"[\W]", "_", request.node.name)
-    return tmp_path_factory.mktemp(name)
+    new_tmp_path = tmp_path_factory.mktemp(name)
+    yield new_tmp_path
+    shutil.rmtree(str(new_tmp_path))
 
 
 @pytest.fixture(scope="session")
