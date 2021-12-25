@@ -1,109 +1,75 @@
 import uuid
+from pathlib import Path
 
 import httpx
 import pytest
 
 import httpx_cache
-from httpx_cache.utils import parse_cache_control_headers
+from httpx_cache.utils import (
+    get_cache_filepath,
+    get_cache_key,
+    parse_cache_control_headers,
+    parse_headers_date,
+)
 
 pytestmark = pytest.mark.anyio
 
 
-def test_parse_cache_control_headers_no_cache():
-    headers = httpx.Headers([("Cache-Control", "no-cache")])
-    assert parse_cache_control_headers(headers) == {"no-cache": None}
+def test_parse_headers_date_none():
+    parsed = parse_headers_date(None)
+    assert parsed is None
 
 
-def test_parse_cache_control_headers_no_store():
-    headers = httpx.Headers(
-        [("Cache-Control", "no-store"), ("Content-Type", "text/plain")]
+def test_parse_headers_date():
+    parsed = parse_headers_date("Tue, 15 Nov 1994 12:45:26 GMT")
+    assert parsed.isoformat() == "1994-11-15T12:45:26+00:00"
+
+
+@pytest.mark.parametrize("invalid_date", ["some-str-invalid-date", "Tue", 15])
+def test_parse_headers_date_value_error(invalid_date):
+    parsed = parse_headers_date(invalid_date)
+    assert parsed is None
+
+
+def test_get_cache_key(httpx_request):
+    assert get_cache_key(httpx_request) == "http://httpx-cache"
+
+
+def test_get_cache_filepath(httpx_request):
+    cache_dir = Path("./some-relative-dir")
+    assert get_cache_filepath(cache_dir, httpx_request) == Path(
+        "some-relative-dir/5092db9fa0e037de33b24831c064396e00d79173978beef0153a0027"
     )
-    assert parse_cache_control_headers(headers) == {"no-store": None}
 
 
-def test_parse_cache_control_headers_max_age_666():
-    headers = httpx.Headers(
-        [("Cache-Control", "max-age=666"), ("Content-Type", "text/plain")]
-    )
-    assert parse_cache_control_headers(headers) == {"max-age": 666}
+def test_parse_cache_control_headers_no_cc():
+    headers = httpx.Headers([("content-type", "application/json")])
+    cc = parse_cache_control_headers(headers)
+    assert cc == {}
 
 
-def test_parse_cache_control_headers_max_age_0():
-    headers = httpx.Headers(
-        [("Cache-Control", "max-age=0"), ("Content-Type", "text/plain")]
-    )
-    assert parse_cache_control_headers(headers) == {"max-age": 0}
+def test_parse_cache_control_headers_simple_cc():
+    headers = httpx.Headers([("cache-control", "no-store")])
+    cc = parse_cache_control_headers(headers)
+    assert cc == {"no-store": None}
 
 
-def test_parse_cache_control_headers_content_type_text_plain():
-    headers = httpx.Headers([("Content-Type", "text/plain")])
-    assert parse_cache_control_headers(headers) == {}
+def test_parse_cache_control_headers_simple_cc_with_comma():
+    headers = httpx.Headers([("cache-control", "no-store,no-transform")])
+    cc = parse_cache_control_headers(headers)
+    assert cc == {"no-store": None, "no-transform": None}
 
 
-def test_parse_cache_control_headers_content_type_application_json():
-    headers = httpx.Headers([("Content-Type", "application/json")])
-    assert parse_cache_control_headers(headers) == {}
+def test_parse_cache_control_headers_simple_cc_with_digit_value():
+    headers = httpx.Headers([("cache-control", "no-store,max-age=679900")])
+    cc = parse_cache_control_headers(headers)
+    assert cc == {"no-store": None, "max-age": 679900}
 
 
-def test_parse_cache_control_headerse_max_age_invalid():
-    headers = httpx.Headers(
-        [
-            ("Cache-Control", "max-stale=aaa"),
-            ("Cache-Control", "max-age=aaa"),
-            ("Cache-Control", "max-age"),
-        ]
-    )
-    assert parse_cache_control_headers(headers) == {"max-stale": None}
-
-
-def test_parse_cache_control_headerse_no_transform():
-    headers = httpx.Headers(
-        [("Cache-Control", "no-transform"), ("Content-Type", "text/plain")]
-    )
-    assert parse_cache_control_headers(headers) == {"no-transform": None}
-
-
-def test_parse_cache_control_headerse_max_stale():
-    headers = httpx.Headers(
-        [
-            ("Cache-Control", "no-cache"),
-            ("Cache-Control", "max-age=666"),
-            ("Cache-Control", "max-stale=44"),
-        ]
-    )
-    assert parse_cache_control_headers(headers) == {
-        "max-age": 666,
-        "max-stale": None,
-        "no-cache": None,
-    }
-
-
-def test_parse_cache_control_headerse_unknown():
-    headers = httpx.Headers(
-        [
-            ("Cache-Control", "no-transform"),
-            ("Cache-Control", "max-age=666"),
-            ("Cache-Control", "unknown"),
-        ]
-    )
-    assert parse_cache_control_headers(headers) == {
-        "max-age": 666,
-        "no-transform": None,
-    }
-
-
-def test_parse_cache_control_headerse_with_comma():
-    headers = httpx.Headers(
-        [
-            ("Cache-Control", "max-age=666,proxy-revalidate,min-fresh=09"),
-            ("Content-Type", "text/plain"),
-        ]
-    )
-    assert parse_cache_control_headers(headers) == {
-        "max-age": 666,
-        "min-fresh": 9,
-        "proxy-revalidate": None,
-    }
+def test_parse_cache_control_headers_simple_cc_with_non_digit_value():
+    headers = httpx.Headers([("cache-control", "no-store,max-age=lol")])
+    cc = parse_cache_control_headers(headers)
+    assert cc == {"no-store": None, "max-age": None}
 
 
 def test_response_stream_wrapper(streaming_body):

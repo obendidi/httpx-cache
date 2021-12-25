@@ -15,18 +15,6 @@ import httpx_cache
 
 pytestmark = pytest.mark.anyio
 
-testcases = [
-    httpx_cache.DictSerializer(),
-    httpx_cache.StringJsonSerializer(),
-    httpx_cache.BytesJsonSerializer(),
-    httpx_cache.MsgPackSerializer(),
-]
-testids = [
-    "DictSerializer",
-    "StringJsonSerializer",
-    "BytesJsonSerializer",
-    "MsgPackSerializer",
-]
 testcases_encoding = [
     "utf-8",
     "utf-8-sig",
@@ -45,7 +33,6 @@ class StreamingBody:
         yield b"world!"
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_content(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, content=b"Hello, world!")
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -57,7 +44,6 @@ def test_response_content(serializer: httpx_cache.BaseSerializer):
     assert response.is_closed and cached.is_closed
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_content_with_request(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, content=b"Hello, world!")
     request = httpx.Request("GET", "http://testurl")
@@ -67,7 +53,6 @@ def test_response_content_with_request(serializer: httpx_cache.BaseSerializer):
     assert cached.request is request
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_text(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, text="Hello, world!")
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -82,7 +67,6 @@ def test_response_text(serializer: httpx_cache.BaseSerializer):
     assert response.headers == cached.headers == expected_headers
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_html(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, html="<html><body>Hello, world!</html></body>")
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -96,7 +80,6 @@ def test_response_html(serializer: httpx_cache.BaseSerializer):
     assert response.headers == cached.headers == expected_headers
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_json(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, json={"hello": "world"})
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -110,7 +93,6 @@ def test_response_json(serializer: httpx_cache.BaseSerializer):
     assert response.headers == cached.headers == expected_headers
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_content_type_encoding(serializer: httpx_cache.BaseSerializer):
     headers = {"Content-Type": "text-plain; charset=latin-1"}
     content = "Latin 1: ÿ".encode("latin-1")
@@ -124,7 +106,6 @@ def test_response_content_type_encoding(serializer: httpx_cache.BaseSerializer):
     assert response.encoding == cached.encoding
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_autodetect_encoding(serializer: httpx_cache.BaseSerializer):
     content = "おはようございます。".encode("utf-8")
     response = httpx.Response(
@@ -136,7 +117,6 @@ def test_response_autodetect_encoding(serializer: httpx_cache.BaseSerializer):
     assert response.encoding is cached.encoding is None
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_fallback_to_autodetect(serializer: httpx_cache.BaseSerializer):
     headers = {"Content-Type": "text-plain; charset=invalid-codec-name"}
     content = "おはようございます。".encode("utf-8")
@@ -150,7 +130,6 @@ def test_response_fallback_to_autodetect(serializer: httpx_cache.BaseSerializer)
     assert response.encoding is cached.encoding is None
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_no_charset_with_ascii_content(
     serializer: httpx_cache.BaseSerializer,
 ):
@@ -166,7 +145,6 @@ def test_response_no_charset_with_ascii_content(
     assert response.encoding is cached.encoding is None
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_no_charset_with_utf8_content(
     serializer: httpx_cache.BaseSerializer,
 ):
@@ -182,7 +160,6 @@ def test_response_no_charset_with_utf8_content(
     assert response.encoding is cached.encoding is None
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_no_charset_with_iso_8859_1_content(
     serializer: httpx_cache.BaseSerializer,
 ):
@@ -199,7 +176,6 @@ def test_response_no_charset_with_iso_8859_1_content(
     assert response.apparent_encoding is cached.apparent_encoding is not None
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_no_charset_with_cp_1252_content(
     serializer: httpx_cache.BaseSerializer,
 ):
@@ -216,7 +192,6 @@ def test_response_no_charset_with_cp_1252_content(
     assert response.apparent_encoding is cached.apparent_encoding is not None
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_non_text_encoding(serializer: httpx_cache.BaseSerializer):
     headers = {"Content-Type": "image/png"}
     response = httpx.Response(
@@ -229,7 +204,6 @@ def test_response_non_text_encoding(serializer: httpx_cache.BaseSerializer):
     assert response.encoding is cached.encoding is None
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_set_explicit_encoding(serializer: httpx_cache.BaseSerializer):
     headers = {
         "Content-Type": "text-plain; charset=utf-8"
@@ -245,7 +219,6 @@ def test_response_set_explicit_encoding(serializer: httpx_cache.BaseSerializer):
     assert response.encoding == cached.encoding == "latin-1"
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_response_force_encoding(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(
         200,
@@ -257,7 +230,6 @@ def test_response_force_encoding(serializer: httpx_cache.BaseSerializer):
     assert response.encoding == cached.encoding == "iso-8859-1"
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_json_with_specified_encoding(serializer: httpx_cache.BaseSerializer):
     data = {"greeting": "hello", "recipient": "world"}
     content = json.dumps(data).encode("utf-16")
@@ -271,7 +243,6 @@ def test_json_with_specified_encoding(serializer: httpx_cache.BaseSerializer):
     assert cached.json() == data
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_json_with_options(serializer: httpx_cache.BaseSerializer):
     data = {"greeting": "hello", "recipient": "world", "amount": 1}
     content = json.dumps(data).encode("utf-16")
@@ -286,7 +257,6 @@ def test_json_with_options(serializer: httpx_cache.BaseSerializer):
 
 
 @pytest.mark.parametrize("encoding", testcases_encoding, ids=testcases_encoding)
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_json_without_specified_charset(
     encoding: str, serializer: httpx_cache.BaseSerializer
 ):
@@ -303,7 +273,6 @@ def test_json_without_specified_charset(
 
 
 @pytest.mark.parametrize("encoding", testcases_encoding, ids=testcases_encoding)
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_json_with_specified_charset(
     encoding: str, serializer: httpx_cache.BaseSerializer
 ):
@@ -319,7 +288,6 @@ def test_json_with_specified_charset(
     assert cached.json() == data
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_read(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(
         200,
@@ -331,7 +299,6 @@ def test_read(serializer: httpx_cache.BaseSerializer):
     assert content == cached_content
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_empty_read(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200)
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -341,7 +308,6 @@ def test_empty_read(serializer: httpx_cache.BaseSerializer):
     assert content == cached_content == cached.content == b""
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 async def test_aread(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(
         200,
@@ -354,7 +320,6 @@ async def test_aread(serializer: httpx_cache.BaseSerializer):
     assert content == cached_content == cached.content == b"Hello, world!"
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 async def test_empty_aread(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200)
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -364,7 +329,6 @@ async def test_empty_aread(serializer: httpx_cache.BaseSerializer):
     assert content == cached_content == cached.content == b""
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_iter_raw_request_not_read_error(
     serializer: httpx_cache.BaseSerializer, streaming_body
 ):
@@ -373,7 +337,6 @@ def test_iter_raw_request_not_read_error(
         serializer.loads(cached=serializer.dumps(response=response))
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_iter_raw(serializer: httpx_cache.BaseSerializer, streaming_body):
     # We create a response with a streamig body response
     response = httpx.Response(200, content=streaming_body)
@@ -428,7 +391,6 @@ def test_iter_raw(serializer: httpx_cache.BaseSerializer, streaming_body):
     assert cached_content == original_content
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_iter_raw_with_chunksize(
     serializer: httpx_cache.BaseSerializer, streaming_body
 ):
@@ -458,7 +420,6 @@ def test_iter_raw_with_chunksize(
     assert original_parts == cached_parts == [b"Hello", b", wor", b"ld!"]
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_iter_raw_on_iterable(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, content=StreamingBody())
     store = {}
@@ -487,7 +448,6 @@ def test_iter_raw_on_iterable(serializer: httpx_cache.BaseSerializer):
     assert cached_content == original_content
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 async def test_aiter_raw(serializer: httpx_cache.BaseSerializer, async_streaming_body):
     response = httpx.Response(200, content=async_streaming_body)
     store = {}
@@ -516,7 +476,6 @@ async def test_aiter_raw(serializer: httpx_cache.BaseSerializer, async_streaming
     assert cached_content == original_content
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 async def test_aiter_raw_with_chunksize(
     serializer: httpx_cache.BaseSerializer, async_streaming_body
 ):
@@ -546,7 +505,6 @@ async def test_aiter_raw_with_chunksize(
     assert original_parts == cached_parts == [b"Hello", b", wor", b"ld!"]
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_iter_bytes(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, content=b"Hello, world!")
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -557,7 +515,6 @@ def test_iter_bytes(serializer: httpx_cache.BaseSerializer):
     assert content == b"Hello, world!"
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_iter_bytes_with_chunk_size(
     serializer: httpx_cache.BaseSerializer, streaming_body
 ):
@@ -586,7 +543,6 @@ def test_iter_bytes_with_chunk_size(
     assert original_parts == cached_parts == [b"Hello", b", wor", b"ld!"]
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_iter_bytes_with_empty_response(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, content=b"")
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -594,7 +550,6 @@ def test_iter_bytes_with_empty_response(serializer: httpx_cache.BaseSerializer):
     assert parts == []
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 async def test_aiter_bytes(serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(200, content=b"Hello, world!")
     cached = serializer.loads(cached=serializer.dumps(response=response))
@@ -605,7 +560,6 @@ async def test_aiter_bytes(serializer: httpx_cache.BaseSerializer):
     assert content == b"Hello, world!"
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 async def test_aiter_bytes_with_chunk_size(
     serializer: httpx_cache.BaseSerializer, async_streaming_body
 ):
@@ -634,7 +588,6 @@ async def test_aiter_bytes_with_chunk_size(
     assert original_parts == cached_parts == [b"Hello", b", wor", b"ld!"]
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_sync_streaming_response(
     serializer: httpx_cache.BaseSerializer, streaming_body
 ):
@@ -659,7 +612,6 @@ def test_sync_streaming_response(
     assert cached.is_closed
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 async def test_async_streaming_response(
     serializer: httpx_cache.BaseSerializer, async_streaming_body
 ):
@@ -700,7 +652,6 @@ async def test_async_streaming_response(
         ),
     ],
 )
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_link_headers(headers, expected, serializer: httpx_cache.BaseSerializer):
     response = httpx.Response(
         200,
@@ -711,7 +662,6 @@ def test_link_headers(headers, expected, serializer: httpx_cache.BaseSerializer)
     assert cached.links == expected
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_generator_with_transfer_encoding_header(
     serializer: httpx_cache.BaseSerializer,
 ):
@@ -735,7 +685,6 @@ def test_generator_with_transfer_encoding_header(
     assert cached.headers == {"Transfer-Encoding": "chunked"}
 
 
-@pytest.mark.parametrize("serializer", testcases, ids=testids)
 def test_generator_with_content_length_header(
     serializer: httpx_cache.BaseSerializer,
 ):

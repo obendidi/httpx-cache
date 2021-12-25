@@ -1,28 +1,14 @@
 import hashlib
+import logging
 import typing as tp
+from datetime import datetime
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import attr
 import httpx
-from httpx._utils import get_logger
 
-logger = get_logger(__name__)
-
-# https://tools.ietf.org/html/rfc7234#section-5.2
-KNOWN_DIRECTIVES = {
-    "max-age": (int, True),
-    "max-stale": (int, False),
-    "min-fresh": (int, True),
-    "no-cache": (None, False),
-    "no-store": (None, False),
-    "no-transform": (None, False),
-    "only-if-cached": (None, False),
-    "must-revalidate": (None, False),
-    "public": (None, False),
-    "private": (None, False),
-    "proxy-revalidate": (None, False),
-    "s-maxage": (int, True),
-}
+logger = logging.getLogger(__name__)
 
 
 def get_cache_key(request: httpx.Request) -> str:
@@ -53,6 +39,28 @@ def get_cache_filepath(cache_dir: Path, request: httpx.Request) -> Path:
     return cache_dir / filename
 
 
+def parse_headers_date(headers_date: tp.Optional[str]) -> tp.Optional[datetime]:
+    """Parse a 'Date' header and return it as an optional datetime object.
+
+    If the 'Date' doe not exist return None
+    IF there is an error usirng parsing return None
+
+    Args:
+        headers: httpx.Headers
+
+    Returns:
+        Optional[datetime]
+    """
+    if not isinstance(headers_date, str):
+        return None
+
+    try:
+        return parsedate_to_datetime(headers_date)
+    except (ValueError, TypeError) as error:
+        logger.error(error)
+        return None
+
+
 def parse_cache_control_headers(
     headers: httpx.Headers,
 ) -> tp.Dict[str, tp.Optional[int]]:
@@ -65,28 +73,18 @@ def parse_cache_control_headers(
         parsed cache-control headers as dict.
     """
 
-    parsed_cc: tp.Dict[str, tp.Any] = {}
+    cache_control: tp.Dict[str, tp.Optional[int]] = {}
     directives = headers.get_list("cache-control", split_commas=True)
     for directive in directives:
-        name, value = directive.split("=", 1) if "=" in directive else (directive, None)
-        if name not in KNOWN_DIRECTIVES:
-            logger.debug(f"Unknown cache-control directive: {name}")
-            continue
-        value_type, required = KNOWN_DIRECTIVES[name]
-        if value_type is None or not required:
-            parsed_cc[name] = None
-        elif value_type is not None:
-            if value is not None:
-                try:
-                    parsed_cc[name] = value_type(value)
-                except ValueError:
-                    logger.debug(
-                        f"Invalid value for cache-control directive: {name}."
-                        f"Expected {value_type}, got {value} ({type(value)})"
-                    )
-            elif value is None and required:
-                logger.debug(f"Missing value for cache-control directive: {name}")
-    return parsed_cc
+        if "=" in directive:
+            name, value = directive.split("=", maxsplit=1)
+            if value.isdigit():
+                cache_control[name] = int(value)
+            else:
+                cache_control[name] = None
+        else:
+            cache_control[directive] = None
+    return cache_control
 
 
 @attr.s

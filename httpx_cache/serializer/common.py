@@ -36,24 +36,23 @@ class DictSerializer(BaseSerializer):
         Returns:
             Dict[str, Any]
         """
-        state = response.__getstate__()
-        if "_content" not in state:
-            if content is None:
-                raise httpx.ResponseNotRead()
+        state: tp.Dict[str, tp.Any] = {}
+
+        # set status_code
+        state["status_code"] = response.status_code
+
+        # get content or stream_content
+        if hasattr(response, "_content"):
+            state["_content"] = response.content
+        elif content is None:
+            raise httpx.ResponseNotRead()
+        else:
             state["stream_content"] = content
-            # remove info related to content if present
-            # will be populated automatically by httpx
-            # when the response will be recreated.
-            state.pop("is_stream_consumed", None)
-            state.pop("_num_bytes_downloaded", None)
 
-        # remove request if in state
-        state.pop("_request", None)
+        # get headers
+        state["headers"] = response.headers.multi_items()
 
-        # get state of headers
-        headers = state.get("headers")
-        assert isinstance(headers, httpx.Headers)
-        state["headers"] = headers.multi_items()
+        # get encoding
         if response.encoding:
             state["encoding"] = response.encoding
         return state
@@ -74,14 +73,18 @@ class DictSerializer(BaseSerializer):
         Returns:
             httpx.Response
         """
-        status_code = cached.pop("status_code")
-        headers = cached.pop("headers", None)
-        stream_content = cached.pop("stream_content", None)
+        status_code = cached["status_code"]
+        headers = cached["headers"]
+        content = cached.get("_content")
+        stream_content = cached.get("stream_content")
+        encoding = cached.get("encoding")
 
         stream = None if stream_content is None else httpx.ByteStream(stream_content)
-        response = httpx.Response(status_code, stream=stream, headers=headers)
-        for name, value in cached.items():
-            setattr(response, name, value)
+        response = httpx.Response(
+            status_code, stream=stream, headers=headers, content=content
+        )
+        if encoding is not None:
+            response.encoding = encoding
 
         if request is not None:
             response.request = request

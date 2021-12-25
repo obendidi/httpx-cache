@@ -62,10 +62,3 @@ with httpx.Client(transport=CacheControlTransport(transport=my_transport)) as cl
 ## Examples
 
  more examples in [./examples](./examples).
-
-## TODO
-
-- [ ] support etags
-- [ ] support cache expiry dates
-- [ ] support file cach
-- [ ] support redis (sync/async) cache

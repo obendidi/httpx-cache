@@ -49,6 +49,7 @@ mock = "^4.0.3"
 types-mock = "^4.0.4"
 mkautodoc = "^0.1.0"
 mkdocs-material = "^8.1.3"
+pytest-cases = "^3.6.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -80,6 +81,8 @@ known_third_party = ["httpx", "attrs", "msgpack", "anyio"]
 
 [tool.pytest.ini_options]
 addopts = "-ra -q -vv --cov=httpx_cache --cov-report=term --cov-report=xml"
+# log_cli = true
+# log_cli_level = "DEBUG"
 
 
 [tool.coverage.run]
