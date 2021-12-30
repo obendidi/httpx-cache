@@ -12,6 +12,14 @@ _PERMANENT_REDIRECT_STATUSES = (301, 308)
 
 
 class CacheControl:
+    """Cache controller for httpx-cache.
+
+    Uses 'cache-contol' header direcrives for using/skipping cache.
+
+    If no cache-control directive is set, the cache is used by default (except if there
+    is an expires header in the response.)
+    """
+
     def __init__(
         self,
         *,
@@ -58,7 +66,18 @@ class CacheControl:
             return False
         return True
 
-    def is_response_fresh(self, *, request: httpx.Request, response: httpx.Response):
+    def is_response_fresh(
+        self, *, request: httpx.Request, response: httpx.Response
+    ) -> bool:
+        """Checks wether a cached response is fresh or not.
+
+        Args:
+            request: httpx.Request
+            response: httpx.Response
+
+        Returns:
+            True if request is fresh else False
+        """
 
         # check if response is a permanenet redirect
         if response.status_code in _PERMANENT_REDIRECT_STATUSES:
@@ -164,7 +183,7 @@ class CacheControl:
             response: httpx.Response
 
         Returns:
-            bool: wether response is cacheable or not.
+            wether response is cacheable or not.
         """
 
         if response.status_code not in self.cacheable_status_codes:

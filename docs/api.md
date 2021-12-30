@@ -10,13 +10,9 @@
     :docstring:
     :members:
 
-!!! **Note** FileCache only supports `MsgPackSerializer` and `BytesSerializer`
+!!! **Note** FileCache only supports `httpx_cache.MsgPackSerializer` and `httpx_cache.BytesJsonSerializer` serializers.
 
 ## Serializer
-
-::: httpx_cache.MsgPackSerializer
-    :docstring:
-    :members:
 
 ::: httpx_cache.DictSerializer
     :docstring:
@@ -30,12 +26,22 @@
     :docstring:
     :members:
 
-## Transports
+::: httpx_cache.MsgPackSerializer
+    :docstring:
+    :members:
 
-<!-- ::: httpx_cache.CacheControlTransport
+## CacheControl
+
+::: httpx_cache.CacheControl
+    :docstring:
+    :members:
+
+## Transport
+
+::: httpx_cache.CacheControlTransport
     :docstring:
     :members:
 
 ::: httpx_cache.AsyncCacheControlTransport
     :docstring:
-    :members: -->
+    :members:

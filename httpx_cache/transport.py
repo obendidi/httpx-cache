@@ -11,6 +11,18 @@ logger = logging.getLogger(__name__)
 
 
 class CacheControlTransport(httpx.BaseTransport, httpx.AsyncBaseTransport):
+    """Main CacheControl transport for httpx_cache.
+
+    Args:
+        transport (optional): an existing httpx (async-)transport, if no transport
+            is given, defaults to an httpx.HTTPTransport with default args.
+        cache (optional): cache to use with this transport, defaults to
+            httpx_cache.DictCache
+        cacheable_methods: methods that are allowed to be cached, defaults to ['GET']
+        cacheable_status_codes: status codes that are allowed to be cached,
+            defaults to: (200, 203, 300, 301, 308)
+    """
+
     def __init__(
         self,
         *,
@@ -111,6 +123,18 @@ class CacheControlTransport(httpx.BaseTransport, httpx.AsyncBaseTransport):
 
 
 class AsyncCacheControlTransport(CacheControlTransport):
+    """Shortcut for an Async CacheControl transport for httpx_cache.
+
+    Args:
+        transport (optional): an existing httpx async-transport, if no transport
+            is given, defaults to an httpx.AsyncHTTPTransport with default args.
+        cache (optional): cache to use with this transport, defaults to
+            httpx_cache.DictCache
+        cacheable_methods: methods that are allowed to be cached, defaults to ['GET']
+        cacheable_status_codes: status codes that are allowed to be cached,
+            defaults to: (200, 203, 300, 301, 308)
+    """
+
     def __init__(
         self,
         *,
