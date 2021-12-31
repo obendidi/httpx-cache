@@ -1,8 +1,8 @@
 import uuid
 
 import httpx
-import pytest
 import mock
+import pytest
 
 import httpx_cache
 
@@ -67,7 +67,7 @@ async def test_cache_control_transport_handle_async_request(
     cache: httpx_cache.BaseCache,
 ):
 
-    transport = httpx_cache.CacheControlTransport(
+    transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
 
@@ -123,7 +123,7 @@ async def test_cache_control_transport_handle_async_request_no_cache(
     cache: httpx_cache.BaseCache,
 ):
 
-    transport = httpx_cache.CacheControlTransport(
+    transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
 
@@ -191,7 +191,7 @@ async def test_cache_control_transport_handle_async_request_no_store(
     cache: httpx_cache.BaseCache,
 ):
 
-    transport = httpx_cache.CacheControlTransport(
+    transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
 
@@ -258,7 +258,7 @@ async def test_cache_control_transport_handle_async_request_stale_response(
     cache: httpx_cache.BaseCache,
 ):
 
-    transport = httpx_cache.CacheControlTransport(
+    transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
 
@@ -332,7 +332,7 @@ async def test_cache_control_transport_handle_async_request_with_response_stream
     cache: httpx_cache.BaseCache,
 ):
 
-    transport = httpx_cache.CacheControlTransport(
+    transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(stream_response_handler)
     )
 

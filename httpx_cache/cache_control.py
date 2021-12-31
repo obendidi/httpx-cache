@@ -135,7 +135,7 @@ class CacheControl:
 
         else:
             logger.debug(
-                "Request/Response pair have no cache-control headers. Assuming "
+                "Request/Response pair has no cache-control headers. Assuming "
                 "response is fresh!"
             )
             return True
