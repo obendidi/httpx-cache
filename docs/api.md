@@ -1,5 +1,31 @@
 # API documentation
 
+## Client
+
+::: httpx_cache.Client
+    :docstring:
+    :members:
+
+::: httpx_cache.AsyncClient
+    :docstring:
+    :members:
+
+## Transport
+
+::: httpx_cache.CacheControlTransport
+    :docstring:
+    :members:
+
+::: httpx_cache.AsyncCacheControlTransport
+    :docstring:
+    :members:
+
+## CacheControl
+
+::: httpx_cache.CacheControl
+    :docstring:
+    :members:
+
 ## Cache
 
 ::: httpx_cache.DictCache
@@ -27,21 +53,5 @@
     :members:
 
 ::: httpx_cache.MsgPackSerializer
-    :docstring:
-    :members:
-
-## CacheControl
-
-::: httpx_cache.CacheControl
-    :docstring:
-    :members:
-
-## Transport
-
-::: httpx_cache.CacheControlTransport
-    :docstring:
-    :members:
-
-::: httpx_cache.AsyncCacheControlTransport
     :docstring:
     :members:

@@ -22,50 +22,21 @@ Requires Python 3.6+ and HTTPX 0.21+.
 ### Usage with Client
 
 ```py
-import httpx
 import httpx_cache
 
-# create a default httpx_cache transport (by default it's a sync transport)
-transport = httpx_cache.CacheControlTransport()
-
-# use the httpx client with our httpx_cache transport, and that's it!
-with httpx.Client(transport=transport) as client:
+with httpx_cache.Client() as client:
   response = client.get("https://httpbin.org/get")
 ```
 
 ### Usage with AsyncClient
 
 ```py
-import httpx
 import httpx_cache
 
-# create a an async cache-control transport
-# equivalent to: transport = httpx_cache.CacheControlTransport(transport=httpx.AsyncHTTPTransport())
-transport = httpx_cache.AsyncCacheControlTransport()
-
-# use the httpx client with our httpx_cache transport, and that's it!
-async with httpx.AsyncClient(transport=transport) as client:
+async with httpx_cache.AsyncClient() as client:
   response = await client.get("https://httpbin.org/get")
 ```
 
-### Usage with custom httpx transport
-
-httpx_cache can be used with any httpx transport as long as it supports the basic methods for an httpx transport (`handle_request`, `handle_async_request`, ..):
-
-```py
-import httpx
-import httpx_cache
-
-# create an AsyncHTTPTransport with custom args
-# NOTE: an AsyncHTTPTransport should be used with an AsyncCacheControlTransport
-my_custom_transport = httpx.AsyncHTTPTransport(verify=False, http2=True, retries=10)
-
-# create a an async cache-control transport
-transport = httpx_cache.AsyncCacheControlTransport(transport=my_custom_transport)
-
-# use the httpx client with our httpx_cache transport, and that's it!
-async with httpx.AsyncClient(transport=transport) as client:
-  response = await client.get("https://httpbin.org/get")
-```
+When using `httpx-cache.Client`/`httpx_cache.AsyncClient`, the interface and features (except caching) are exactly the same as `httpx.Client`/`httpx.AsyncClient`
 
 > Read the [User Guide](./guide.md) for a complete walk-through.

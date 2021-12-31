@@ -175,6 +175,7 @@ class CacheControl:
         A respons is cacheable if:
 
             - response status_code is cacheable
+            - request method is cacheable
             - Response has no 'no-store' cache-control header
             - Request has no 'no-store' cache-control header
 
@@ -185,6 +186,19 @@ class CacheControl:
         Returns:
             wether response is cacheable or not.
         """
+        if request.url.is_relative_url:
+            logger.debug(
+                f"Only absolute urls are supported, got '{request.url}'. "
+                "Request is not cacheable!"
+            )
+            return False
+
+        if request.method not in self.cacheable_methods:
+            logger.debug(
+                f"Request method '{request.method}' is not supported, only "
+                f"'{self.cacheable_methods}' are supported. Request is not cacheable!"
+            )
+            return False
 
         if response.status_code not in self.cacheable_status_codes:
             logger.debug(
