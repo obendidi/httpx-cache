@@ -10,21 +10,21 @@
       
       
       
-        <link rel="canonical" href="https://obendidi.github.io/httpx-cache/">
+        <link rel="canonical" href="https://obendidi.github.io/httpx-cache/cache_control/">
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.3">
     
     
       
-        <title>HTTPX-CACHE</title>
+        <title>Cache Control - HTTPX-CACHE</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.edf004c2.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.edf004c2.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.e6a45f82.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
         
       
     
@@ -38,9 +38,9 @@
       
     
     
-      <link rel="stylesheet" href="css/custom.css">
+      <link rel="stylesheet" href="../css/custom.css">
     
-    <script>__md_scope=new URL(".",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#httpx-cache" class="md-skip">
+        <a href="#cache-control" class="md-skip">
           Skip to content
         </a>
       
@@ -78,7 +78,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="HTTPX-CACHE" class="md-header__button md-logo" aria-label="HTTPX-CACHE" data-md-component="logo">
+    <a href=".." title="HTTPX-CACHE" class="md-header__button md-logo" aria-label="HTTPX-CACHE" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -97,7 +97,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Cache Control
             
           </span>
         </div>
@@ -176,7 +176,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="HTTPX-CACHE" class="md-nav__button md-logo" aria-label="HTTPX-CACHE" data-md-component="logo">
+    <a href=".." title="HTTPX-CACHE" class="md-nav__button md-logo" aria-label="HTTPX-CACHE" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -205,6 +205,36 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/" class="md-nav__link">
+        User Guide
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -217,12 +247,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Introduction
+          Cache Control
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
-        Introduction
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Cache Control
       </a>
       
         
@@ -241,30 +271,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    Installation
+  <a href="#disable-checking-cache" class="md-nav__link">
+    Disable Checking Cache
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart" class="md-nav__link">
-    Quickstart
+  <a href="#disable-storing-in-cache" class="md-nav__link">
+    Disable Storing in Cache
   </a>
   
-    <nav class="md-nav" aria-label="Quickstart">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache-expiration" class="md-nav__link">
+    Cache Expiration
+  </a>
+  
+    <nav class="md-nav" aria-label="Cache Expiration">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#usage-with-client" class="md-nav__link">
-    Usage with Client
+  <a href="#max-age-directive" class="md-nav__link">
+    Max-Age Directive
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#usage-with-asyncclient" class="md-nav__link">
-    Usage with AsyncClient
+  <a href="#expires-header" class="md-nav__link">
+    Expires Header
   </a>
   
 </li>
@@ -290,37 +327,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guide/" class="md-nav__link">
-        User Guide
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="cache_control/" class="md-nav__link">
-        Cache Control
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="api/" class="md-nav__link">
+      <a href="../api/" class="md-nav__link">
         Developper Interface
       </a>
     </li>
@@ -354,30 +361,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    Installation
+  <a href="#disable-checking-cache" class="md-nav__link">
+    Disable Checking Cache
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart" class="md-nav__link">
-    Quickstart
+  <a href="#disable-storing-in-cache" class="md-nav__link">
+    Disable Storing in Cache
   </a>
   
-    <nav class="md-nav" aria-label="Quickstart">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache-expiration" class="md-nav__link">
+    Cache Expiration
+  </a>
+  
+    <nav class="md-nav" aria-label="Cache Expiration">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#usage-with-client" class="md-nav__link">
-    Usage with Client
+  <a href="#max-age-directive" class="md-nav__link">
+    Max-Age Directive
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#usage-with-asyncclient" class="md-nav__link">
-    Usage with AsyncClient
+  <a href="#expires-header" class="md-nav__link">
+    Expires Header
   </a>
   
 </li>
@@ -400,35 +414,56 @@
               
                 
 
-<h1 id="httpx-cache">HTTPX-CACHE</h1>
-<p>httpx-cache is an implementation of the caching algorithms in <a href="https://github.com/httplib2/httplib2">httplib2</a> and <a href="https://github.com/ionrock/cachecontrol">CacheControl</a> for use with <a href="https://github.com/encode/httpx">httpx</a> transport object.</p>
-<p>It is is heavily insipired by:</p>
+<h1 id="cache-control">Cache Control</h1>
+<p>By defaults <code>httpx-cache</code> caches every response that:</p>
 <ul>
-<li><a href="https://github.com/ionrock/cachecontrol">https://github.com/ionrock/cachecontrol</a></li>
-<li><a href="https://github.com/johtso/httpx-caching">https://github.com/johtso/httpx-caching</a></li>
+<li>has a cacheable status_code in <code>(200, 203, 300, 301, 308)</code> (can be modified)</li>
+<li>corresponding request has a cacheable method in <code>('GET',)</code> (can be modified)</li>
+<li>corresponding request has an absolute url</li>
 </ul>
-<h2 id="installation">Installation</h2>
-<p>Install with pip:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>$ pip install httpx-cache
+<p>Enabling/Disabling cache can also be configured at the operation level using <code>cache-control</code> headers directives (<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control">https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control</a>)</p>
+<h2 id="disable-checking-cache">Disable Checking Cache</h2>
+<p>Disabling cache on a particular request can be achieved by setting either the <code>cache-control: no-cache</code> or <code>cache-control: max-age=0</code> headers.</p>
+<blockquote>
+<p>The <code>no-cache</code> request directive asks caches to validate the response with the origin server before reuse. <code>no-cache</code> allows clients to request the most up-to-date response even if the cache has a fresh response. Browsers usually add no-cache to requests when users are force reloading a page.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4"></a>  <span class="n">response1</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span> <span class="c1"># will be cached</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a>  <span class="n">response2</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cache-control&quot;</span><span class="p">:</span> <span class="s2">&quot;no-cache&quot;</span><span class="p">})</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6"></a>  <span class="c1"># will NOT get it from cache, but it will make a new request that then will be re-cached again (refreched in the cache)</span>
 </code></pre></div>
-<p>Requires Python 3.6+ and HTTPX 0.21+.</p>
-<h2 id="quickstart">Quickstart</h2>
-<h3 id="usage-with-client">Usage with Client</h3>
+<h2 id="disable-storing-in-cache">Disable Storing in Cache</h2>
+<p>Sometimes we want to make a request but not store a response in cache. So that we always get the freshest response. This can be achieved with <code>cache-control: no-store</code> header.</p>
+<blockquote>
+<p>The no-store response/request directive indicates that any caches of any kind (private or shared) should not store this response.</p>
+</blockquote>
+<p><strong>NOTE</strong>: a <code>no-store</code> cache-control directive can also be set on the response headers by the server, in that case it will not be cached too.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4"></a>  <span class="n">response1</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cache-control&quot;</span><span class="p">:</span> <span class="s2">&quot;no-cache&quot;</span><span class="p">})</span> <span class="c1"># will not be stored in cache</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5"></a>  <span class="n">response2</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6"></a>  <span class="c1"># cache is empty since previous request was not stored, will make a new request.</span>
 </code></pre></div>
-<h3 id="usage-with-asyncclient">Usage with AsyncClient</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="k">async</span> <span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>When using <code>httpx-cache.Client</code>/<code>httpx_cache.AsyncClient</code>, the interface and features (except caching) are exactly the same as <code>httpx.Client</code>/<code>httpx.AsyncClient</code></p>
+<h2 id="cache-expiration">Cache Expiration</h2>
+<h3 id="max-age-directive">Max-Age Directive</h3>
+<p>Cache expiration can be controlled with the request (or response) <code>max-age</code> direvtive (directives found in a request take precedence over those in a response.)</p>
 <blockquote>
-<p>Read the <a href="guide/">User Guide</a> for a complete walk-through.</p>
+<p>The <code>max-age=N</code> request or response directive indicates that the client allows a stored response that is generated on the origin server within N seconds. Ff the response with <code>cache-control: max-age=604800</code> was stored in caches 3 hours ago, <code>httpx-cache</code> couldn't reuse that response.</p>
 </blockquote>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="kn">import</span> <span class="nn">time</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5"></a>  <span class="n">response1</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span> <span class="c1"># store in cache at time T</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6"></a>  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># sleep for 10s (T+10)</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7"></a>  <span class="n">response2</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cache-control&quot;</span><span class="p">:</span> <span class="s2">&quot;max-age=5&quot;</span><span class="p">})</span> <span class="c1"># response in cache has expried since T+5 &lt; T+10</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8"></a>  <span class="c1"># cached response will be deleted</span>
+</code></pre></div>
+<h3 id="expires-header">Expires Header</h3>
+<p>In addition to the <code>max-age</code> directive, we can achieve the same effect with the <code>expires</code> header.</p>
 
               
             </article>
@@ -441,15 +476,30 @@
   
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
+        
+        <a href="../guide/" class="md-footer__link md-footer__link--prev" aria-label="Previous: User Guide" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              User Guide
+            </div>
+          </div>
+        </a>
+      
       
         
-        <a href="guide/" class="md-footer__link md-footer__link--next" aria-label="Next: User Guide" rel="next">
+        <a href="../api/" class="md-footer__link md-footer__link--next" aria-label="Next: Developper Interface" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              User Guide
+              Developper Interface
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -479,10 +529,10 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.0bbba5b5.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.0bbba5b5.min.js"}</script>
     
     
-      <script src="assets/javascripts/bundle.e1a181d9.min.js"></script>
+      <script src="../assets/javascripts/bundle.e1a181d9.min.js"></script>
       
     
   </body>

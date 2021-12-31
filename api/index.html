@@ -235,6 +235,21 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../cache_control/" class="md-nav__link">
+        Cache Control
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -271,6 +286,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#client" class="md-nav__link">
+    Client
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transport" class="md-nav__link">
+    Transport
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cachecontrol" class="md-nav__link">
+    CacheControl
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cache" class="md-nav__link">
     Cache
   </a>
@@ -280,13 +316,6 @@
         <li class="md-nav__item">
   <a href="#serializer" class="md-nav__link">
     Serializer
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#transports" class="md-nav__link">
-    Transports
   </a>
   
 </li>
@@ -326,6 +355,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#client" class="md-nav__link">
+    Client
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transport" class="md-nav__link">
+    Transport
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cachecontrol" class="md-nav__link">
+    CacheControl
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#cache" class="md-nav__link">
     Cache
   </a>
@@ -335,13 +385,6 @@
         <li class="md-nav__item">
   <a href="#serializer" class="md-nav__link">
     Serializer
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#transports" class="md-nav__link">
-    Transports
   </a>
   
 </li>
@@ -360,11 +403,262 @@
                 
 
 <h1 id="api-documentation">API documentation</h1>
-<h2 id="cache">Cache</h2>
+<h2 id="client">Client</h2>
 <div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>DictCache</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=NOTHING</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">serializer=NOTHING</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>Client</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">verify=True</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cert=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">http1=True</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">http2=False</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">proxies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">mounts=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=Timeout(timeout=5.0)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=False</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">limits=Limits(max_connections=100, max_keepalive_connections=20, keepalive_expiry=5.0)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">max_redirects=20</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">event_hooks=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">base_url=''</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">transport=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">app=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">trust_env=True</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cache=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_methods=('GET',)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_status_codes=(200, 203, 300, 301, 308)</em><span class="autodoc-punctuation">)</span></div>
 <div class="autodoc-docstring"></div>
 <div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>auth</strong></code></div>
+<div class="autodoc-docstring"><p>Authentication class used when none is passed at the request-level.</p>
+<p>See also <a href="/quickstart/#authentication">Authentication</a>.</p></div>
+<div class="autodoc-signature"><code><strong>base_url</strong></code></div>
+<div class="autodoc-docstring"><p>Base URL to use when sending requests with relative URLs.</p></div>
+<div class="autodoc-signature"><code><strong>build_request</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">method</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Build and return a request instance.</p>
+<ul>
+<li>The <code>params</code>, <code>headers</code> and <code>cookies</code> arguments
+are merged with any values set on the client.</li>
+<li>The <code>url</code> argument is merged with any <code>base_url</code> set on the client.</li>
+</ul>
+<p>See also: <a href="/advanced/#request-instances">Request instances</a></p></div>
+<div class="autodoc-signature"><code><strong>close</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Close transport and proxies.</p></div>
+<div class="autodoc-signature"><code><strong>cookies</strong></code></div>
+<div class="autodoc-docstring"><p>Cookie values to include when sending requests.</p></div>
+<div class="autodoc-signature"><code><strong>delete</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>DELETE</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>event_hooks</strong></code></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>get</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>GET</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>head</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>HEAD</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>headers</strong></code></div>
+<div class="autodoc-docstring"><p>HTTP headers to include when sending requests.</p></div>
+<div class="autodoc-signature"><code><strong>is_closed</strong></code></div>
+<div class="autodoc-docstring"><p>Check if the client being closed</p></div>
+<div class="autodoc-signature"><code><strong>options</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send an <code>OPTIONS</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>params</strong></code></div>
+<div class="autodoc-docstring"><p>Query parameters to include in the URL when sending requests.</p></div>
+<div class="autodoc-signature"><code><strong>patch</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>PATCH</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>post</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>POST</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>put</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>PUT</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>request</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">method</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Build and send a request.</p>
+<p>Equivalent to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="n">request</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">build_request</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+<p>See <code>Client.build_request()</code>, <code>Client.send()</code> and
+<a href="/advanced/#merging-of-configuration">Merging of configuration</a> for how the various parameters
+are merged with client-level configuration.</p></div>
+<div class="autodoc-signature"><code><strong>send</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">stream=False</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a request.</p>
+<p>The request is sent as-is, unmodified.</p>
+<p>Typically you'll want to build one with <code>Client.build_request()</code>
+so that any client-level configuration is merged into the request,
+but passing an explicit <code>httpx.Request()</code> is supported as well.</p>
+<p>See also: <a href="/advanced/#request-instances">Request instances</a></p></div>
+<div class="autodoc-signature"><code><strong>stream</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">method</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Alternative to <code>httpx.request()</code> that streams the response body
+instead of loading it into memory at once.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p>
+<p>See also: <a href="/quickstart#streaming-responses">Streaming Responses</a></p></div>
+<div class="autodoc-signature"><code><strong>timeout</strong></code></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>trust_env</strong></code></div>
+<div class="autodoc-docstring"></div>
+</div>
+</div>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>AsyncClient</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">verify=True</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cert=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">http1=True</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">http2=False</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">proxies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">mounts=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=Timeout(timeout=5.0)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=False</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">limits=Limits(max_connections=100, max_keepalive_connections=20, keepalive_expiry=5.0)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">max_redirects=20</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">event_hooks=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">base_url=''</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">transport=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">app=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">trust_env=True</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cache=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_methods=('GET',)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_status_codes=(200, 203, 300, 301, 308)</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>aclose</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Close transport and proxies.</p></div>
+<div class="autodoc-signature"><code><strong>auth</strong></code></div>
+<div class="autodoc-docstring"><p>Authentication class used when none is passed at the request-level.</p>
+<p>See also <a href="/quickstart/#authentication">Authentication</a>.</p></div>
+<div class="autodoc-signature"><code><strong>base_url</strong></code></div>
+<div class="autodoc-docstring"><p>Base URL to use when sending requests with relative URLs.</p></div>
+<div class="autodoc-signature"><code><strong>build_request</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">method</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Build and return a request instance.</p>
+<ul>
+<li>The <code>params</code>, <code>headers</code> and <code>cookies</code> arguments
+are merged with any values set on the client.</li>
+<li>The <code>url</code> argument is merged with any <code>base_url</code> set on the client.</li>
+</ul>
+<p>See also: <a href="/advanced/#request-instances">Request instances</a></p></div>
+<div class="autodoc-signature"><code><strong>cookies</strong></code></div>
+<div class="autodoc-docstring"><p>Cookie values to include when sending requests.</p></div>
+<div class="autodoc-signature"><code><strong>delete</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>DELETE</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>event_hooks</strong></code></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>get</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>GET</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>head</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>HEAD</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>headers</strong></code></div>
+<div class="autodoc-docstring"><p>HTTP headers to include when sending requests.</p></div>
+<div class="autodoc-signature"><code><strong>is_closed</strong></code></div>
+<div class="autodoc-docstring"><p>Check if the client being closed</p></div>
+<div class="autodoc-signature"><code><strong>options</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send an <code>OPTIONS</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>params</strong></code></div>
+<div class="autodoc-docstring"><p>Query parameters to include in the URL when sending requests.</p></div>
+<div class="autodoc-signature"><code><strong>patch</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>PATCH</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>post</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>POST</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>put</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a <code>PUT</code> request.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p></div>
+<div class="autodoc-signature"><code><strong>request</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">method</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Build and send a request.</p>
+<p>Equivalent to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="n">request</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">build_request</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+<p>See <code>AsyncClient.build_request()</code>, <code>AsyncClient.send()</code>
+and <a href="/advanced/#merging-of-configuration">Merging of configuration</a> for how the various parameters
+are merged with client-level configuration.</p></div>
+<div class="autodoc-signature"><code><strong>send</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">stream=False</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Send a request.</p>
+<p>The request is sent as-is, unmodified.</p>
+<p>Typically you'll want to build one with <code>AsyncClient.build_request()</code>
+so that any client-level configuration is merged into the request,
+but passing an explicit <code>httpx.Request()</code> is supported as well.</p>
+<p>See also: <a href="/advanced/#request-instances">Request instances</a></p></div>
+<div class="autodoc-signature"><code><strong>stream</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">method</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">url</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">files=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">json=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">params=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">headers=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cookies=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">auth=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">follow_redirects=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">timeout=<httpx._client.UseClientDefault object at 0x10273cbe0></em><span class="autodoc-punctuation">, </span><em class="autodoc-param">extensions=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Alternative to <code>httpx.request()</code> that streams the response body
+instead of loading it into memory at once.</p>
+<p><strong>Parameters</strong>: See <code>httpx.request</code>.</p>
+<p>See also: <a href="/quickstart#streaming-responses">Streaming Responses</a></p></div>
+<div class="autodoc-signature"><code><strong>timeout</strong></code></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>trust_env</strong></code></div>
+<div class="autodoc-docstring"></div>
+</div>
+</div>
+<h2 id="transport">Transport</h2>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>CacheControlTransport</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">transport=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cache=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_methods=('GET',)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_status_codes=(200, 203, 300, 301, 308)</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>CacheControl transport for httpx_cache.</p>
+<p>Args:
+    transport (optional): an existing httpx transport, if no transport
+        is given, defaults to an httpx.HTTPTransport with default args.
+    cache (optional): cache to use with this transport, defaults to
+        httpx_cache.DictCache
+    cacheable_methods: methods that are allowed to be cached, defaults to ['GET']
+    cacheable_status_codes: status codes that are allowed to be cached,
+        defaults to: (200, 203, 300, 301, 308)</p></div>
+<div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>close</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>handle_request</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+</div>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>AsyncCacheControlTransport</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">transport=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cache=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_methods=('GET',)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_status_codes=(200, 203, 300, 301, 308)</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Async CacheControl transport for httpx_cache.</p>
+<p>Args:
+    transport (optional): an existing httpx async-transport, if no transport
+        is given, defaults to an httpx.AsyncHTTPTransport with default args.
+    cache (optional): cache to use with this transport, defaults to
+        httpx_cache.DictCache
+    cacheable_methods: methods that are allowed to be cached, defaults to ['GET']
+    cacheable_status_codes: status codes that are allowed to be cached,
+        defaults to: (200, 203, 300, 301, 308)</p></div>
+<div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>aclose</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>handle_async_request</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+</div>
+</div>
+<h2 id="cachecontrol">CacheControl</h2>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>CacheControl</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_methods=('GET',)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_status_codes=(200, 203, 300, 301, 308)</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Cache controller for httpx-cache.</p>
+<p>Uses 'cache-contol' header direcrives for using/skipping cache.</p>
+<p>If no cache-control directive is set, the cache is used by default (except if there
+is an expires header in the response.)</p></div>
+<div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>is_request_cacheable</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Checks if an httpx request has the necessary requirement to support caching.</p>
+<p>A request is cacheable if:</p>
+<div class="highlight"><pre><span></span><code>- url is absolute
+- method is defined as cacheable (by default only GET methods are cached)
+- request has no &#39;no-cache&#39; cache-control header directive
+- request has no &#39;max-age=0&#39; cache-control header directive
+</code></pre></div>
+
+<p>Args:
+    request: httpx.Request</p>
+<p>Returns:
+    True if request cacheable else False</p></div>
+<div class="autodoc-signature"><code><strong>is_response_cacheable</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Check if an httpx response is cacheable.</p>
+<p>A respons is cacheable if:</p>
+<div class="highlight"><pre><span></span><code>- response status_code is cacheable
+- request method is cacheable
+- Response has no &#39;no-store&#39; cache-control header
+- Request has no &#39;no-store&#39; cache-control header
+</code></pre></div>
+
+<p>Args:
+    request: httpx.Request
+    response: httpx.Response</p>
+<p>Returns:
+    wether response is cacheable or not.</p></div>
+<div class="autodoc-signature"><code><strong>is_response_fresh</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Checks wether a cached response is fresh or not.</p>
+<p>Args:
+    request: httpx.Request
+    response: httpx.Response</p>
+<p>Returns:
+    True if request is fresh else False</p></div>
+</div>
+</div>
+<h2 id="cache">Cache</h2>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>DictCache</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">data=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">serializer=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Simple in-memory dict cache.</p>
+<p>Uses a lock/async_lock to make sure each get/set/delete operation is safe.</p>
+<p>Args:
+    data: Optional initial data for the cache {str: Any}, default to {}
+    serializer: Optional serializer for the data to cache, defaults to:
+        httpx_cache.MsgPackSerializer</p></div>
+<div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>aclose</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>(Async) Close cache.</p></div>
+<div class="autodoc-signature"><code><strong>adelete</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>aget</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>aset</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><code><strong>async_lock</strong></code></div>
+<div class="autodoc-docstring"></div>
 <div class="autodoc-signature"><code><strong>close</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
 <div class="autodoc-docstring"><p>Close cache.</p></div>
 <div class="autodoc-signature"><code><strong>delete</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
@@ -378,25 +672,25 @@
 </div>
 </div>
 <div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>AsyncDictCache</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data=NOTHING</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">serializer=NOTHING</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>FileCache</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">cache_dir=None</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">serializer=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>File cache that stores cached responses in files on disk.</p>
+<p>Uses a lock/async_lock to make sure each get/set/delete operation is safe.</p>
+<p>Args:
+    cache_dir: Optional custom cache_dir where to store cache files, defaults to
+        ~/.cache/httpx-cache
+    serializer: Optional serializer for the data to cache, defaults to:
+        httpx_cache.MsgPackSerializer</p></div>
 <div class="autodoc-members">
 <div class="autodoc-signature"><code><strong>aclose</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Close cache.</p></div>
+<div class="autodoc-docstring"><p>(Async) Close cache.</p></div>
 <div class="autodoc-signature"><code><strong>adelete</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
 <div class="autodoc-docstring"></div>
 <div class="autodoc-signature"><code><strong>aget</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
 <div class="autodoc-docstring"></div>
 <div class="autodoc-signature"><code><strong>aset</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
 <div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>lock</strong></code></div>
+<div class="autodoc-signature"><code><strong>async_lock</strong></code></div>
 <div class="autodoc-docstring"></div>
-</div>
-</div>
-<div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>FileCache</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">serializer=NOTHING</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cache_dir=NOTHING</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-members">
 <div class="autodoc-signature"><code><strong>close</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
 <div class="autodoc-docstring"><p>Close cache.</p></div>
 <div class="autodoc-signature"><code><strong>delete</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
@@ -417,201 +711,76 @@ gets accepted into the python standard threading library...</p></div>
 <div class="autodoc-docstring"></div>
 </div>
 </div>
-<div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>AsyncFileCache</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">serializer=NOTHING</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cache_dir=NOTHING</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-members">
-<div class="autodoc-signature"><code><strong>aclose</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Close cache.</p></div>
-<div class="autodoc-signature"><code><strong>adelete</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>aget</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>aset</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>lock</strong></code></div>
-<div class="autodoc-docstring"></div>
-</div>
-</div>
-<p>!!! <strong>Note</strong> FileCache only supports <code>MsgPackSerializer</code> and <code>BytesSerializer</code></p>
+<p>!!! <strong>Note</strong> FileCache only supports <code>httpx_cache.MsgPackSerializer</code> and <code>httpx_cache.BytesJsonSerializer</code> serializers.</p>
 <h2 id="serializer">Serializer</h2>
 <div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>NullSerializer</strong></code><span class="autodoc-punctuation">(</span><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-members">
-<div class="autodoc-signature"><code><strong>deserialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Do Nothing.</p></div>
-<div class="autodoc-signature"><code><strong>dumps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>serialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Do Nothing.</p></div>
-</div>
-</div>
-<div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>StringSerializer</strong></code><span class="autodoc-punctuation">(</span><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-members">
-<div class="autodoc-signature"><code><strong>deserialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>dumps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Dumps amd httpx Response and serialize it to be stored in cache.</p>
-<p>The content is provided separatly because in most cases, the response contains
-a stream that completly read before caching.</p>
-<p>When used with an httpx.BaseTransport the content is generally provided via a
-callback, when the user as completly read the stream (we wrapp the response
-stream so that a callback is called when the stream is fully loaded).</p>
-<p>Usage:
-    &gt;&gt;&gt; # simplest usage.
-    &gt;&gt;&gt; resp = httpx.Response(200, ...)
-    &gt;&gt;&gt; data = Serializer().dumps(response=resp, content=resp.read())</p>
-<p>Args:
-    response: httpx.Response
-    content: optional content in bytes of the httpx.Response</p>
-<p>Returns:
-    dumped and serialized response.</p></div>
-<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Deserialize and loads an httpx.Response from serialized data.</p>
-<p>Data will first be deserialized before creating a new httpx.Response object.</p>
-<p>The bytes content will be wrapped in an httpx.ByteStream.</p>
-<p>Args:
-    data: dumped data to load</p>
-<p>Returns:
-    httpx.Response</p></div>
-<div class="autodoc-signature"><code><strong>serialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-</div>
-</div>
-<div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>BytesSerializer</strong></code><span class="autodoc-punctuation">(</span><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-members">
-<div class="autodoc-signature"><code><strong>deserialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>dumps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Dumps amd httpx Response and serialize it to be stored in cache.</p>
-<p>The content is provided separatly because in most cases, the response contains
-a stream that completly read before caching.</p>
-<p>When used with an httpx.BaseTransport the content is generally provided via a
-callback, when the user as completly read the stream (we wrapp the response
-stream so that a callback is called when the stream is fully loaded).</p>
-<p>Usage:
-    &gt;&gt;&gt; # simplest usage.
-    &gt;&gt;&gt; resp = httpx.Response(200, ...)
-    &gt;&gt;&gt; data = Serializer().dumps(response=resp, content=resp.read())</p>
-<p>Args:
-    response: httpx.Response
-    content: optional content in bytes of the httpx.Response</p>
-<p>Returns:
-    dumped and serialized response.</p></div>
-<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Deserialize and loads an httpx.Response from serialized data.</p>
-<p>Data will first be deserialized before creating a new httpx.Response object.</p>
-<p>The bytes content will be wrapped in an httpx.ByteStream.</p>
-<p>Args:
-    data: dumped data to load</p>
-<p>Returns:
-    httpx.Response</p></div>
-<div class="autodoc-signature"><code><strong>serialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-</div>
-</div>
-<div class="autodoc">
 <div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>DictSerializer</strong></code><span class="autodoc-punctuation">(</span><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
+<div class="autodoc-docstring"><p>Dumps and loads and httpx.Response into/from a python dict.</p>
+<p>The dict contains the state of the response, with all necessary info to recreate it.</p></div>
 <div class="autodoc-members">
-<div class="autodoc-signature"><code><strong>deserialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
 <div class="autodoc-signature"><code><strong>dumps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Dumps amd httpx Response and serialize it to be stored in cache.</p>
-<p>The content is provided separatly because in most cases, the response contains
-a stream that completly read before caching.</p>
-<p>When used with an httpx.BaseTransport the content is generally provided via a
-callback, when the user as completly read the stream (we wrapp the response
-stream so that a callback is called when the stream is fully loaded).</p>
-<p>Usage:
-    &gt;&gt;&gt; # simplest usage.
-    &gt;&gt;&gt; resp = httpx.Response(200, ...)
-    &gt;&gt;&gt; data = Serializer().dumps(response=resp, content=resp.read())</p>
+<div class="autodoc-docstring"><p>Converts and httpx.Response into a dict with it's state.</p>
+<p>The goal is that this state we are able later to reconstruct the same
+response later on.</p>
+<p>In case the response does not yet have a '_content' property, content should
+be provided in the optional 'content' kwarg (usually using a callback)</p>
 <p>Args:
     response: httpx.Response
-    content: optional content in bytes of the httpx.Response</p>
+    content (bytes, optional): Defaults to None, should be provided in case
+        response that not have yet content.</p>
+<p>Raises:
+    httpx.ResponseNotRead: if response does not have content and no content
+        is provided</p>
 <p>Returns:
-    dumped and serialized response.</p></div>
-<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Deserialize and loads an httpx.Response from serialized data.</p>
-<p>Data will first be deserialized before creating a new httpx.Response object.</p>
-<p>The bytes content will be wrapped in an httpx.ByteStream.</p>
+    Dict[str, Any]</p></div>
+<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cached</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Convert a dict (contains response state) to an httpx.Response instance.</p>
 <p>Args:
-    data: dumped data to load</p>
+    state: Dict of the state of teh response to create
+    request (httpx.Request, optional): Defaults to None, request to optionally
+        attach to the response</p>
 <p>Returns:
     httpx.Response</p></div>
-<div class="autodoc-signature"><code><strong>serialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
+</div>
+</div>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>StringJsonSerializer</strong></code><span class="autodoc-punctuation">(</span><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Serialize an httpx.Response using python Json Encoder.</p>
+<p>Serialized data is returned as a JSON string.</p>
+<p>The serialized data contains the state of the response, with all necessary
+info to recreate it.</p>
+<p>NB: bytes are automatically parsed as strings when using this serializer, when
+recreating response the loader is smart enough to know which key/value need to
+be bytes and not strings (like: _content/stream)</p></div>
+<div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>dumps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Dump an httpx.Response to json string.</p></div>
+<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cached</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Load an httpx.Response from a json string</p></div>
+</div>
+</div>
+<div class="autodoc">
+<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>BytesJsonSerializer</strong></code><span class="autodoc-punctuation">(</span><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Same as httpx_cache.StringJsonSerializer, but converts the dumped strings
+into bytes (encoded/decode with utf-8).</p></div>
+<div class="autodoc-members">
+<div class="autodoc-signature"><code><strong>dumps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Dump an httpx.Response to an utf-8 encoded bytes string.</p></div>
+<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cached</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Load an httpx.Response to an utf-8 encoded bytes string.</p></div>
 </div>
 </div>
 <div class="autodoc">
 <div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>MsgPackSerializer</strong></code><span class="autodoc-punctuation">(</span><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Simple serializer to bytes using msgpack.</p></div>
+<div class="autodoc-docstring"><p>Serialize an httpx.Response using msgpack.</p>
+<p>Serialized data is returned as a bytes.</p>
+<p>The serialized data contains the state of the response, with all necessary
+info to recreate it.</p></div>
 <div class="autodoc-members">
-<div class="autodoc-signature"><code><strong>deserialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
 <div class="autodoc-signature"><code><strong>dumps</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">content=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Dumps amd httpx Response and serialize it to be stored in cache.</p>
-<p>The content is provided separatly because in most cases, the response contains
-a stream that completly read before caching.</p>
-<p>When used with an httpx.BaseTransport the content is generally provided via a
-callback, when the user as completly read the stream (we wrapp the response
-stream so that a callback is called when the stream is fully loaded).</p>
-<p>Usage:
-    &gt;&gt;&gt; # simplest usage.
-    &gt;&gt;&gt; resp = httpx.Response(200, ...)
-    &gt;&gt;&gt; data = Serializer().dumps(response=resp, content=resp.read())</p>
-<p>Args:
-    response: httpx.Response
-    content: optional content in bytes of the httpx.Response</p>
-<p>Returns:
-    dumped and serialized response.</p></div>
-<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"><p>Deserialize and loads an httpx.Response from serialized data.</p>
-<p>Data will first be deserialized before creating a new httpx.Response object.</p>
-<p>The bytes content will be wrapped in an httpx.ByteStream.</p>
-<p>Args:
-    data: dumped data to load</p>
-<p>Returns:
-    httpx.Response</p></div>
-<div class="autodoc-signature"><code><strong>serialize</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">data</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-</div>
-</div>
-<h2 id="transports">Transports</h2>
-<div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>CacheControlTransport</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_methods=('GET',)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_status_codes=(200, 203, 300, 301, 308)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">transport=NOTHING</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cache=NOTHING</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-members">
-<div class="autodoc-signature"><code><strong>close</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>handle_request</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>is_request_cacheable</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>is_response_cacheable</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-</div>
-</div>
-<div class="autodoc">
-<div class="autodoc-signature"><em>class </em><code>httpx_cache.<strong>AsyncCacheControlTransport</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_methods=('GET',)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cacheable_status_codes=(200, 203, 300, 301, 308)</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">transport=NOTHING</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cache=NOTHING</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-members">
-<div class="autodoc-signature"><code><strong>aclose</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>handle_async_request</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>is_request_cacheable</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
-<div class="autodoc-signature"><code><strong>is_response_cacheable</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">response</em><span class="autodoc-punctuation">)</span></div>
-<div class="autodoc-docstring"></div>
+<div class="autodoc-docstring"><p>Dump an httpx.Response to msgapck bytes.</p></div>
+<div class="autodoc-signature"><code><strong>loads</strong></code><span class="autodoc-punctuation">(</span><em class="autodoc-param">self</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">*</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">cached</em><span class="autodoc-punctuation">, </span><em class="autodoc-param">request=None</em><span class="autodoc-punctuation">)</span></div>
+<div class="autodoc-docstring"><p>Load an httpx.Response from a msgapck bytes.</p></div>
 </div>
 </div>
 
@@ -627,7 +796,7 @@ stream so that a callback is called when the stream is fully loaded).</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../guide/" class="md-footer__link md-footer__link--prev" aria-label="Previous: User Guide" rel="prev">
+        <a href="../cache_control/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Cache Control" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -636,7 +805,7 @@ stream so that a callback is called when the stream is fully loaded).</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              User Guide
+              Cache Control
             </div>
           </div>
         </a>
