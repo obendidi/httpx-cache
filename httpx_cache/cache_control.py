@@ -12,6 +12,14 @@ _PERMANENT_REDIRECT_STATUSES = (301, 308)
 
 
 class CacheControl:
+    """Cache controller for httpx-cache.
+
+    Uses 'cache-contol' header direcrives for using/skipping cache.
+
+    If no cache-control directive is set, the cache is used by default (except if there
+    is an expires header in the response.)
+    """
+
     def __init__(
         self,
         *,
@@ -58,7 +66,18 @@ class CacheControl:
             return False
         return True
 
-    def is_response_fresh(self, *, request: httpx.Request, response: httpx.Response):
+    def is_response_fresh(
+        self, *, request: httpx.Request, response: httpx.Response
+    ) -> bool:
+        """Checks wether a cached response is fresh or not.
+
+        Args:
+            request: httpx.Request
+            response: httpx.Response
+
+        Returns:
+            True if request is fresh else False
+        """
 
         # check if response is a permanenet redirect
         if response.status_code in _PERMANENT_REDIRECT_STATUSES:
@@ -116,7 +135,7 @@ class CacheControl:
 
         else:
             logger.debug(
-                "Request/Response pair have no cache-control headers. Assuming "
+                "Request/Response pair has no cache-control headers. Assuming "
                 "response is fresh!"
             )
             return True
@@ -156,6 +175,7 @@ class CacheControl:
         A respons is cacheable if:
 
             - response status_code is cacheable
+            - request method is cacheable
             - Response has no 'no-store' cache-control header
             - Request has no 'no-store' cache-control header
 
@@ -164,8 +184,21 @@ class CacheControl:
             response: httpx.Response
 
         Returns:
-            bool: wether response is cacheable or not.
+            wether response is cacheable or not.
         """
+        if request.url.is_relative_url:
+            logger.debug(
+                f"Only absolute urls are supported, got '{request.url}'. "
+                "Request is not cacheable!"
+            )
+            return False
+
+        if request.method not in self.cacheable_methods:
+            logger.debug(
+                f"Request method '{request.method}' is not supported, only "
+                f"'{self.cacheable_methods}' are supported. Request is not cacheable!"
+            )
+            return False
 
         if response.status_code not in self.cacheable_status_codes:
             logger.debug(

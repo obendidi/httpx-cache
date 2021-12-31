@@ -25,17 +25,21 @@ def get_cache_key(request: httpx.Request) -> str:
     return str(request.url)
 
 
-def get_cache_filepath(cache_dir: Path, request: httpx.Request) -> Path:
+def get_cache_filepath(
+    cache_dir: Path, request: httpx.Request, extra: str = ""
+) -> Path:
     """Get the cache filepath from a request.
 
     Args:
         cache_dir: pathlib.Path, path to the cache_dir
         request: httpx.Request
+        extra: an extra string to add to filename before encoding it.
 
     Returns:
         pathlib.Path of the cache filepath
     """
-    filename = hashlib.sha224(get_cache_key(request).encode()).hexdigest()
+    buffer = (get_cache_key(request) + extra).encode()
+    filename = hashlib.sha224(buffer).hexdigest()
     return cache_dir / filename
 
 

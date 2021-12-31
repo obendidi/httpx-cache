@@ -1,4 +1,5 @@
 import re
+import shutil
 from pathlib import Path
 
 import httpx
@@ -6,7 +7,6 @@ import pytest
 from pytest_cases import case, fixture, fixture_union, parametrize_with_cases
 
 import httpx_cache
-import shutil
 
 
 @pytest.fixture

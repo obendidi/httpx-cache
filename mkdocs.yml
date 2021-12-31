@@ -12,6 +12,7 @@ theme:
 nav:
   - Introduction: "index.md"
   - User Guide: "guide.md"
+  - Cache Control: "cache_control.md"
   - Developper Interface: "api.md"
 
 markdown_extensions:
@@ -19,6 +20,15 @@ markdown_extensions:
   - codehilite:
       css_class: highlight
   - mkautodoc
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
 
 extra_css:
   - css/custom.css

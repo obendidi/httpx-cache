@@ -10,11 +10,23 @@ from httpx_cache.utils import ByteStreamWrapper
 logger = logging.getLogger(__name__)
 
 
-class CacheControlTransport(httpx.BaseTransport, httpx.AsyncBaseTransport):
+class CacheControlTransport(httpx.BaseTransport):
+    """CacheControl transport for httpx_cache.
+
+    Args:
+        transport (optional): an existing httpx transport, if no transport
+            is given, defaults to an httpx.HTTPTransport with default args.
+        cache (optional): cache to use with this transport, defaults to
+            httpx_cache.DictCache
+        cacheable_methods: methods that are allowed to be cached, defaults to ['GET']
+        cacheable_status_codes: status codes that are allowed to be cached,
+            defaults to: (200, 203, 300, 301, 308)
+    """
+
     def __init__(
         self,
         *,
-        transport: tp.Union[None, httpx.BaseTransport, httpx.AsyncBaseTransport] = None,
+        transport: tp.Optional[httpx.BaseTransport] = None,
         cache: tp.Optional[BaseCache] = None,
         cacheable_methods: tp.Tuple[str, ...] = ("GET",),
         cacheable_status_codes: tp.Tuple[int, ...] = (200, 203, 300, 301, 308),
@@ -29,10 +41,6 @@ class CacheControlTransport(httpx.BaseTransport, httpx.AsyncBaseTransport):
     def close(self):
         self.cache.close()
         self.transport.close()
-
-    async def aclose(self):
-        await self.cache.aclose()
-        await self.transport.aclose()
 
     def handle_request(self, request: httpx.Request) -> httpx.Response:
         # check if request is cacheable
@@ -52,7 +60,6 @@ class CacheControlTransport(httpx.BaseTransport, httpx.AsyncBaseTransport):
             logger.debug("No valid cached response found in cache...")
 
         # Request is not in cache, call original transport
-        assert isinstance(self.transport, httpx.BaseTransport)
         response = self.transport.handle_request(request)
 
         if self.controller.is_response_cacheable(request=request, response=response):
@@ -71,6 +78,39 @@ class CacheControlTransport(httpx.BaseTransport, httpx.AsyncBaseTransport):
         setattr(response, "from_cache", False)
         return response
 
+
+class AsyncCacheControlTransport(httpx.AsyncBaseTransport):
+    """Async CacheControl transport for httpx_cache.
+
+    Args:
+        transport (optional): an existing httpx async-transport, if no transport
+            is given, defaults to an httpx.AsyncHTTPTransport with default args.
+        cache (optional): cache to use with this transport, defaults to
+            httpx_cache.DictCache
+        cacheable_methods: methods that are allowed to be cached, defaults to ['GET']
+        cacheable_status_codes: status codes that are allowed to be cached,
+            defaults to: (200, 203, 300, 301, 308)
+    """
+
+    def __init__(
+        self,
+        *,
+        transport: tp.Optional[httpx.AsyncBaseTransport] = None,
+        cache: tp.Optional[BaseCache] = None,
+        cacheable_methods: tp.Tuple[str, ...] = ("GET",),
+        cacheable_status_codes: tp.Tuple[int, ...] = (200, 203, 300, 301, 308),
+    ):
+        self.controller = CacheControl(
+            cacheable_methods=cacheable_methods,
+            cacheable_status_codes=cacheable_status_codes,
+        )
+        self.transport = transport or httpx.AsyncHTTPTransport()
+        self.cache = cache or DictCache()
+
+    async def aclose(self):
+        await self.cache.aclose()
+        await self.transport.aclose()
+
     async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
         # check if request is cacheable
         if self.controller.is_request_cacheable(request):
@@ -88,7 +128,6 @@ class CacheControlTransport(httpx.BaseTransport, httpx.AsyncBaseTransport):
                     await self.cache.adelete(request)
 
         # Request is not in cache, call original transport
-        assert isinstance(self.transport, httpx.AsyncBaseTransport)
         response = await self.transport.handle_async_request(request)
 
         if self.controller.is_response_cacheable(request=request, response=response):
@@ -108,21 +147,3 @@ class CacheControlTransport(httpx.BaseTransport, httpx.AsyncBaseTransport):
                 )
         setattr(response, "from_cache", False)
         return response
-
-
-class AsyncCacheControlTransport(CacheControlTransport):
-    def __init__(
-        self,
-        *,
-        transport: tp.Optional[httpx.AsyncBaseTransport] = None,
-        cache: tp.Optional[BaseCache] = None,
-        cacheable_methods: tp.Tuple[str, ...] = ("GET",),
-        cacheable_status_codes: tp.Tuple[int, ...] = (200, 203, 300, 301, 308),
-    ):
-        transport = transport or httpx.AsyncHTTPTransport()
-        super().__init__(
-            transport=transport,
-            cache=cache,
-            cacheable_methods=cacheable_methods,
-            cacheable_status_codes=cacheable_status_codes,
-        )

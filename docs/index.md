@@ -1,21 +1,11 @@
 # HTTPX-CACHE
 
-## Quickstart
+httpx-cache is an implementation of the caching algorithms in [httplib2](https://github.com/httplib2/httplib2) and [CacheControl](https://github.com/ionrock/cachecontrol) for use with [httpx](https://github.com/encode/httpx) transport object.
 
-httpx-cache is a simple utility for caching (sync/async) responses from httpx.
+It is is heavily insipired by:
 
-It provides a custom transport that can be used with any httpx Client.
-
-```py
-import httpx
-import httpx_cache
-
-transport = httpx_cache.CacheControlTransport()
-with httpx.Client(transport=transport) as client:
-  response = client.get("https://httpbin.org/get")
-```
-
-> Read the [User Guide](./guide.md) for a complete walk-through.
+- [https://github.com/ionrock/cachecontrol](https://github.com/ionrock/cachecontrol)
+- [https://github.com/johtso/httpx-caching](https://github.com/johtso/httpx-caching)
 
 ## Installation
 
@@ -26,3 +16,27 @@ $ pip install httpx-cache
 ```
 
 Requires Python 3.6+ and HTTPX 0.21+.
+
+## Quickstart
+
+### Usage with Client
+
+```py
+import httpx_cache
+
+with httpx_cache.Client() as client:
+  response = client.get("https://httpbin.org/get")
+```
+
+### Usage with AsyncClient
+
+```py
+import httpx_cache
+
+async with httpx_cache.AsyncClient() as client:
+  response = await client.get("https://httpbin.org/get")
+```
+
+When using `httpx-cache.Client`/`httpx_cache.AsyncClient`, the interface and features (except caching) are exactly the same as `httpx.Client`/`httpx.AsyncClient`
+
+> Read the [User Guide](./guide.md) for a complete walk-through.

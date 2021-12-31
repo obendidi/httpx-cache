@@ -103,6 +103,10 @@ def test_file_cache_set_get_delete(
     file_cache.delete(httpx_request)
     assert len(list(file_cache.cache_dir.glob("**/*"))) == 0
 
+    # delete with cached file not found
+    # should do nothing (not raise an error)
+    file_cache.delete(httpx_request)
+
     file_cache.close()
 
 

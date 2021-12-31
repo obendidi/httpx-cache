@@ -33,10 +33,10 @@ class DictCache(BaseCache):
         self.serializer = serializer or MsgPackSerializer()
 
         if not isinstance(self.data, dict):
-            raise TypeError(f"Excpected sel.data of type 'dict', got {type(self.data)}")
+            raise TypeError(f"Excpected data of type 'dict', got {type(self.data)}")
         if not isinstance(self.serializer, BaseSerializer):
             raise TypeError(
-                "Excpected sel.serializer of type 'httpx_cache.BaseSerializer', "
+                "Excpected serializer of type 'httpx_cache.BaseSerializer', "
                 f"got {type(self.serializer)}"
             )
 

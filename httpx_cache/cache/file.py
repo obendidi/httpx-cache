@@ -37,6 +37,7 @@ class FileCache(BaseCache):
                 "Excpected sel.serializer of type 'httpx_cache.BaseSerializer', "
                 f"got {type(self.serializer)}"
             )
+        self._extra = str(type(self.serializer).__name__)
 
         if cache_dir is None:
             cache_dir = Path.home() / ".cache/httpx-cache"
@@ -48,7 +49,7 @@ class FileCache(BaseCache):
         self.cache_dir.mkdir(exist_ok=True)
 
     def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        filepath = get_cache_filepath(self.cache_dir, request)
+        filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
         if filepath.is_file():
             with self.lock.read_lock():
                 cached = filepath.read_bytes()
@@ -56,7 +57,9 @@ class FileCache(BaseCache):
         return None
 
     async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        filepath = anyio.Path(get_cache_filepath(self.cache_dir, request))
+        filepath = anyio.Path(
+            get_cache_filepath(self.cache_dir, request, extra=self._extra)
+        )
         if await filepath.is_file():
             async with self.async_lock:
                 cached = await filepath.read_bytes()
@@ -70,7 +73,7 @@ class FileCache(BaseCache):
         response: httpx.Response,
         content: tp.Optional[bytes] = None,
     ) -> None:
-        filepath = get_cache_filepath(self.cache_dir, request)
+        filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
         to_cache = self.serializer.dumps(response=response, content=content)
         with self.lock.write_lock():
             filepath.write_bytes(to_cache)
@@ -82,18 +85,22 @@ class FileCache(BaseCache):
         response: httpx.Response,
         content: tp.Optional[bytes] = None,
     ) -> None:
-        filepath = anyio.Path(get_cache_filepath(self.cache_dir, request))
+        filepath = anyio.Path(
+            get_cache_filepath(self.cache_dir, request, extra=self._extra)
+        )
         to_cache = self.serializer.dumps(response=response, content=content)
         async with self.async_lock:
             await filepath.write_bytes(to_cache)
 
     def delete(self, request: httpx.Request) -> None:
-        filepath = get_cache_filepath(self.cache_dir, request)
+        filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
         if filepath.is_file():
             with self.lock.write_lock():
                 filepath.unlink()
 
     async def adelete(self, request: httpx.Request) -> None:
-        filepath = anyio.Path(get_cache_filepath(self.cache_dir, request))
+        filepath = anyio.Path(
+            get_cache_filepath(self.cache_dir, request, extra=self._extra)
+        )
         async with self.async_lock:
             await filepath.unlink(missing_ok=True)
