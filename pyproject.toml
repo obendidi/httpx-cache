@@ -5,8 +5,8 @@ description = "Simple caching transport for httpx."
 authors = ["Ouail Bendidi <ouail.bendidi@gmail.com>"]
 license = "BSD 3"
 readme = "README.md"
-repository = "https://github.com/bendidi/httpx-cache"
-homepage = "https://github.com/bendidi/httpx-cache"
+repository = "https://github.com/obendidi/httpx-cache"
+homepage = "https://github.com/obendidi/httpx-cache"
 keywords = ["httpx", "cache", "cache-control"]
 classifiers = [
   "Development Status :: 3 - Alpha",
