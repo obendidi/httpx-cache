@@ -36,7 +36,7 @@ fasteners = "^0.16.3"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.9b0", allow-prereleases = true}
-mypy = "^0.910"
+mypy = "^0.930"
 isort = "^5.9.3"
 flake8 = "^4.0.1"
 pytest = "^6.2.5"
