@@ -932,7 +932,7 @@ sortedcontainers = "*"
 
 [[package]]
 name = "trio-typing"
-version = "0.6.0"
+version = "0.7.0"
 description = "Static type checking support for Trio and related projects"
 category = "dev"
 optional = false
@@ -944,7 +944,7 @@ trio = ">=0.16.0"
 typing-extensions = ">=3.7.4"
 
 [package.extras]
-mypy = ["mypy (>=0.780)"]
+mypy = ["mypy (>=0.920)"]
 
 [[package]]
 name = "typed-ast"
@@ -1017,7 +1017,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<4.0"
-content-hash = "ee3e0cceb3ab190d76ce0c195aa364fd4f71edf4901a19fe8a0c0bce85df26be"
+content-hash = "4930404d73c8a9982220e80e85e4d570c4481d75fc20f054a6896d54b88b771b"
 
 [metadata.files]
 anyio = [
@@ -1597,8 +1597,8 @@ trio = [
     {file = "trio-0.19.0.tar.gz", hash = "sha256:895e318e5ec5e8cea9f60b473b6edb95b215e82d99556a03eb2d20c5e027efe1"},
 ]
 trio-typing = [
-    {file = "trio-typing-0.6.0.tar.gz", hash = "sha256:3a3088a50da53d7c169362cfcf72d9ef40c402f4366dbdbf67e1e61c23b47c42"},
-    {file = "trio_typing-0.6.0-py3-none-any.whl", hash = "sha256:29b24ddf0555052efa86a3b7c3bd4cd49c21573458290eab98083b0f7365fb44"},
+    {file = "trio-typing-0.7.0.tar.gz", hash = "sha256:5bb2184de144c15f2cc252bba4fd167125758df7339c4f7bc40538940aefa3b9"},
+    {file = "trio_typing-0.7.0-py3-none-any.whl", hash = "sha256:156ba760f444aa2f8af43f4459d462415fc297234feb27018e4e902bb62a122b"},
 ]
 typed-ast = [
     {file = "typed_ast-1.4.3-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:2068531575a125b87a41802130fa7e29f26c09a2833fea68d9a40cf33902eba6"},
