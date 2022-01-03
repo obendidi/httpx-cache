@@ -49,7 +49,7 @@ mock = "^4.0.3"
 types-mock = "^4.0.4"
 mkautodoc = "^0.1.0"
 mkdocs-material = "^8.1.4"
-pytest-cases = "^3.6.5"
+pytest-cases = "^3.6.7"
 nox = "^2021.10.1"
 rich = "^10.16.2"
 
