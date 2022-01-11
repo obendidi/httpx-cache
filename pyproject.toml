@@ -51,7 +51,7 @@ mkautodoc = "^0.1.0"
 mkdocs-material = "^8.1.4"
 pytest-cases = "^3.6.7"
 nox = "^2021.10.1"
-rich = "^10.16.2"
+rich = "^11.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
