@@ -33,6 +33,7 @@ httpx = "^0.21.1"
 anyio = "^3.4.0"
 msgpack = "^1.0.3"
 fasteners = "^0.16.3"
+attrs = "^21.4.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.9b0", allow-prereleases = true}
