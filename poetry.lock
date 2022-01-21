@@ -242,14 +242,11 @@ python-versions = "*"
 
 [[package]]
 name = "fasteners"
-version = "0.16.3"
-description = "A python package that provides useful locks."
+version = "0.17.2"
+description = "A python package that provides useful locks"
 category = "main"
 optional = false
-python-versions = "*"
-
-[package.dependencies]
-six = "*"
+python-versions = ">=3.6"
 
 [[package]]
 name = "filelock"
@@ -873,7 +870,7 @@ jupyter = ["ipywidgets (>=7.5.1,<8.0.0)"]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -1017,7 +1014,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<4.0"
-content-hash = "85b2c84fc2fafb0ee11e5499c1faf9b6c443eed434f3fa636816f2bc2f1ea251"
+content-hash = "533966f07faffc0eb25909592188c75eb964d830a1fefd2ed5aa4e9a217a346e"
 
 [metadata.files]
 anyio = [
@@ -1193,8 +1190,8 @@ distlib = [
     {file = "distlib-0.3.4.zip", hash = "sha256:e4b58818180336dc9c529bfb9a0b58728ffc09ad92027a3f30b7cd91e3458579"},
 ]
 fasteners = [
-    {file = "fasteners-0.16.3-py2.py3-none-any.whl", hash = "sha256:8408e52656455977053871990bd25824d85803b9417aa348f10ba29ef0c751f7"},
-    {file = "fasteners-0.16.3.tar.gz", hash = "sha256:b1ab4e5adfbc28681ce44b3024421c4f567e705cc3963c732bf1cba3348307de"},
+    {file = "fasteners-0.17.2-py3-none-any.whl", hash = "sha256:2a4292ca86cdac2533226a62e7dbf4078d2a561fa615d33dd18921fa1d22a1e4"},
+    {file = "fasteners-0.17.2.tar.gz", hash = "sha256:2aceacb2bd618ce8526676f7a3e84ea25d0165ef10abb574a45b4a9c07292d2e"},
 ]
 filelock = [
     {file = "filelock-3.4.0-py3-none-any.whl", hash = "sha256:2e139a228bcf56dd8b2274a65174d005c4a6b68540ee0bdbb92c76f43f29f7e8"},
