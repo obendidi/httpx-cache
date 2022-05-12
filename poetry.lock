@@ -242,7 +242,7 @@ python-versions = "*"
 
 [[package]]
 name = "fasteners"
-version = "0.17.2"
+version = "0.17.3"
 description = "A python package that provides useful locks"
 category = "main"
 optional = false
@@ -1191,8 +1191,8 @@ distlib = [
     {file = "distlib-0.3.4.zip", hash = "sha256:e4b58818180336dc9c529bfb9a0b58728ffc09ad92027a3f30b7cd91e3458579"},
 ]
 fasteners = [
-    {file = "fasteners-0.17.2-py3-none-any.whl", hash = "sha256:2a4292ca86cdac2533226a62e7dbf4078d2a561fa615d33dd18921fa1d22a1e4"},
-    {file = "fasteners-0.17.2.tar.gz", hash = "sha256:2aceacb2bd618ce8526676f7a3e84ea25d0165ef10abb574a45b4a9c07292d2e"},
+    {file = "fasteners-0.17.3-py3-none-any.whl", hash = "sha256:cae0772df265923e71435cc5057840138f4e8b6302f888a567d06ed8e1cbca03"},
+    {file = "fasteners-0.17.3.tar.gz", hash = "sha256:a9a42a208573d4074c77d041447336cf4e3c1389a256fd3e113ef59cf29b7980"},
 ]
 filelock = [
     {file = "filelock-3.4.0-py3-none-any.whl", hash = "sha256:2e139a228bcf56dd8b2274a65174d005c4a6b68540ee0bdbb92c76f43f29f7e8"},
