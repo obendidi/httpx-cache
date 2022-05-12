@@ -36,7 +36,7 @@ fasteners = ">=0.16.3,<0.18.0"
 attrs = "^21.4.0"
 
 [tool.poetry.dev-dependencies]
-black = {version = "^21.9b0", allow-prereleases = true}
+black = {version = "^22.3", allow-prereleases = true}
 mypy = "^0.931"
 isort = "^5.9.3"
 flake8 = "^4.0.1"
