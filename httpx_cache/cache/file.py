@@ -3,6 +3,7 @@ from pathlib import Path
 
 import anyio
 import fasteners
+from aiorwlock import RWLock
 import httpx
 
 from httpx_cache.cache.base import BaseCache
@@ -24,7 +25,6 @@ class FileCache(BaseCache):
     """
 
     lock = fasteners.ReaderWriterLock()
-    async_lock = anyio.Lock()
 
     def __init__(
         self,
@@ -61,7 +61,7 @@ class FileCache(BaseCache):
             get_cache_filepath(self.cache_dir, request, extra=self._extra)
         )
         if await filepath.is_file():
-            async with self.async_lock:
+            async with RWLock().reader:
                 cached = await filepath.read_bytes()
             return self.serializer.loads(request=request, cached=cached)
         return None
@@ -89,7 +89,7 @@ class FileCache(BaseCache):
             get_cache_filepath(self.cache_dir, request, extra=self._extra)
         )
         to_cache = self.serializer.dumps(response=response, content=content)
-        async with self.async_lock:
+        async with RWLock().writer:
             await filepath.write_bytes(to_cache)
 
     def delete(self, request: httpx.Request) -> None:
@@ -102,5 +102,5 @@ class FileCache(BaseCache):
         filepath = anyio.Path(
             get_cache_filepath(self.cache_dir, request, extra=self._extra)
         )
-        async with self.async_lock:
+        async with RWLock().writer:
             await filepath.unlink(missing_ok=True)

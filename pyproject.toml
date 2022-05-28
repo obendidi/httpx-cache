@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "httpx-cache"
-version = "0.4.1"
+version = "0.5.0"
 description = "Simple caching transport for httpx."
 authors = ["Ouail Bendidi <ouail.bendidi@gmail.com>"]
 license = "BSD 3"
@@ -34,6 +34,7 @@ anyio = "^3.4.0"
 msgpack = "^1.0.3"
 fasteners = ">=0.16.3,<0.18.0"
 attrs = "^21.4.0"
+aiorwlock = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.9b0", allow-prereleases = true}
