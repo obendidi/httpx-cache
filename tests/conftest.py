@@ -10,6 +10,11 @@ import httpx_cache
 
 
 @pytest.fixture
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.fixture
 def tmp_path(request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory):
     name = re.sub(r"[\W]", "_", request.node.name)
     new_tmp_path = tmp_path_factory.mktemp(name)
