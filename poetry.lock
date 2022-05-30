@@ -770,7 +770,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 name = "pytest-cases"
-version = "3.6.8"
+version = "3.6.13"
 description = "Separate test code from test cases in pytest."
 category = "dev"
 optional = false
@@ -1015,7 +1015,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<4.0"
-content-hash = "86f18d4275ac68d83ecf58e1c794ccce4bae4ec15d75d6ae780c1df704112422"
+content-hash = "4421e158606d57bd7cdb3da347248c6f9f78263abafff7c27e021bab7fe47f56"
 
 [metadata.files]
 anyio = [
@@ -1508,8 +1508,8 @@ pytest = [
     {file = "pytest-6.2.5.tar.gz", hash = "sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89"},
 ]
 pytest-cases = [
-    {file = "pytest-cases-3.6.8.tar.gz", hash = "sha256:d423e87b30e1080cc162d86c72bfa35861cccfe3539125e81c68ba142ab974bc"},
-    {file = "pytest_cases-3.6.8-py2.py3-none-any.whl", hash = "sha256:247b8d572a1003b0c90c114394df2980ed757574c8529f38e3a66b68f0caeadf"},
+    {file = "pytest-cases-3.6.13.tar.gz", hash = "sha256:7b584433231280b16a74f34d9ba1f50abcc6b973d3ba3ada9053c2c41a11fb77"},
+    {file = "pytest_cases-3.6.13-py2.py3-none-any.whl", hash = "sha256:d5bdea5a2bf8a9fef594153d2f33c6a5b45328fe26bb7b8e136442ddc67c72cd"},
 ]
 pytest-cov = [
     {file = "pytest-cov-3.0.0.tar.gz", hash = "sha256:e7f0f5b1617d2210a2cabc266dfe2f4c75a8d32fb89eafb7ad9d06f6d076d470"},
