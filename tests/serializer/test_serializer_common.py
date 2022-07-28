@@ -10,6 +10,7 @@ import json
 
 import httpx
 import pytest
+import chardet
 
 import httpx_cache
 
@@ -25,6 +26,10 @@ testcases_encoding = [
     "utf-32-be",
     "utf-32-le",
 ]
+
+
+def autodetect(content):
+    return chardet.detect(content).get("encoding")
 
 
 class StreamingBody:
@@ -112,9 +117,11 @@ def test_response_autodetect_encoding(serializer: httpx_cache.BaseSerializer):
         200,
         content=content,
     )
+
     cached = serializer.loads(cached=serializer.dumps(response=response))
+
     assert response.text == cached.text
-    assert response.encoding is cached.encoding is None
+    assert response.encoding == cached.encoding
 
 
 def test_response_fallback_to_autodetect(serializer: httpx_cache.BaseSerializer):
@@ -127,7 +134,7 @@ def test_response_fallback_to_autodetect(serializer: httpx_cache.BaseSerializer)
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert response.text == cached.text
-    assert response.encoding is cached.encoding is None
+    assert response.encoding == cached.encoding
 
 
 def test_response_no_charset_with_ascii_content(
@@ -142,7 +149,7 @@ def test_response_no_charset_with_ascii_content(
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert response.text == cached.text
-    assert response.encoding is cached.encoding is None
+    assert response.encoding == cached.encoding
 
 
 def test_response_no_charset_with_utf8_content(
@@ -157,7 +164,7 @@ def test_response_no_charset_with_utf8_content(
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert response.text == cached.text
-    assert response.encoding is cached.encoding is None
+    assert response.encoding == cached.encoding
 
 
 def test_response_no_charset_with_iso_8859_1_content(
@@ -169,11 +176,12 @@ def test_response_no_charset_with_iso_8859_1_content(
         200,
         content=content,
         headers=headers,
+        default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert response.text == cached.text
+    assert response.encoding == cached.encoding
     assert response.charset_encoding is cached.charset_encoding is None
-    assert response.apparent_encoding is cached.apparent_encoding is not None
 
 
 def test_response_no_charset_with_cp_1252_content(
@@ -185,11 +193,12 @@ def test_response_no_charset_with_cp_1252_content(
         200,
         content=content,
         headers=headers,
+        default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert response.text == cached.text
+    assert response.encoding == cached.encoding
     assert response.charset_encoding is cached.charset_encoding is None
-    assert response.apparent_encoding is cached.apparent_encoding is not None
 
 
 def test_response_non_text_encoding(serializer: httpx_cache.BaseSerializer):
@@ -201,7 +210,7 @@ def test_response_non_text_encoding(serializer: httpx_cache.BaseSerializer):
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert response.text == cached.text == "xyz"
-    assert response.encoding is cached.encoding is None
+    assert response.encoding == cached.encoding
 
 
 def test_response_set_explicit_encoding(serializer: httpx_cache.BaseSerializer):
@@ -238,6 +247,7 @@ def test_json_with_specified_encoding(serializer: httpx_cache.BaseSerializer):
         200,
         content=content,
         headers=headers,
+        default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert cached.json() == data
@@ -251,6 +261,7 @@ def test_json_with_options(serializer: httpx_cache.BaseSerializer):
         200,
         content=content,
         headers=headers,
+        default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert cached.json(parse_int=str)["amount"] == "1"
@@ -267,6 +278,7 @@ def test_json_without_specified_charset(
         200,
         content=content,
         headers=headers,
+        default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert cached.json() == data
@@ -705,3 +717,53 @@ def test_generator_with_content_length_header(
     response.read()
     cached = serializer.loads(cached=store["cached"])
     assert cached.headers == {"Content-Length": "8"}
+
+
+def test_response_decode_text_using_autodetect(serializer: httpx_cache.BaseSerializer):
+    # Ensure that a 'default_encoding="autodetect"' on the response allows for
+    # encoding autodetection to be used when no "Content-Type: text/plain; charset=..."
+    # info is present.
+    #
+    # Here we have some french text encoded with ISO-8859-1, rather than UTF-8.
+    text = (
+        "Non-seulement Despréaux ne se trompait pas, mais de tous les écrivains "
+        "que la France a produits, sans excepter Voltaire lui-même, imprégné de "
+        "l'esprit anglais par son séjour à Londres, c'est incontestablement "
+        "Molière ou Poquelin qui reproduit avec l'exactitude la plus vive et la "
+        "plus complète le fond du génie français."
+    )
+    content = text.encode("ISO-8859-1")
+    response = httpx.Response(200, content=content, default_encoding=autodetect)
+
+    cached = serializer.loads(cached=serializer.dumps(response=response))
+
+    assert response.status_code == cached.status_code == 200
+    assert response.reason_phrase == cached.reason_phrase == "OK"
+    assert response.encoding == cached.encoding == "ISO-8859-1"
+    assert response.text == cached.text == text
+
+
+def test_response_decode_text_using_explicit_encoding(
+    serializer: httpx_cache.BaseSerializer
+):
+    # Ensure that a 'default_encoding="..."' on the response is used for text decoding
+    # when no "Content-Type: text/plain; charset=..."" info is present.
+    #
+    # Here we have some french text encoded with Windows-1252, rather than UTF-8.
+    # https://en.wikipedia.org/wiki/Windows-1252
+    text = (
+        "Non-seulement Despréaux ne se trompait pas, mais de tous les écrivains "
+        "que la France a produits, sans excepter Voltaire lui-même, imprégné de "
+        "l'esprit anglais par son séjour à Londres, c'est incontestablement "
+        "Molière ou Poquelin qui reproduit avec l'exactitude la plus vive et la "
+        "plus complète le fond du génie français."
+    )
+    content = text.encode("cp1252")
+    response = httpx.Response(200, content=content, default_encoding="cp1252")
+
+    cached = serializer.loads(cached=serializer.dumps(response=response))
+
+    assert response.status_code == cached.status_code == 200
+    assert response.reason_phrase == cached.reason_phrase == "OK"
+    assert response.encoding == cached.encoding == "cp1252"
+    assert response.text == cached.text == text
