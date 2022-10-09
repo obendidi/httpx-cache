@@ -46,7 +46,7 @@ class FileCache(BaseCache):
             cache_dir = Path(cache_dir)
 
         self.cache_dir = cache_dir
-        self.cache_dir.mkdir(exist_ok=True)
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
         filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
