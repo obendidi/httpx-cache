@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "httpx-cache"
-version = "0.6.0"
+version = "0.6.1"
 description = "Simple caching transport for httpx."
 authors = ["Ouail Bendidi <ouail.bendidi@gmail.com>"]
 license = "BSD 3"
