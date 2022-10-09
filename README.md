@@ -20,3 +20,11 @@ Using pip:
 ```sh
 pip install httpx-cache
 ```
+
+## Contributors
+
+Feel free to contribute !
+
+<a href = "https://github.com/obendidi/httpx-cache/graphs/contributors">
+<img src = "https://contrib.rocks/image?repo=obendidi/httpx-cache"/>
+</a>
