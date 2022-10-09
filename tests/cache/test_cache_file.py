@@ -37,7 +37,7 @@ def test_file_cache_init_bad_custom_path_cache_dir(mock_mkdir: mock.MagicMock):
     cache_dir = Path("./some-path")
     cache = httpx_cache.FileCache(cache_dir=cache_dir)
     assert cache.cache_dir == cache_dir
-    mock_mkdir.assert_called_once_with(exist_ok=True)
+    mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
 
 
 @mock.patch.object(Path, "mkdir")
@@ -46,7 +46,7 @@ def test_file_cache_init_bad_custom_str_cache_dir(mock_mkdir: mock.MagicMock):
     cache = httpx_cache.FileCache(cache_dir=cache_dir)
     assert isinstance(cache.cache_dir, Path)
     assert cache.cache_dir == Path(cache_dir)
-    mock_mkdir.assert_called_once_with(exist_ok=True)
+    mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
 
 
 @mock.patch.object(Path, "mkdir", new=lambda *args, **kwargs: None)
