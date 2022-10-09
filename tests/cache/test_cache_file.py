@@ -29,7 +29,7 @@ def test_file_cache_init_default_cache_dir(mock_mkdir: mock.MagicMock):
     cache = httpx_cache.FileCache()
     default_cache_dir = Path.home() / ".cache/httpx-cache"
     assert cache.cache_dir == default_cache_dir
-    mock_mkdir.assert_called_once_with(exist_ok=True)
+    mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
 
 
 @mock.patch.object(Path, "mkdir")
