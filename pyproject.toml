@@ -40,7 +40,7 @@ black = {version = "^21.9b0", allow-prereleases = true}
 mypy = "^0.931"
 isort = "^5.9.3"
 flake8 = "^4.0.1"
-pytest = "^7.0.1"
+pytest = "^7.2.0"
 pytest-cov = "^3.0.0"
 pre-commit = "^2.17.0"
 trio = "^0.19.0"
