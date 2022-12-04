@@ -41,14 +41,11 @@
   "[python]": {
     "editor.formatOnSave": true
   },
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/dev",
   "python.linting.enabled": true,
   "python.linting.mypyEnabled": true,
   "python.linting.pylintEnabled": false,
-  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Enabled": false,
   "python.formatting.provider": "black",
-  "python.sortImports.path": "isort",
-  "python.languageServer": "Pylance",
-  "python.testing.pytestEnabled": true,
-  "python.testing.autoTestDiscoverOnSaveEnabled": true
+  "python.languageServer": "Pylance"
 }
