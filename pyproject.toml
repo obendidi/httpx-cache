@@ -73,7 +73,7 @@ extra-dependencies = [
 fmt = ["ruff --fix .", "black ."]
 lint = ["ruff .", "black --check --diff ."]
 typing = "mypy --install-types --non-interactive httpx_cache"
-test = "pytest -ra -q -vv --cov=httpx_cache --cov-report=term-missing --cov-config=pyproject.toml"
+test = "pytest -ra -q -vv --cov=httpx_cache --cov-report=term-missing --cov-report=xml --cov-config=pyproject.toml"
 docs-build = "mkdocs build --clean --strict"
 docs-serve = "mkdocs serve --dev-addr localhost:8000"
 
