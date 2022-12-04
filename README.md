@@ -21,6 +21,8 @@ Using pip:
 pip install httpx-cache
 ```
 
+_Please make sure to pin the exact `httpx-cache` version for your project, to make sure it all works._
+
 ## Contributors
 
 Feel free to contribute !
