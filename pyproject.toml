@@ -61,6 +61,7 @@ extra-dependencies = [
     "ruff~=0.0.153",
     "black~=22.10.0",
     "mypy~=0.931",
+    "pre-commit",
     # Doc dependencies
     "mkdocs~=1.4",
     "mkautodoc~=0.1",
