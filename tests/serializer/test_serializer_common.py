@@ -173,10 +173,7 @@ def test_response_no_charset_with_iso_8859_1_content(
     content = "Accented: Österreich abcdefghijklmnopqrstuzwxyz".encode("iso-8859-1")
     headers = {"Content-Type": "text/plain"}
     response = httpx.Response(
-        200,
-        content=content,
-        headers=headers,
-        default_encoding=autodetect
+        200, content=content, headers=headers, default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert response.text == cached.text
@@ -190,10 +187,7 @@ def test_response_no_charset_with_cp_1252_content(
     content = "Euro Currency: € abcdefghijklmnopqrstuzwxyz".encode("cp1252")
     headers = {"Content-Type": "text/plain"}
     response = httpx.Response(
-        200,
-        content=content,
-        headers=headers,
-        default_encoding=autodetect
+        200, content=content, headers=headers, default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert response.text == cached.text
@@ -244,10 +238,7 @@ def test_json_with_specified_encoding(serializer: httpx_cache.BaseSerializer):
     content = json.dumps(data).encode("utf-16")
     headers = {"Content-Type": "application/json, charset=utf-16"}
     response = httpx.Response(
-        200,
-        content=content,
-        headers=headers,
-        default_encoding=autodetect
+        200, content=content, headers=headers, default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert cached.json() == data
@@ -258,10 +249,7 @@ def test_json_with_options(serializer: httpx_cache.BaseSerializer):
     content = json.dumps(data).encode("utf-16")
     headers = {"Content-Type": "application/json, charset=utf-16"}
     response = httpx.Response(
-        200,
-        content=content,
-        headers=headers,
-        default_encoding=autodetect
+        200, content=content, headers=headers, default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert cached.json(parse_int=str)["amount"] == "1"
@@ -275,10 +263,7 @@ def test_json_without_specified_charset(
     content = json.dumps(data).encode(encoding)
     headers = {"Content-Type": "application/json"}
     response = httpx.Response(
-        200,
-        content=content,
-        headers=headers,
-        default_encoding=autodetect
+        200, content=content, headers=headers, default_encoding=autodetect
     )
     cached = serializer.loads(cached=serializer.dumps(response=response))
     assert cached.json() == data
@@ -744,7 +729,7 @@ def test_response_decode_text_using_autodetect(serializer: httpx_cache.BaseSeria
 
 
 def test_response_decode_text_using_explicit_encoding(
-    serializer: httpx_cache.BaseSerializer
+    serializer: httpx_cache.BaseSerializer,
 ):
     # Ensure that a 'default_encoding="..."' on the response is used for text decoding
     # when no "Content-Type: text/plain; charset=..."" info is present.
