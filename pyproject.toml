@@ -1,10 +1,17 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "httpx-cache"
 version = "0.6.1"
 description = "Simple caching transport for httpx."
-authors = ["Ouail Bendidi <ouail.bendidi@gmail.com>"]
-license = "BSD 3"
 readme = "README.md"
+requires-python = ">=3.7"
+license-files = { paths = ["LICENSE"] }
+authors = [
+    { name = "Ouail Bendidi", email = "ouail.bendidi@gmail.com" },
+]
 repository = "https://github.com/obendidi/httpx-cache"
 homepage = "https://github.com/obendidi/httpx-cache"
 keywords = ["httpx", "cache", "cache-control"]
@@ -16,79 +23,69 @@ classifiers = [
   "Operating System :: OS Independent",
   "Topic :: Internet :: WWW/HTTP",
   "Framework :: AsyncIO",
-  "Framework :: Trio",
+  "Typing :: Typed",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3 :: Only",
 ]
-include = ["LICENSE"]
+dependencies = [
+  "httpx~=0.23",
+  "anyio~=3.0",
+  "msgpack~=1.0",
+  "fasteners>=0.16.3,<0.18.0",
+  "attrs>=21.4,<23.0",
+  "aiorwlock~=1.2"
+]
 
-[tool.poetry.dependencies]
-python = ">=3.7,<4.0"
-httpx = "^0.23.0"
-anyio = "^3.4.0"
-msgpack = "^1.0.3"
-fasteners = ">=0.16.3,<0.18.0"
-attrs = ">=21.4,<23.0"
-aiorwlock = "^1.2.0"
+[project.urls]
+Homepage = "https://github.com/obendidi/httpx-cache"
+Documentation = "https://obendidi.github.io/httpx-cache/"
 
-[tool.poetry.dev-dependencies]
-black = {version = "^21.9b0", allow-prereleases = true}
-mypy = "^0.931"
-isort = "^5.9.3"
-flake8 = "^4.0.1"
-pytest = "^7.0.1"
-pytest-cov = "^3.0.0"
-pre-commit = "^2.17.0"
-trio = "^0.19.0"
-trio-typing = "^0.7.0"
-respx = "^0.19.1"
-mock = "^4.0.3"
-types-mock = "^4.0.8"
-mkautodoc = "^0.1.0"
-mkdocs-material = "^8.1.8"
-pytest-cases = "^3.6.8"
-nox = "^2022.1.7"
-rich = "^12.0.1"
-chardet = "^5.0.0"
-types-chardet = "^5.0.3"
+[tool.hatch.envs.dev]
+extra-dependencies = [
+    # Test dependencies
+    "pytest~=7.2",
+    "coverage[toml]~=6.5",
+    "pytest-cov~=3.0",
+    "chardet~=5.0",
+    "types-chardet~=5.0",
+    "pytest-cases~=3.6.8",
+    "respx~=0.19",
+    "mock~=4.0",
+    "types-mock~=4.0",
+    # Linting
+    "ruff~=0.0.153",
+    "black~=22.10.0",
+    "mypy~=0.931",
+    # Doc dependencies
+    "mkdocs~=1.4",
+    "mkautodoc~=0.1",
+    "mkdocs-material~=8.1"
+]
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
 
-[mypy]
-python_version = 3.8
-exclude = "tests/"
+[tool.hatch.envs.dev.scripts]
+fmt = ["ruff --fix .", "black ."]
+lint = ["ruff .", "black --check --diff ."]
+typing = "mypy --install-types --non-interactive httpx_cache"
+test = "pytest -ra -q -vv --cov=httpx_cache --cov-report=term-missing --cov-config=pyproject.toml"
+docs-build = "mkdocs build --clean --strict"
+docs-serve = "mkdocs serve --dev-addr localhost:8000"
 
-[tool.black]
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | \.tox
-  | venv
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+[tool.ruff.isort]
+known-first-party = ["httpx_cache"]
+known-third-party = ["httpx", "attrs", "msgpack", "anyio"]
 
-[tool.isort]
-profile = "black"
-known_first_party = ["httpx_cache"]
-known_third_party = ["httpx", "attrs", "msgpack", "anyio"]
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
 
-[tool.pytest.ini_options]
-addopts = "-ra -q -vv --cov=httpx_cache --cov-report=term --cov-report=xml"
-# log_cli = true
-# log_cli_level = "DEBUG"
-
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
 
 [tool.coverage.run]
 branch = true
