@@ -1,5 +1,6 @@
 import threading
 import typing as tp
+from abc import ABC
 
 import anyio
 import httpx
@@ -11,7 +12,7 @@ from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
 
 
-class RedisCache(BaseCache):
+class RedisCache(BaseCache, ABC):
     lock = threading.Lock()
 
     def __init__(
@@ -22,7 +23,7 @@ class RedisCache(BaseCache):
 
         if not isinstance(self.serializer, BaseSerializer):
             raise TypeError(
-                "Excpected serializer of type 'httpx_cache.BaseSerializer', "
+                "Expected serializer of type 'httpx_cache.BaseSerializer', "
                 f"got {type(self.serializer)}"
             )
 
@@ -54,7 +55,7 @@ class RedisCache(BaseCache):
             self.cache.delete(key)
 
 
-class AsyncRedisCache(BaseCache):
+class AsyncRedisCache(BaseCache, ABC):
     async_lock = anyio.Lock()
 
     def __init__(
@@ -65,7 +66,7 @@ class AsyncRedisCache(BaseCache):
 
         if not isinstance(self.serializer, BaseSerializer):
             raise TypeError(
-                "Excpected serializer of type 'httpx_cache.BaseSerializer', "
+                "Expected serializer of type 'httpx_cache.BaseSerializer', "
                 f"got {type(self.serializer)}"
             )
 
