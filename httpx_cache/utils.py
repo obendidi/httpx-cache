@@ -38,19 +38,19 @@ def get_cache_filepath(
     Returns:
         pathlib.Path of the cache filepath
     """
-    buffer = (get_cache_key(request) + extra).encode()
-    filename = hashlib.sha224(buffer).hexdigest()
+    _buffer = (get_cache_key(request) + extra).encode()
+    filename = hashlib.sha224(_buffer).hexdigest()
     return cache_dir / filename
 
 
 def parse_headers_date(headers_date: tp.Optional[str]) -> tp.Optional[datetime]:
     """Parse a 'Date' header and return it as an optional datetime object.
 
-    If the 'Date' doe not exist return None
-    IF there is an error usirng parsing return None
+    If the 'Date' does not exist return None
+    IF there is an error using parsing return None
 
     Args:
-        headers: httpx.Headers
+        headers_date: httpx.Headers
 
     Returns:
         Optional[datetime]
@@ -93,7 +93,7 @@ def parse_cache_control_headers(
 
 @attr.s
 class ByteStreamWrapper(httpx.ByteStream):
-    """Wrapper around the stream object of an httpx.Response."""
+    """Wrapper around the stream object of a httpx.Response."""
 
     stream: httpx.ByteStream = attr.ib(kw_only=True)
     callback: tp.Callable[[bytes], tp.Any] = attr.ib(kw_only=True)
@@ -108,7 +108,7 @@ class ByteStreamWrapper(httpx.ByteStream):
         await self.stream.aclose()
 
     def __iter__(self) -> tp.Iterator[bytes]:
-        """Iterate over the stream object and store it's chunks in a content.
+        """Iterate over the stream object and store its chunks in a content.
 
         After the stream is completed call the callback with content as argument.
         """
@@ -118,7 +118,7 @@ class ByteStreamWrapper(httpx.ByteStream):
         self.callback(bytes(self.content))
 
     async def __aiter__(self) -> tp.AsyncIterator[bytes]:
-        """Iterate over the async stream object and store it's chunks in a content.
+        """Iterate over the async stream object and store its chunks in a content.
 
         After the stream is completed call the async callback with content as argument.
         """

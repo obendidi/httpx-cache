@@ -3,12 +3,11 @@ import typing as tp
 
 import httpx
 import msgpack
-
 from httpx_cache.serializer.base import BaseSerializer
 
 
 class DictSerializer(BaseSerializer):
-    """Dumps and loads and httpx.Response into/from a python dict.
+    """Dumps and loads a httpx.Response into/from a python dict.
 
     The dict contains the state of the response, with all necessary info to recreate it.
     """
@@ -36,10 +35,8 @@ class DictSerializer(BaseSerializer):
         Returns:
             Dict[str, Any]
         """
-        state: tp.Dict[str, tp.Any] = {}
-
         # set status_code
-        state["status_code"] = response.status_code
+        state: tp.Dict[str, tp.Any] = {"status_code": response.status_code}
 
         # get content or stream_content
         if hasattr(response, "_content"):
@@ -63,10 +60,10 @@ class DictSerializer(BaseSerializer):
         cached: tp.Dict[str, tp.Any],
         request: tp.Optional[httpx.Request] = None
     ) -> httpx.Response:
-        """Convert a dict (contains response state) to an httpx.Response instance.
+        """Convert a dict (contains response state) to a httpx.Response instance.
 
         Args:
-            state: Dict of the state of teh response to create
+            cached: Dict with the state of the response to create
             request (httpx.Request, optional): Defaults to None, request to optionally
                 attach to the response
 
@@ -92,7 +89,7 @@ class DictSerializer(BaseSerializer):
 
 
 class StringJsonSerializer(DictSerializer):
-    """Serialize an httpx.Response using python Json Encoder.
+    """Serialize a httpx.Response using python Json Encoder.
 
     Serialized data is returned as a JSON string.
 
@@ -107,7 +104,7 @@ class StringJsonSerializer(DictSerializer):
     def dumps(  # type: ignore
         self, *, response: httpx.Response, content: tp.Optional[bytes] = None
     ) -> str:
-        """Dump an httpx.Response to json string."""
+        """Dump a httpx.Response to json string."""
         state = super().dumps(response=response, content=content)
         encoding = state.get("encoding", "utf-8")
         if isinstance(state.get("_content"), bytes):
@@ -120,7 +117,7 @@ class StringJsonSerializer(DictSerializer):
     def loads(  # type: ignore
         self, *, cached: str, request: tp.Optional[httpx.Request] = None
     ) -> httpx.Response:
-        """Load an httpx.Response from a json string"""
+        """Load a httpx.Response from a json string"""
         state = json.loads(cached)
         encoding = state.get("encoding", "utf-8")
         if isinstance(state.get("_content"), str):
@@ -132,24 +129,24 @@ class StringJsonSerializer(DictSerializer):
 
 class BytesJsonSerializer(StringJsonSerializer):
     """Same as httpx_cache.StringJsonSerializer, but converts the dumped strings
-    into bytes (encoded/decode with utf-8).
+    into bytes (encoded/decoded with utf-8).
     """
 
     def dumps(  # type: ignore
         self, *, response: httpx.Response, content: tp.Optional[bytes] = None
     ) -> bytes:
-        """Dump an httpx.Response to an utf-8 encoded bytes string."""
+        """Dump a httpx.Response to an utf-8 encoded bytes string."""
         return super().dumps(response=response, content=content).encode("utf-8")
 
     def loads(  # type: ignore
         self, *, cached: bytes, request: tp.Optional[httpx.Request] = None
     ) -> httpx.Response:
-        """Load an httpx.Response to an utf-8 encoded bytes string."""
+        """Load a httpx.Response to an utf-8 encoded bytes string."""
         return super().loads(cached=cached.decode("utf-8"), request=request)
 
 
 class MsgPackSerializer(DictSerializer):
-    """Serialize an httpx.Response using msgpack.
+    """Serialize a httpx.Response using msgpack.
 
     Serialized data is returned as a bytes.
 
@@ -160,7 +157,7 @@ class MsgPackSerializer(DictSerializer):
     def dumps(  # type: ignore
         self, *, response: httpx.Response, content: tp.Optional[bytes] = None
     ) -> bytes:
-        """Dump an httpx.Response to msgapck bytes."""
+        """Dump a httpx.Response to msgpack bytes."""
         return msgpack.dumps(
             super().dumps(response=response, content=content), use_bin_type=True
         )
@@ -168,5 +165,5 @@ class MsgPackSerializer(DictSerializer):
     def loads(  # type: ignore
         self, *, cached: bytes, request: tp.Optional[httpx.Request] = None
     ) -> httpx.Response:
-        """Load an httpx.Response from a msgapck bytes."""
+        """Load a httpx.Response from a msgpack bytes."""
         return super().loads(cached=msgpack.loads(cached, raw=False), request=request)

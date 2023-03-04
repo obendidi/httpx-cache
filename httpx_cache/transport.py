@@ -2,8 +2,8 @@ import logging
 import typing as tp
 
 import httpx
-
-from httpx_cache.cache import BaseCache, DictCache
+from httpx_cache.cache import BaseCache
+from httpx_cache.cache import DictCache
 from httpx_cache.cache_control import CacheControl
 from httpx_cache.utils import ByteStreamWrapper
 
@@ -15,7 +15,7 @@ class CacheControlTransport(httpx.BaseTransport):
 
     Args:
         transport (optional): an existing httpx transport, if no transport
-            is given, defaults to an httpx.HTTPTransport with default args.
+            is given, defaults to a httpx.HTTPTransport with default args.
         cache (optional): cache to use with this transport, defaults to
             httpx_cache.DictCache
         cacheable_methods: methods that are allowed to be cached, defaults to ['GET']
@@ -84,7 +84,7 @@ class AsyncCacheControlTransport(httpx.AsyncBaseTransport):
 
     Args:
         transport (optional): an existing httpx async-transport, if no transport
-            is given, defaults to an httpx.AsyncHTTPTransport with default args.
+            is given, defaults to a httpx.AsyncHTTPTransport with default args.
         cache (optional): cache to use with this transport, defaults to
             httpx_cache.DictCache
         cacheable_methods: methods that are allowed to be cached, defaults to ['GET']
