@@ -1,6 +1,5 @@
 import threading
 import typing as tp
-from abc import ABC
 
 import anyio
 import httpx
@@ -12,30 +11,48 @@ from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
 
 
-class RedisCache(BaseCache, ABC):
+class RedisCache(BaseCache):
     lock = threading.Lock()
+    async_lock = anyio.Lock()
 
     def __init__(
-        self, serializer: tp.Optional[BaseSerializer] = None, **configs
+        self, redis_url, serializer: tp.Optional[BaseSerializer] = None
     ) -> None:
-        self.cache = Redis(**configs)
+        self._redis_url = redis_url
+        self._redis: tp.Optional[Redis] = None
+        self._aredis: tp.Optional[AsyncRedis] = None
         self.serializer = serializer or MsgPackSerializer()
-
         if not isinstance(self.serializer, BaseSerializer):
             raise TypeError(
                 "Expected serializer of type 'httpx_cache.BaseSerializer', "
                 f"got {type(self.serializer)}"
             )
 
-    def _get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
+    @property
+    def redis(self) -> Redis:
+        if self._redis is None:
+            self._redis = Redis.from_url(self._redis_url)
+        return self._redis
+
+    @property
+    def aredis(self) -> AsyncRedis:
+        if self._aredis is None:
+            self._aredis = AsyncRedis.from_url(self._redis_url)
+        return self._aredis
+
+    def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
         key = get_cache_key(request)
-        cached = self.cache.get(key)
+        cached = self._redis.get(key)
         if cached is not None:
             return self.serializer.loads(cached=cached, request=request)
         return None
 
-    def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        return self._get(request)
+    async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
+        key = get_cache_key(request)
+        cached_data = await self._aredis.get(key)
+        if cached_data is not None:
+            return self.serializer.loads(cached=cached_data, request=request)
+        return None
 
     def set(
         self,
@@ -47,39 +64,7 @@ class RedisCache(BaseCache, ABC):
         key = get_cache_key(request)
         to_cache = self.serializer.dumps(response=response, content=content)
         with self.lock:
-            self.cache.set(key, to_cache)
-
-    def delete(self, request: httpx.Request) -> None:
-        key = get_cache_key(request)
-        with self.lock:
-            self.cache.delete(key)
-
-
-class AsyncRedisCache(BaseCache, ABC):
-    async_lock = anyio.Lock()
-
-    def __init__(
-        self, serializer: tp.Optional[BaseSerializer] = None, **configs
-    ) -> None:
-        self.cache = AsyncRedis(**configs)
-        self.serializer = serializer or MsgPackSerializer()
-
-        if not isinstance(self.serializer, BaseSerializer):
-            raise TypeError(
-                "Expected serializer of type 'httpx_cache.BaseSerializer', "
-                f"got {type(self.serializer)}"
-            )
-
-    async def _get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        key = get_cache_key(request)
-        cached_data = await self.cache.get(key)
-
-        if cached_data is not None:
-            return self.serializer.loads(cached=cached_data, request=request)
-        return None
-
-    async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        return await self._get(request)
+            self._redis.set(key, to_cache)
 
     async def aset(
         self,
@@ -91,12 +76,17 @@ class AsyncRedisCache(BaseCache, ABC):
         to_cache = self.serializer.dumps(response=response, content=content)
         key = get_cache_key(request)
         async with self.async_lock:
-            await self.cache.set(key, to_cache)
+            await self._aredis.set(key, to_cache)
+
+    def delete(self, request: httpx.Request) -> None:
+        key = get_cache_key(request)
+        with self.lock:
+            self._redis.delete(key)
 
     async def adelete(self, request: httpx.Request) -> None:
         key = get_cache_key(request)
         async with self.async_lock:
-            await self.cache.delete(key)
+            await self._aredis.delete(key)
 
     async def aclose(self):
-        await self.cache.close()
+        await self._aredis.close()
