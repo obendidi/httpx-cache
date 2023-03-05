@@ -1,10 +1,12 @@
 import logging
 import typing as tp
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 
 import httpx
-
-from httpx_cache.utils import parse_cache_control_headers, parse_headers_date
+from httpx_cache.utils import parse_cache_control_headers
+from httpx_cache.utils import parse_headers_date
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +16,7 @@ _PERMANENT_REDIRECT_STATUSES = (301, 308)
 class CacheControl:
     """Cache controller for httpx-cache.
 
-    Uses 'cache-contol' header direcrives for using/skipping cache.
+    Uses 'cache-control' header directives for using/skipping cache.
 
     If no cache-control directive is set, the cache is used by default (except if there
     is an expires header in the response.)
@@ -30,7 +32,7 @@ class CacheControl:
         self.cacheable_status_codes = cacheable_status_codes
 
     def is_request_cacheable(self, request: httpx.Request) -> bool:
-        """Checks if an httpx request has the necessary requirement to support caching.
+        """Checks if a httpx request has the necessary requirement to support caching.
 
         A request is cacheable if:
 
@@ -66,10 +68,9 @@ class CacheControl:
             return False
         return True
 
-    def is_response_fresh(
-        self, *, request: httpx.Request, response: httpx.Response
-    ) -> bool:
-        """Checks wether a cached response is fresh or not.
+    @staticmethod
+    def is_response_fresh(*, request: httpx.Request, response: httpx.Response) -> bool:
+        """Checks whether a cached response is fresh or not.
 
         Args:
             request: httpx.Request
@@ -79,7 +80,7 @@ class CacheControl:
             True if request is fresh else False
         """
 
-        # check if response is a permanenet redirect
+        # check if response is a permanent redirect
         if response.status_code in _PERMANENT_REDIRECT_STATUSES:
             logger.debug(
                 "Cached response with permanent redirect status "
@@ -170,7 +171,7 @@ class CacheControl:
     def is_response_cacheable(
         self, *, request: httpx.Request, response: httpx.Response
     ) -> bool:
-        """Check if an httpx response is cacheable.
+        """Check if a httpx response is cacheable.
 
         A respons is cacheable if:
 
@@ -184,7 +185,7 @@ class CacheControl:
             response: httpx.Response
 
         Returns:
-            wether response is cacheable or not.
+            whether response is cacheable or not.
         """
         if request.url.is_relative_url:
             logger.debug(
@@ -214,7 +215,7 @@ class CacheControl:
 
         if "no-store" in request_cc or "no-store" in response_cc:
             logger.debug(
-                "Request/Response cache-control headers has a 'no-store' directive. "
+                "Request/Response cache-control headers have a 'no-store' directive. "
                 "Response is not cacheable!"
             )
             return False
