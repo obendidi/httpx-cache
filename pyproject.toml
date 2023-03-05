@@ -41,6 +41,9 @@ dependencies = [
   "aiorwlock~=1.2"
 ]
 
+[project.optional-dependencies]
+redis = ["redis~=4.5"]
+
 [project.urls]
 Homepage = "https://github.com/obendidi/httpx-cache"
 Documentation = "https://obendidi.github.io/httpx-cache/"
