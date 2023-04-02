@@ -37,7 +37,7 @@ class BaseCache(ABC):
         *,
         request: httpx.Request,
         response: httpx.Response,
-        content: tp.Optional[bytes] = None
+        content: tp.Optional[bytes] = None,
     ) -> None:
         """Set new response entry in cache.
 
@@ -57,7 +57,7 @@ class BaseCache(ABC):
         *,
         request: httpx.Request,
         response: httpx.Response,
-        content: tp.Optional[bytes] = None
+        content: tp.Optional[bytes] = None,
     ) -> None:
         """(Async) Set new response entry in cache.
 

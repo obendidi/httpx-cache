@@ -38,10 +38,11 @@ def test_cache_control_transport_init_defaults():
         == async_transport.controller.cacheable_status_codes
         == (200, 203, 300, 301, 308)
     )
+    assert transport.controller.always_cache is False
+    assert async_transport.controller.always_cache is False
 
 
 def test_cache_control_transport_handle_request(cache: httpx_cache.BaseCache):
-
     transport = httpx_cache.CacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
@@ -66,7 +67,6 @@ def test_cache_control_transport_handle_request(cache: httpx_cache.BaseCache):
 async def test_cache_control_transport_handle_async_request(
     cache: httpx_cache.BaseCache,
 ):
-
     transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
@@ -89,7 +89,6 @@ async def test_cache_control_transport_handle_async_request(
 
 
 def test_cache_control_transport_handle_request_no_cache(cache: httpx_cache.BaseCache):
-
     transport = httpx_cache.CacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
@@ -122,7 +121,6 @@ def test_cache_control_transport_handle_request_no_cache(cache: httpx_cache.Base
 async def test_cache_control_transport_handle_async_request_no_cache(
     cache: httpx_cache.BaseCache,
 ):
-
     transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
@@ -157,7 +155,6 @@ async def test_cache_control_transport_handle_async_request_no_cache(
 
 
 def test_cache_control_transport_handle_request_no_store(cache: httpx_cache.BaseCache):
-
     transport = httpx_cache.CacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
@@ -180,7 +177,8 @@ def test_cache_control_transport_handle_request_no_store(cache: httpx_cache.Base
 
     # run a 3rd request to get from cache
     response3 = transport.handle_request(httpx.Request("GET", "http://test-request-1"))
-    # second response is not from cache
+
+    # 3rd response is from cache
     assert getattr(response3, "from_cache") is True
     assert response2.content == response3.content
 
@@ -190,7 +188,6 @@ def test_cache_control_transport_handle_request_no_store(cache: httpx_cache.Base
 async def test_cache_control_transport_handle_async_request_no_store(
     cache: httpx_cache.BaseCache,
 ):
-
     transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
@@ -224,12 +221,67 @@ async def test_cache_control_transport_handle_async_request_no_store(
     await transport.aclose()
 
 
+def test_cache_control_transport_handle_request_no_store_always_cache(
+    cache: httpx_cache.BaseCache,
+):
+    transport = httpx_cache.CacheControlTransport(
+        cache=cache,
+        transport=httpx.MockTransport(random_response_handler),
+        always_cache=True,
+    )
+
+    # we start with an empty cache
+    response1 = transport.handle_request(
+        httpx.Request(
+            "GET", "http://test-request-1", headers={"cache-control": "no-store"}
+        )
+    )
+
+    # first response is not from cache (since it's the first request)
+    assert getattr(response1, "from_cache") is False
+
+    # run the same request again, it should be from cache, since we always cache
+    response2 = transport.handle_request(httpx.Request("GET", "http://test-request-1"))
+    assert getattr(response2, "from_cache") is True
+    assert response2.content == response1.content
+
+    transport.close()
+
+
+async def test_cache_control_transport_handle_async_request_no_store_always_cache(
+    cache: httpx_cache.BaseCache,
+):
+    transport = httpx_cache.AsyncCacheControlTransport(
+        cache=cache,
+        transport=httpx.MockTransport(random_response_handler),
+        always_cache=True,
+    )
+
+    # we start with an empty cache
+    response1 = await transport.handle_async_request(
+        httpx.Request(
+            "GET", "http://test-request-1", headers={"cache-control": "no-store"}
+        )
+    )
+
+    # first response is not from cache (since it's the first request)
+    assert getattr(response1, "from_cache") is False
+
+    # run the same request again, it should be from cache, since we always cache
+    response2 = await transport.handle_async_request(
+        httpx.Request("GET", "http://test-request-1")
+    )
+    assert getattr(response2, "from_cache") is True
+    assert response2.content == response1.content
+
+    await transport.aclose()
+
+
 @mock.patch.object(httpx_cache.CacheControl, "is_response_fresh", return_value=False)
 def test_cache_control_transport_handle_request_stale_response(
     mock_is_response_fresh: mock.MagicMock,
     cache: httpx_cache.BaseCache,
 ):
-
     transport = httpx_cache.CacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
@@ -257,7 +309,6 @@ async def test_cache_control_transport_handle_async_request_stale_response(
     mock_is_response_fresh: mock.MagicMock,
     cache: httpx_cache.BaseCache,
 ):
-
     transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(random_response_handler)
     )
@@ -283,7 +334,6 @@ async def test_cache_control_transport_handle_async_request_stale_response(
 def test_cache_control_transport_handle_request_with_response_stream(
     cache: httpx_cache.BaseCache,
 ):
-
     transport = httpx_cache.CacheControlTransport(
         cache=cache, transport=httpx.MockTransport(stream_response_handler)
     )
@@ -331,7 +381,6 @@ def test_cache_control_transport_handle_request_with_response_stream(
 async def test_cache_control_transport_handle_async_request_with_response_stream(
     cache: httpx_cache.BaseCache,
 ):
-
     transport = httpx_cache.AsyncCacheControlTransport(
         cache=cache, transport=httpx.MockTransport(stream_response_handler)
     )

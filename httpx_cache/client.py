@@ -50,11 +50,12 @@ class Client(httpx.Client):
         cache: tp.Optional[BaseCache] = None,
         cacheable_methods: tp.Tuple[str, ...] = ("GET",),
         cacheable_status_codes: tp.Tuple[int, ...] = (200, 203, 300, 301, 308),
+        always_cache: bool = False,
     ):
-
         self.cache = cache or DictCache()
         self.cacheable_methods = cacheable_methods
         self.cacheable_status_codes = cacheable_status_codes
+        self.always_cache = always_cache
         super().__init__(
             auth=auth,
             params=params,
@@ -105,6 +106,7 @@ class Client(httpx.Client):
             cache=self.cache,
             cacheable_status_codes=self.cacheable_status_codes,
             cacheable_methods=self.cacheable_methods,
+            always_cache=self.always_cache,
         )
 
     def _init_proxy_transport(
@@ -130,6 +132,7 @@ class Client(httpx.Client):
             cache=self.cache,
             cacheable_status_codes=self.cacheable_status_codes,
             cacheable_methods=self.cacheable_methods,
+            always_cache=self.always_cache,
         )
 
 
@@ -159,11 +162,12 @@ class AsyncClient(httpx.AsyncClient):
         cache: tp.Optional[BaseCache] = None,
         cacheable_methods: tp.Tuple[str, ...] = ("GET",),
         cacheable_status_codes: tp.Tuple[int, ...] = (200, 203, 300, 301, 308),
+        always_cache: bool = False,
     ):
-
         self.cache = cache or DictCache()
         self.cacheable_methods = cacheable_methods
         self.cacheable_status_codes = cacheable_status_codes
+        self.always_cache = always_cache
         super().__init__(
             auth=auth,
             params=params,
@@ -214,6 +218,7 @@ class AsyncClient(httpx.AsyncClient):
             cache=self.cache,
             cacheable_status_codes=self.cacheable_status_codes,
             cacheable_methods=self.cacheable_methods,
+            always_cache=self.always_cache,
         )
 
     def _init_proxy_transport(
@@ -226,7 +231,6 @@ class AsyncClient(httpx.AsyncClient):
         limits: Limits = DEFAULT_LIMITS,
         trust_env: bool = True,
     ) -> AsyncCacheControlTransport:
-
         return AsyncCacheControlTransport(
             transport=super()._init_proxy_transport(
                 verify=verify,
@@ -240,4 +244,5 @@ class AsyncClient(httpx.AsyncClient):
             cache=self.cache,
             cacheable_status_codes=self.cacheable_status_codes,
             cacheable_methods=self.cacheable_methods,
+            always_cache=self.always_cache,
         )

@@ -61,7 +61,7 @@ class DictSerializer(BaseSerializer):
         self,
         *,
         cached: tp.Dict[str, tp.Any],
-        request: tp.Optional[httpx.Request] = None
+        request: tp.Optional[httpx.Request] = None,
     ) -> httpx.Response:
         """Convert a dict (contains response state) to an httpx.Response instance.
 

@@ -30,15 +30,17 @@ class CacheControlTransport(httpx.BaseTransport):
         cache: tp.Optional[BaseCache] = None,
         cacheable_methods: tp.Tuple[str, ...] = ("GET",),
         cacheable_status_codes: tp.Tuple[int, ...] = (200, 203, 300, 301, 308),
+        always_cache: bool = False,
     ):
         self.controller = CacheControl(
             cacheable_methods=cacheable_methods,
             cacheable_status_codes=cacheable_status_codes,
+            always_cache=always_cache,
         )
         self.transport = transport or httpx.HTTPTransport()
         self.cache = cache or DictCache()
 
-    def close(self):
+    def close(self) -> None:
         self.cache.close()
         self.transport.close()
 
@@ -99,15 +101,17 @@ class AsyncCacheControlTransport(httpx.AsyncBaseTransport):
         cache: tp.Optional[BaseCache] = None,
         cacheable_methods: tp.Tuple[str, ...] = ("GET",),
         cacheable_status_codes: tp.Tuple[int, ...] = (200, 203, 300, 301, 308),
+        always_cache: bool = False,
     ):
         self.controller = CacheControl(
             cacheable_methods=cacheable_methods,
             cacheable_status_codes=cacheable_status_codes,
+            always_cache=always_cache,
         )
         self.transport = transport or httpx.AsyncHTTPTransport()
         self.cache = cache or DictCache()
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         await self.cache.aclose()
         await self.transport.aclose()
 

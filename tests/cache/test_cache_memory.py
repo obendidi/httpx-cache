@@ -19,7 +19,6 @@ def test_dict_cache_invalid_serializer():
 def test_dict_cache_get_not_found(
     dict_cache: httpx_cache.DictCache, httpx_request: httpx.Request
 ):
-
     cached = dict_cache.get(httpx_request)
     assert cached is None
 
@@ -27,7 +26,6 @@ def test_dict_cache_get_not_found(
 async def test_dict_cache_aget_not_found(
     dict_cache: httpx_cache.DictCache, httpx_request: httpx.Request
 ):
-
     cached = await dict_cache.aget(httpx_request)
     assert cached is None
 
@@ -37,7 +35,6 @@ def test_dict_cache_set_get_delete(
     httpx_request: httpx.Request,
     httpx_response: httpx.Response,
 ):
-
     assert len(dict_cache.data) == 0
 
     # cache a request
@@ -65,7 +62,6 @@ async def test_dict_cache_aset_aget_adelete(
     httpx_request: httpx.Request,
     httpx_response: httpx.Response,
 ):
-
     assert len(dict_cache.data) == 0
 
     # cache a request
@@ -93,7 +89,6 @@ def test_dict_cache_set_get_delete_with_streaming_body(
     httpx_request: httpx.Request,
     streaming_body,
 ):
-
     assert len(dict_cache.data) == 0
 
     httpx_response = httpx.Response(200, content=streaming_body)
@@ -134,7 +129,6 @@ async def test_dict_cache_aset_aget_adelete_with_async_streaming_body(
     httpx_request: httpx.Request,
     async_streaming_body,
 ):
-
     assert len(dict_cache.data) == 0
 
     httpx_response = httpx.Response(200, content=async_streaming_body)

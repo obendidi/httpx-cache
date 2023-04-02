@@ -25,9 +25,11 @@ class CacheControl:
         *,
         cacheable_methods: tp.Tuple[str, ...] = ("GET",),
         cacheable_status_codes: tp.Tuple[int, ...] = (200, 203, 300, 301, 308),
+        always_cache: bool = False,
     ) -> None:
         self.cacheable_methods = cacheable_methods
         self.cacheable_status_codes = cacheable_status_codes
+        self.always_cache = always_cache
 
     def is_request_cacheable(self, request: httpx.Request) -> bool:
         """Checks if an httpx request has the necessary requirement to support caching.
@@ -176,8 +178,11 @@ class CacheControl:
 
             - response status_code is cacheable
             - request method is cacheable
-            - Response has no 'no-store' cache-control header
-            - Request has no 'no-store' cache-control header
+            - One of:
+                - always_cache is True
+            OR:
+                - Response has no 'no-store' cache-control header
+                - Request has no 'no-store' cache-control header
 
         Args:
             request: httpx.Request
@@ -207,6 +212,11 @@ class CacheControl:
                 "cacheable!"
             )
             return False
+
+        # always cache request, eevent if 'no-store' is set as header
+        if self.always_cache:
+            logger.debug("Caching Response because 'always_cache' is set to True.'")
+            return True
 
         # extract cache_control for both request and response
         request_cc = parse_cache_control_headers(request.headers)

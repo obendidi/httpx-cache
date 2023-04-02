@@ -26,7 +26,7 @@ with httpx_cache.Client() as client:
 
 ## Disable Storing in Cache
 
-Sometimes we want to make a request but not store a response in cache. So that we always get the freshest response. This can be achieved with `cache-control: no-store` header.
+Sometimes we want to make a request but not store a response in cache, so that we always get the freshest response. This can be achieved with `cache-control: no-store` header.
 
 > The no-store response/request directive indicates that any caches of any kind (private or shared) should not store this response.
 
@@ -39,6 +39,34 @@ with httpx_cache.Client() as client:
   response1 = client.get("https://httpbin.org/get", headers={"cache-control": "no-cache"}) # will not be stored in cache
   response2 = client.get("https://httpbin.org/get")
   # cache is empty since previous request was not stored, will make a new request.
+```
+
+## Always Cache
+
+In the case where we want to ignore the `no-store` directive in the response headers, we can set the parameter `always_cache=True`. This parameter can be set on the `client` or on the `transport`.
+
+:warning: Note: Event when `always_cache=True` is set, the cache controller will still does the basic checks to make sure the response is cacheable, namely: status_code is cacheable, request method is cacheable, and request url is absolute.
+
+Usage with `client`:
+
+```py
+import httpx_cache
+
+with httpx_cache.Client(always_cache=True) as client:
+  response1 = client.get("https://httpbin.org/get", headers={"cache-control": "no-store"}) # will be stored in cache
+  response2 = client.get("https://httpbin.org/get")
+  # cache is not empty since previous request was stored, will NOT make a new request.
+```
+
+Usage with `transport`:
+
+```py
+import httpx_cache
+
+with httpx_cache.Client(transport=httpx_cache.CachedTransport(always_cache=True)) as client:
+  response1 = client.get("https://httpbin.org/get", headers={"cache-control": "no-store"}) # will be stored in cache
+  response2 = client.get("https://httpbin.org/get")
+  # cache is not empty since previous request was stored, will NOT make a new request.
 ```
 
 ## Cache Expiration
@@ -63,3 +91,22 @@ with httpx_cache.Client() as client:
 ### Expires Header
 
 In addition to the `max-age` directive, we can achieve the same effect with the `expires` header.
+
+## Use your own CacheController
+
+To use your own cache controller with custom logic for when to cache a response, you can directly subclass `httpx_cache.CacheController` and `httpx_cache.CacheControlTransport` (or `httpx_cache.AsyncCacheControlTransport`):
+
+```py
+import httpx
+import httpx_cache
+
+class MyCacheController(httpx_cache.CacheController):
+  def is_response_cacheable(self, response: httpx.Response) -> bool:
+    # always cache responses
+    return True
+
+class MyCacheControlTransport(httpx_cache.CacheControlTransport):
+  def __init__(self, **kwargs):
+    super().__init__(**kwargs)
+    self.cache_controller = MyCacheController()
+```
