@@ -56,7 +56,6 @@ def test_file_cache_get_not_found(
     file_cache: httpx_cache.FileCache,
     httpx_request: httpx.Request,
 ):
-
     cached = file_cache.get(httpx_request)
     mock_is_file.assert_called_once_with()
     assert cached is None
@@ -69,7 +68,6 @@ async def test_file_cache_aget_not_found(
     file_cache: httpx_cache.FileCache,
     httpx_request: httpx.Request,
 ):
-
     cached = await file_cache.aget(httpx_request)
     mock_is_file.assert_awaited_once_with()
     assert cached is None
@@ -80,7 +78,6 @@ def test_file_cache_set_get_delete(
     httpx_request: httpx.Request,
     httpx_response: httpx.Response,
 ):
-
     # make sure cache_dir is new and empty
     assert len(list(file_cache.cache_dir.glob("**/*"))) == 0
 
@@ -115,7 +112,6 @@ async def test_file_cache_aset_aget_adelete(
     httpx_request: httpx.Request,
     httpx_response: httpx.Response,
 ):
-
     assert len(list(file_cache.cache_dir.glob("**/*"))) == 0
 
     # cache a request
@@ -143,7 +139,6 @@ def test_file_cache_set_get_delete_with_streaming_body(
     httpx_request: httpx.Request,
     streaming_body,
 ):
-
     assert len(list(file_cache.cache_dir.glob("**/*"))) == 0
 
     httpx_response = httpx.Response(200, content=streaming_body)
@@ -184,7 +179,6 @@ async def test_file_cache_aset_aget_adelete_with_async_streaming_body(
     httpx_request: httpx.Request,
     async_streaming_body,
 ):
-
     assert len(list(file_cache.cache_dir.glob("**/*"))) == 0
 
     httpx_response = httpx.Response(200, content=async_streaming_body)

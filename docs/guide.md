@@ -21,6 +21,7 @@ For caching, `httpx_cache.Client` adds 3 new key-args to the table:
 - `cache`: An optional value for which cache type to use, defaults to an in-memory dict cache if not provided.
 - `cacheable_methods`: tuple of str http methods that support caching (if a request does not use one of these methods, it's corresponding response will not be cached), defaults to `('GET',)`
 - `cacheable_status_codes`: tuple of int http status codes that supports caching (if response does not have one of these status codes, it will not be cached), defaults to: `(200, 203, 300, 301, 308)`
+- `always_cache`: bool, if True, all **valid** responses will be cached, regardless of the `no-store` directive set in either the request or response, defaults to False.
 
 Example usage:
 

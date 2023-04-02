@@ -5,3 +5,11 @@ from httpx_cache.serializer.common import (
     MsgPackSerializer,
     StringJsonSerializer,
 )
+
+__all__ = [
+    "BaseSerializer",
+    "BytesJsonSerializer",
+    "DictSerializer",
+    "MsgPackSerializer",
+    "StringJsonSerializer",
+]

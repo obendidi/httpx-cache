@@ -94,6 +94,15 @@ def test_is_response_cacheable_with_request_no_store_header():
     assert controller.is_response_cacheable(request=request, response=response) is False
 
 
+def test_is_response_cacheable_with_request_no_store_header_and_always_cache_is_True():
+    request = httpx.Request(
+        "GET", "http://testurl", headers={"cache-control": "no-store"}
+    )
+    response = httpx.Response(200)
+    controller = httpx_cache.CacheControl(always_cache=True)
+    assert controller.is_response_cacheable(request=request, response=response) is True
+
+
 def test_is_response_fresh(httpx_request, httpx_response):
     controller = httpx_cache.CacheControl()
     assert (
@@ -148,7 +157,6 @@ def test_is_response_fresh_with_expires_header_fresh():
 
 
 def test_is_response_fresh_with_expires_header_not_fresh():
-
     expires = datetime.now(tz=timezone.utc) - timedelta(minutes=5)
     date = expires - timedelta(minutes=5)
     request = httpx.Request("GET", "http://testurl")
@@ -164,7 +172,6 @@ def test_is_response_fresh_with_expires_header_not_fresh():
 
 
 def test_is_response_fresh_with_max_age_response_header_fresh():
-
     expires = datetime.now(tz=timezone.utc) - timedelta(minutes=5)
     date = expires - timedelta(minutes=5)
     request = httpx.Request("GET", "http://testurl")
@@ -181,7 +188,6 @@ def test_is_response_fresh_with_max_age_response_header_fresh():
 
 
 def test_is_response_fresh_with_max_age_response_header_not_fresh():
-
     date = datetime.now(tz=timezone.utc) - timedelta(days=1)
     expires = datetime.now(tz=timezone.utc) + timedelta(hours=1)
     request = httpx.Request("GET", "http://testurl")
@@ -198,7 +204,6 @@ def test_is_response_fresh_with_max_age_response_header_not_fresh():
 
 
 def test_is_response_fresh_with_max_age_response_header_no_date():
-
     request = httpx.Request("GET", "http://testurl")
     response = httpx.Response(
         200,
@@ -209,7 +214,6 @@ def test_is_response_fresh_with_max_age_response_header_no_date():
 
 
 def test_is_response_fresh_with_max_age_request_header_fresh():
-
     date = datetime.now(tz=timezone.utc) - timedelta(days=1)
     request = httpx.Request(
         "GET", "http://testurl", headers={"cache-control": "max-age=100000"}
@@ -226,7 +230,6 @@ def test_is_response_fresh_with_max_age_request_header_fresh():
 
 
 def test_is_response_fresh_with_max_age_request_header_not_fresh():
-
     date = datetime.now(tz=timezone.utc) - timedelta(days=1)
     request = httpx.Request(
         "GET", "http://testurl", headers={"cache-control": "max-age=900"}
@@ -243,7 +246,6 @@ def test_is_response_fresh_with_max_age_request_header_not_fresh():
 
 
 def test_is_response_fresh_with_max_age_request_header_fresh_with_min_fresh_header():
-
     date = datetime.now(tz=timezone.utc) - timedelta(minutes=51)
     request = httpx.Request(
         "GET", "http://testurl", headers={"cache-control": "max-age=3600,min-fresh=600"}
