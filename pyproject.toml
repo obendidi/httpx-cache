@@ -58,9 +58,9 @@ extra-dependencies = [
     "mock~=4.0",
     "types-mock~=4.0",
     # Linting
-    "ruff~=0.0.153",
-    "black~=22.10.0",
-    "mypy~=0.931",
+    "ruff~=0.0.260",
+    "black~=23.3.0",
+    "mypy~=1.1.1",
     "pre-commit",
     # Doc dependencies
     "mkdocs~=1.4",
