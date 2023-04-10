@@ -7,6 +7,7 @@ import pytest
 from pytest_cases import case, fixture, fixture_union, parametrize_with_cases
 
 import httpx_cache
+from httpx_cache.cache.redis import RedisCache
 
 
 @pytest.fixture
@@ -88,4 +89,54 @@ def file_cache(
     return httpx_cache.FileCache(serializer=serializer, cache_dir=tmp_path)
 
 
-cache = fixture_union("cache", [dict_cache, file_cache], scope="function")
+class _MockRedis:
+    def __init__(self):
+        self._data = {}
+
+    def get(self, key: str) -> bytes:
+        return self._data.get(key)
+
+    def set(self, key: str, value: bytes):
+        self._data[key] = value
+
+    def setex(self, key: str, time_: int, value: bytes):
+        # TODO: time_ is ignored
+        self.set(key, value)
+
+    def delete(self, key: str):
+        self._data.pop(key, None)
+
+    def close(self):
+        pass
+
+
+class _MockAsyncRedis:
+    def __init__(self):
+        self._data = {}
+
+    async def get(self, key: str) -> bytes:
+        return self._data.get(key)
+
+    async def set(self, key: str, value: bytes):
+        self._data[key] = value
+
+    async def setex(self, key: str, time_: int, value: bytes):
+        # TODO: time_ is ignored
+        self.set(key, value)
+
+    async def delete(self, key: str):
+        self._data.pop(key, None)
+
+    async def close(self):
+        pass
+
+
+@fixture(scope="function")
+@parametrize_with_cases("serializer", cases=SerializerCases, has_tag="bytes")
+def redis_cache(serializer: httpx_cache.BaseSerializer) -> RedisCache:
+    redis = _MockRedis()
+    aredis = _MockAsyncRedis()
+    return RedisCache(serializer=serializer, redis=redis, aredis=aredis)
+
+
+cache = fixture_union("cache", [dict_cache, file_cache, redis_cache], scope="function")

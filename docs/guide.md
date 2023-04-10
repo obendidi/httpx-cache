@@ -168,16 +168,46 @@ with httpx_cache.Client(cache=httpx_cache.FileCache(cache_dir="./my-custom-dir")
   response = client.get("https://httpbin.org/get")
 ```
 
+### RedisCache
+
+You need to install `redis` package to use this cache type, or install `httpx-cache[redis]` to install it automatically.
+
+```py
+import httpx_cache
+from httpx.cache.redis import RedisCache
+
+with httpx_cache.Client(cache=RedisCache(redis_url="redis://localhost:6379/0")) as client:
+  response = client.get("https://httpbin.org/get")
+```
+
+By default all cached responses are saved under the namespace `htppx_cache`.
+
+Optionally a TTL can be provided so that the cached responses expire after the given time (as a python timedelta).
+
+It can also accepts direct instances of `redis.Redis` or `redis.StrictRedis` clients.
+
+```py
+import httpx_cache
+from redis import Redis
+from httpx.cache.redis import RedisCache
+
+redis_client = Redis(host="localhost", port=6379, db=0)
+cache = RedisCache(redis=redis_client, namespace="my-custom-namespace", default_ttl=timedelta(hours=1))
+
+with httpx_cache.Client(cache=cache) as client:
+  response = client.get("https://httpbin.org/get")
+```
+
 ## Serializer Types
 
 Before caching an httpx.Response it needs to be serialized to a cacheable format supported by the used cache type (Dict/File).
 
-|     Serializer       |      DictCache     |     FileCache      |
-| -------------------- | ------------------ | ------------------ |
-| DictSerializer       | :white_check_mark: |       :x:          |
-| StringJsonSerializer | :white_check_mark: |       :x:          |
-| BytesJsonSerializer  | :white_check_mark: | :white_check_mark: |
-| MsgPackSerializer    | :white_check_mark: | :white_check_mark: |
+|     Serializer       |      DictCache     |     FileCache      |     RedisCache     |
+| -------------------- | ------------------ | ------------------ | ------------------ |
+| DictSerializer       | :white_check_mark: |       :x:          |       :x:          |
+| StringJsonSerializer | :white_check_mark: |       :x:          |       :x:          |
+| BytesJsonSerializer  | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| MsgPackSerializer    | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 A custom serializer can be used anytime with:
 
