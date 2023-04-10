@@ -483,7 +483,7 @@
 </code></pre></div>
 <h2 id="always-cache">Always Cache</h2>
 <p>In the case where we want to ignore the <code>no-store</code> directive in the response headers, we can set the parameter <code>always_cache=True</code>. This parameter can be set on the <code>client</code> or on the <code>transport</code>.</p>
-<p><img alt="⚠" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/26a0.svg" title=":warning:" /> Note: Event when <code>always_cache=True</code> is set, the cache controller will still does the basic checks to make sure the response is cacheable, namely: status_code is cacheable, request method is cacheable, and request url is absolute.</p>
+<p><img alt="⚠" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/26a0.svg" title=":warning:" /> Note: Event when <code>always_cache=True</code> is set, the cache controller will still does the basic checks to make sure the response is cacheable, namely: status_code is cacheable, request method is cacheable, and request url is absolute.</p>
 <p>Usage with <code>client</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>

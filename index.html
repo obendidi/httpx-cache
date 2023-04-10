@@ -278,6 +278,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#supported-cache-types-and-serializers" class="md-nav__link">
+    Supported Cache Types and Serializers
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -391,6 +398,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#supported-cache-types-and-serializers" class="md-nav__link">
+    Supported Cache Types and Serializers
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -415,26 +429,66 @@
 </ul>
 <h2 id="installation">Installation</h2>
 <p>Install with pip:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$ pip install httpx-cache
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>httpx-cache
+</code></pre></div>
+<p>To use <code>RedisCache</code>, install with <code>redis</code> extra:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>httpx-cache<span class="o">[</span>redis<span class="o">]</span>
 </code></pre></div>
 <p>Requires Python 3.6+ and HTTPX 0.21+.</p>
 <h2 id="quickstart">Quickstart</h2>
 <h3 id="usage-with-client">Usage with Client</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="usage-with-asyncclient">Usage with AsyncClient</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">async</span> <span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="usage-with-asyncclient">Usage with AsyncClient</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">async</span> <span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p>When using <code>httpx-cache.Client</code>/<code>httpx_cache.AsyncClient</code>, the interface and features (except caching) are exactly the same as <code>httpx.Client</code>/<code>httpx.AsyncClient</code></p>
 <blockquote>
 <p>Read the <a href="guide/">User Guide</a> for a complete walk-through.</p>
 </blockquote>
+<h2 id="supported-cache-types-and-serializers">Supported Cache Types and Serializers</h2>
+<table>
+<thead>
+<tr>
+<th>Serializer</th>
+<th>DictCache</th>
+<th>FileCache</th>
+<th>RedisCache</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DictSerializer</td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="❌" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/274c.svg" title=":x:" /></td>
+<td><img alt="❌" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/274c.svg" title=":x:" /></td>
+</tr>
+<tr>
+<td>StringJsonSerializer</td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="❌" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/274c.svg" title=":x:" /></td>
+<td><img alt="❌" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/274c.svg" title=":x:" /></td>
+</tr>
+<tr>
+<td>BytesJsonSerializer</td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+</tr>
+<tr>
+<td>MsgPackSerializer</td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+</tr>
+</tbody>
+</table>
 
 
 

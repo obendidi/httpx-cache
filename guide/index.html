@@ -322,6 +322,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#rediscache" class="md-nav__link">
+    RedisCache
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -491,6 +498,13 @@
           <li class="md-nav__item">
   <a href="#filecache" class="md-nav__link">
     FileCache
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rediscache" class="md-nav__link">
+    RedisCache
   </a>
   
 </li>
@@ -690,6 +704,27 @@
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">httpx_cache</span><span class="o">.</span><span class="n">FileCache</span><span class="p">(</span><span class="n">cache_dir</span><span class="o">=</span><span class="s2">&quot;./my-custom-dir&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
 </code></pre></div>
+<h3 id="rediscache">RedisCache</h3>
+<p>You need to install <code>redis</code> package to use this cache type, or install <code>httpx-cache[redis]</code> to install it automatically.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span> <span class="nn">httpx.cache.redis</span> <span class="kn">import</span> <span class="n">RedisCache</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">RedisCache</span><span class="p">(</span><span class="n">redis_url</span><span class="o">=</span><span class="s2">&quot;redis://localhost:6379/0&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>By default all cached responses are saved under the namespace <code>htppx_cache</code>.</p>
+<p>Optionally a TTL can be provided so that the cached responses expire after the given time (as a python timedelta).</p>
+<p>It can also accepts direct instances of <code>redis.Redis</code> or <code>redis.StrictRedis</code> clients.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">from</span> <span class="nn">redis</span> <span class="kn">import</span> <span class="n">Redis</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kn">from</span> <span class="nn">httpx.cache.redis</span> <span class="kn">import</span> <span class="n">RedisCache</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">redis_client</span> <span class="o">=</span> <span class="n">Redis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">cache</span> <span class="o">=</span> <span class="n">RedisCache</span><span class="p">(</span><span class="n">redis</span><span class="o">=</span><span class="n">redis_client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-custom-namespace&quot;</span><span class="p">,</span> <span class="n">default_ttl</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="k">with</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
+</code></pre></div>
 <h2 id="serializer-types">Serializer Types</h2>
 <p>Before caching an httpx.Response it needs to be serialized to a cacheable format supported by the used cache type (Dict/File).</p>
 <table>
@@ -698,48 +733,53 @@
 <th>Serializer</th>
 <th>DictCache</th>
 <th>FileCache</th>
+<th>RedisCache</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>DictSerializer</td>
-<td><img alt="✅" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2705.svg" title=":white_check_mark:" /></td>
-<td><img alt="❌" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/274c.svg" title=":x:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="❌" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/274c.svg" title=":x:" /></td>
+<td><img alt="❌" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/274c.svg" title=":x:" /></td>
 </tr>
 <tr>
 <td>StringJsonSerializer</td>
-<td><img alt="✅" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2705.svg" title=":white_check_mark:" /></td>
-<td><img alt="❌" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/274c.svg" title=":x:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="❌" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/274c.svg" title=":x:" /></td>
+<td><img alt="❌" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/274c.svg" title=":x:" /></td>
 </tr>
 <tr>
 <td>BytesJsonSerializer</td>
-<td><img alt="✅" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2705.svg" title=":white_check_mark:" /></td>
-<td><img alt="✅" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
 </tr>
 <tr>
 <td>MsgPackSerializer</td>
-<td><img alt="✅" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2705.svg" title=":white_check_mark:" /></td>
-<td><img alt="✅" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
+<td><img alt="✅" class="twemoji" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/2705.svg" title=":white_check_mark:" /></td>
 </tr>
 </tbody>
 </table>
 <p>A custom serializer can be used anytime with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">httpx_cache</span><span class="o">.</span><span class="n">DictCache</span><span class="p">(</span><span class="n">serializer</span><span class="o">=</span><span class="n">httpx_cache</span><span class="o">.</span><span class="n">DictSerializer</span><span class="p">()))</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span> <span class="nn">httpx_cache</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">httpx_cache</span><span class="o">.</span><span class="n">DictCache</span><span class="p">(</span><span class="n">serializer</span><span class="o">=</span><span class="n">httpx_cache</span><span class="o">.</span><span class="n">DictSerializer</span><span class="p">()))</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://httpbin.org/get&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p><code>httpx-cache</code> provides the following serializers:</p>
 <h3 id="dictserializer">DictSerializer</h3>
 <p>The base serializer used in all other serializers, converts an <code>httpx.Response</code> object into python dict that represents the response. The idea is that using the created dict we should be able to recreate exactly the same response.</p>
 <p>The serialized dict has the following elements:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;status_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;int, required, status code of the response&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;List[Tuple[str, str]], required, list of headers of the original response, can be an empty list&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;str, optional, encoding of the response if not Null&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;_content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bytes, optional, content of the response if exists (usually if stream is consumed, or response originally has just a basic content), if not found, &#39;stream_content&#39; should be provided.&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">&quot;stream_content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bytes, optional, in case the response contains a stream that is loaded only after the transport finishies his work, will be converted to an httpx.BytesStream when recreating the response.&quot;</span><span class="w"></span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;status_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;int, required, status code of the response&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;List[Tuple[str, str]], required, list of headers of the original response, can be an empty list&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;str, optional, encoding of the response if not Null&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">&quot;_content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bytes, optional, content of the response if exists (usually if stream is consumed, or response originally has just a basic content), if not found, &#39;stream_content&#39; should be provided.&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nt">&quot;stream_content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bytes, optional, in case the response contains a stream that is loaded only after the transport finishies his work, will be converted to an httpx.BytesStream when recreating the response.&quot;</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="stringjsonserializer">StringJsonSerializer</h3>
 <p>Inherits from <code>DictSerializer</code>, this is the result of <code>json.dumps</code> of the above generated dict.</p>
