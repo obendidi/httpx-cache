@@ -36,7 +36,11 @@
     :docstring:
     :members:
 
-!!! **Note** FileCache only supports `httpx_cache.MsgPackSerializer` and `httpx_cache.BytesJsonSerializer` serializers.
+::: httpx_cache.cache.redis.RedisCache
+    :docstring:
+    :members:
+
+!!! **Note** FileCache and RedisCache only supports `httpx_cache.MsgPackSerializer` and `httpx_cache.BytesJsonSerializer` serializers.
 
 ## Serializer
 

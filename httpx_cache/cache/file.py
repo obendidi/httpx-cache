@@ -2,8 +2,8 @@ import typing as tp
 from pathlib import Path
 
 import anyio
-import fasteners
-from aiorwlock import RWLock
+from fasteners import ReaderWriterLock as RWLock
+from aiorwlock import RWLock as AsyncRWLock
 import httpx
 
 from httpx_cache.cache.base import BaseCache
@@ -24,7 +24,7 @@ class FileCache(BaseCache):
             httpx_cache.MsgPackSerializer
     """
 
-    lock = fasteners.ReaderWriterLock()
+    lock = RWLock()
 
     def __init__(
         self,
@@ -48,6 +48,14 @@ class FileCache(BaseCache):
         self.cache_dir = cache_dir
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
+        self._async_lock: tp.Optional[AsyncRWLock] = None
+
+    @property
+    def async_lock(self) -> AsyncRWLock:
+        if self._async_lock is None:
+            self._async_lock = AsyncRWLock()
+        return self._async_lock
+
     def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
         filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
         if filepath.is_file():
@@ -61,7 +69,7 @@ class FileCache(BaseCache):
             get_cache_filepath(self.cache_dir, request, extra=self._extra)
         )
         if await filepath.is_file():
-            async with RWLock().reader:
+            async with self.async_lock.reader:
                 cached = await filepath.read_bytes()
             return self.serializer.loads(request=request, cached=cached)
         return None
@@ -89,7 +97,7 @@ class FileCache(BaseCache):
             get_cache_filepath(self.cache_dir, request, extra=self._extra)
         )
         to_cache = self.serializer.dumps(response=response, content=content)
-        async with RWLock().writer:
+        async with self.async_lock.writer:
             await filepath.write_bytes(to_cache)
 
     def delete(self, request: httpx.Request) -> None:
@@ -102,5 +110,5 @@ class FileCache(BaseCache):
         filepath = anyio.Path(
             get_cache_filepath(self.cache_dir, request, extra=self._extra)
         )
-        async with RWLock().writer:
+        async with self.async_lock.writer:
             await filepath.unlink(missing_ok=True)

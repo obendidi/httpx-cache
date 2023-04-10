@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "httpx-cache"
-version = "0.8.0"
+version = "0.9.0"
 description = "Simple caching transport for httpx."
 readme = "README.md"
 requires-python = ">=3.7"
@@ -41,12 +41,16 @@ dependencies = [
   "aiorwlock~=1.2"
 ]
 
+[project.optional-dependencies]
+redis = ["redis~=4.5"]
+
 [project.urls]
 Homepage = "https://github.com/obendidi/httpx-cache"
 Documentation = "https://obendidi.github.io/httpx-cache/"
 
 [tool.hatch.envs.dev]
 extra-dependencies = [
+    "httpx-cache[redis]",
     # Test dependencies
     "pytest~=7.2",
     "coverage[toml]~=6.5",
@@ -76,6 +80,7 @@ typing = "mypy --install-types --non-interactive httpx_cache"
 test = "pytest -ra -q -vv --cov=httpx_cache --cov-report=term-missing --cov-report=xml --cov-config=pyproject.toml"
 docs-build = "mkdocs build --clean --strict"
 docs-serve = "mkdocs serve --dev-addr localhost:8000"
+docs-deploy = "mkdocs gh-deploy"
 
 [tool.ruff.isort]
 known-first-party = ["httpx_cache"]
