@@ -174,7 +174,7 @@ You need to install `redis` package to use this cache type, or install `httpx-ca
 
 ```py
 import httpx_cache
-from httpx_cache.cache import RedisCache
+from httpx_cache.cache.redis import RedisCache
 
 with httpx_cache.Client(cache=RedisCache(redis_url="redis://localhost:6379/0")) as client:
   response = client.get("https://httpbin.org/get")
@@ -189,7 +189,7 @@ It can also accepts direct instances of `redis.Redis` or `redis.StrictRedis` cli
 ```py
 import httpx_cache
 from redis import Redis
-from httpx_cache.cache import RedisCache
+from httpx_cache.cache.redis import RedisCache
 
 redis_client = Redis(host="localhost", port=6379, db=0)
 cache = RedisCache(redis=redis_client, namespace="my-custom-namespace", default_ttl=timedelta(hours=1))
