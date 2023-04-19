@@ -1,4 +1,4 @@
-from httpx_cache.cache import BaseCache, DictCache, FileCache, RedisCache
+from httpx_cache.cache import BaseCache, DictCache, FileCache
 from httpx_cache.cache_control import CacheControl
 from httpx_cache.client import AsyncClient, Client
 from httpx_cache.serializer import (
