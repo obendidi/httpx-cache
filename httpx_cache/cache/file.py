@@ -68,10 +68,13 @@ class FileCache(BaseCache):
         filepath = anyio.Path(
             get_cache_filepath(self.cache_dir, request, extra=self._extra)
         )
-        if await filepath.is_file():
-            async with self.async_lock.reader:
-                cached = await filepath.read_bytes()
-            return self.serializer.loads(request=request, cached=cached)
+        async with self.async_lock.reader:
+            if await filepath.is_file():
+                try:
+                    cached = await filepath.read_bytes()
+                    return self.serializer.loads(request=request, cached=cached)
+                except Exception:
+                    return None
         return None
 
     def set(
