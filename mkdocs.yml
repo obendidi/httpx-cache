@@ -13,7 +13,7 @@ nav:
   - Introduction: "index.md"
   - User Guide: "guide.md"
   - Cache Control: "cache_control.md"
-  - Developper Interface: "api.md"
+  - Developer Interface: "api.md"
 
 markdown_extensions:
   - admonition
