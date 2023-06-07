@@ -99,9 +99,12 @@ class FileCache(BaseCache):
         filepath = anyio.Path(
             get_cache_filepath(self.cache_dir, request, extra=self._extra)
         )
-        to_cache = self.serializer.dumps(response=response, content=content)
         async with self.async_lock.writer:
-            await filepath.write_bytes(to_cache)
+            to_cache = self.serializer.dumps(response=response, content=content)
+            try:
+                await filepath.write_bytes(to_cache)
+            except Exception:
+                return None
 
     def delete(self, request: httpx.Request) -> None:
         filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
