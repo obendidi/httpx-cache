@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import anyio
 import httpx
 import mock
 import pytest
@@ -62,14 +61,14 @@ def test_file_cache_get_not_found(
 
 
 @mock.patch.object(Path, "mkdir", new=lambda *args, **kwargs: None)
-@mock.patch.object(anyio.Path, "is_file", return_value=False)
+@mock.patch.object(Path, "is_file", return_value=False)
 async def test_file_cache_aget_not_found(
-    mock_is_file: mock.AsyncMock,
+    mock_is_file: mock.Mock,
     file_cache: httpx_cache.FileCache,
     httpx_request: httpx.Request,
 ):
     cached = await file_cache.aget(httpx_request)
-    mock_is_file.assert_awaited_once_with()
+    mock_is_file.assert_called_once_with()
     assert cached is None
 
 

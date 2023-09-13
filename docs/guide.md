@@ -23,6 +23,8 @@ For caching, `httpx_cache.Client` adds 3 new key-args to the table:
 - `cacheable_status_codes`: tuple of int http status codes that supports caching (if response does not have one of these status codes, it will not be cached), defaults to: `(200, 203, 300, 301, 308)`
 - `always_cache`: bool, if True, all **valid** responses will be cached, regardless of the `no-store` directive set in either the request or response, defaults to False.
 
+_Note: When using the `httpx_cache` client or transport, a new property will be added to the response to specify whether it comes from cache or not: `response.from_cache: bool`_
+
 Example usage:
 
 ```py
@@ -31,6 +33,9 @@ import httpx_cache
 with httpx_cache.Client() as client:
   response1 = client.get("https://httpbin.org/get") # will be cached
   response2 = client.get("https://httpbin.org/get") # will get it from cache
+
+assert response1.from_cache is False
+assert response2.from_cache is True
 ```
 
 ### AsyncClient
@@ -43,6 +48,9 @@ import httpx_cache
 async with httpx_cache.AsyncClient() as client:
   response1 = await client.get("https://httpbin.org/get") # will be cached
   response2 = await client.get("https://httpbin.org/get") # will get it from cache
+
+assert response1.from_cache is False
+assert response2.from_cache is True
 ```
 
 ### Response Stream
@@ -123,6 +131,8 @@ The `(Async-)CacheControlTransport` also accepts the 3 key-args:
 - `cacheable_methods`: tuple of str http methods that support caching (if a request does not use one of these methods, it's corresponding response will not be cached), defaults to `('GET',)`
 - `cacheable_status_codes`: tuple of int http status codes that supports caching (if response does not have one of these status codes, it will not be cached), defaults to: `(200, 203, 300, 301, 308)`
 
+_Note: When using the `httpx_cache` client or transport, a new property will be added to the response to specify whether it comes from cache or not: `response.from_cache: bool`_
+
 ```py
 import httpx
 import httpx_cache
@@ -168,6 +178,33 @@ with httpx_cache.Client(cache=httpx_cache.FileCache(cache_dir="./my-custom-dir")
   response = client.get("https://httpbin.org/get")
 ```
 
+#### fsspec/universal_pathlib integration
+
+Filecache also works out of the box with [fsspec/universal_pathlib](https://github.com/fsspec/universal_pathlib) so that you can use any filesystem supported by fsspec as a cachedir. Please check the [fsspec/universal_pathlib](https://github.com/fsspec/universal_pathlib) docs for the list of supported filesystems (and schemes)
+
+Example with an s3 filesystem:
+
+(don't forget to also install the `s3fs` package to use this backend: `pip install universal_pathlib s3fs`)
+
+
+```py
+import httpx_cache
+from upath import UPath
+
+cache_dir = UPath("s3://my-bucket/httpx-cache")
+cache = httpx_cache.FileCache(cache_dir=cache_dir)
+
+with httpx_cache.Client(cache=cache) as client:
+  response = client.get("https://httpbin.org/get")
+
+# OR async client
+# async with httpx_cache.AsyncClient(cache=cache) as client:
+#   response = await client.get("https://httpbin.org/get")
+
+# should contain one file, with the cached response
+print([f for f in cache_dir.iterdir()])
+```
+
 ### RedisCache
 
 You need to install `redis` package to use this cache type, or install `httpx-cache[redis]` to install it automatically.
@@ -202,10 +239,10 @@ with httpx_cache.Client(cache=cache) as client:
 
 Before caching an httpx.Response it needs to be serialized to a cacheable format supported by the used cache type (Dict/File).
 
-|     Serializer       |      DictCache     |     FileCache      |     RedisCache     |
+| Serializer           | DictCache          | FileCache          | RedisCache         |
 | -------------------- | ------------------ | ------------------ | ------------------ |
-| DictSerializer       | :white_check_mark: |       :x:          |       :x:          |
-| StringJsonSerializer | :white_check_mark: |       :x:          |       :x:          |
+| DictSerializer       | :white_check_mark: | :x:                | :x:                |
+| StringJsonSerializer | :white_check_mark: | :x:                | :x:                |
 | BytesJsonSerializer  | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | MsgPackSerializer    | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
