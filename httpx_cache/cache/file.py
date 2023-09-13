@@ -1,7 +1,7 @@
 import typing as tp
 from pathlib import Path
 
-import anyio
+from anyio import to_thread
 from fasteners import ReaderWriterLock as RWLock
 from aiorwlock import RWLock as AsyncRWLock
 import httpx
@@ -65,13 +65,15 @@ class FileCache(BaseCache):
         return None
 
     async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        filepath = anyio.Path(
-            get_cache_filepath(self.cache_dir, request, extra=self._extra)
-        )
+        filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
+
         async with self.async_lock.reader:
-            if await filepath.is_file():
+            if await to_thread.run_sync(filepath.is_file, cancellable=True):
                 try:
-                    cached = await filepath.read_bytes()
+                    cached = await to_thread.run_sync(
+                        filepath.read_bytes,
+                        cancellable=True,
+                    )
                     return self.serializer.loads(request=request, cached=cached)
                 except Exception:
                     return None
@@ -96,13 +98,11 @@ class FileCache(BaseCache):
         response: httpx.Response,
         content: tp.Optional[bytes] = None,
     ) -> None:
-        filepath = anyio.Path(
-            get_cache_filepath(self.cache_dir, request, extra=self._extra)
-        )
+        filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
         async with self.async_lock.writer:
             to_cache = self.serializer.dumps(response=response, content=content)
             try:
-                await filepath.write_bytes(to_cache)
+                await to_thread.run_sync(filepath.write_bytes, to_cache)
             except Exception:
                 return None
 
@@ -113,8 +113,6 @@ class FileCache(BaseCache):
                 filepath.unlink()
 
     async def adelete(self, request: httpx.Request) -> None:
-        filepath = anyio.Path(
-            get_cache_filepath(self.cache_dir, request, extra=self._extra)
-        )
+        filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
         async with self.async_lock.writer:
-            await filepath.unlink(missing_ok=True)
+            await to_thread.run_sync(filepath.unlink, True)
