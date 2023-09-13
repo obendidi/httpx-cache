@@ -4,14 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "httpx-cache"
-version = "0.12.0"
+version = "0.13.0"
 description = "Simple caching transport for httpx."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license-files = { paths = ["LICENSE"] }
-authors = [
-    { name = "Ouail Bendidi", email = "ouail.bendidi@gmail.com" },
-]
+authors = [{ name = "Ouail Bendidi", email = "ouail.bendidi@gmail.com" }]
 repository = "https://github.com/obendidi/httpx-cache"
 homepage = "https://github.com/obendidi/httpx-cache"
 keywords = ["httpx", "cache", "cache-control"]
@@ -38,7 +36,7 @@ dependencies = [
   "msgpack~=1.0",
   "fasteners>=0.16.3,<0.18.0",
   "attrs>=21.4,<24.0",
-  "aiorwlock~=1.2"
+  "aiorwlock~=1.2",
 ]
 
 [project.optional-dependencies]
@@ -50,26 +48,26 @@ Documentation = "https://obendidi.github.io/httpx-cache/"
 
 [tool.hatch.envs.dev]
 extra-dependencies = [
-    "httpx-cache[redis]",
-    # Test dependencies
-    "pytest~=7.2",
-    "coverage[toml]~=6.5",
-    "pytest-cov~=3.0",
-    "chardet~=5.0",
-    "types-chardet~=5.0",
-    "pytest-cases~=3.6.8",
-    "respx~=0.19",
-    "mock~=4.0",
-    "types-mock~=4.0",
-    # Linting
-    "ruff~=0.0.260",
-    "black~=23.3.0",
-    "mypy~=1.1.1",
-    "pre-commit",
-    # Doc dependencies
-    "mkdocs~=1.4",
-    "mkautodoc~=0.1",
-    "mkdocs-material~=8.1"
+  "httpx-cache[redis]",
+  # Test dependencies
+  "pytest~=7.2",
+  "coverage[toml]~=6.5",
+  "pytest-cov~=3.0",
+  "chardet~=5.0",
+  "types-chardet~=5.0",
+  "pytest-cases~=3.6.8",
+  "respx~=0.19",
+  "mock~=4.0",
+  "types-mock~=4.0",
+  # Linting
+  "ruff~=0.0.260",
+  "black~=23.3.0",
+  "mypy~=1.1.1",
+  "pre-commit",
+  # Doc dependencies
+  "mkdocs~=1.4",
+  "mkautodoc~=0.1",
+  "mkdocs-material~=8.1",
 ]
 
 
