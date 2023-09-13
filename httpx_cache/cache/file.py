@@ -1,5 +1,6 @@
 import typing as tp
 from pathlib import Path
+from functools import partial
 
 from anyio import to_thread
 from fasteners import ReaderWriterLock as RWLock
@@ -102,7 +103,11 @@ class FileCache(BaseCache):
         async with self.async_lock.writer:
             to_cache = self.serializer.dumps(response=response, content=content)
             try:
-                await to_thread.run_sync(filepath.write_bytes, to_cache)
+                await to_thread.run_sync(
+                    filepath.write_bytes,
+                    to_cache,
+                    cancellable=True,
+                )
             except Exception:
                 return None
 
@@ -115,4 +120,5 @@ class FileCache(BaseCache):
     async def adelete(self, request: httpx.Request) -> None:
         filepath = get_cache_filepath(self.cache_dir, request, extra=self._extra)
         async with self.async_lock.writer:
-            await to_thread.run_sync(filepath.unlink, True)
+            _func = partial(filepath.unlink, missing_ok=True)
+            await to_thread.run_sync(_func, cancellable=True)
