@@ -1,3 +1,5 @@
+# Archived: This project is no longer maintained, please migrate to [hishel](https://github.com/karosis88/hishel)
+--------------------------------------------------------
 # HTTPX-CACHE
 
 [![codecov](https://codecov.io/gh/obendidi/httpx-cache/branch/main/graph/badge.svg?token=FHHRA6F17X)](https://codecov.io/gh/obendidi/httpx-cache)
