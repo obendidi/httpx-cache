@@ -16,6 +16,8 @@
         <link rel="prev" href="../cache_control/">
       
       
+        <link rel="next" href="../benchmarks/">
+      
       
         
       
@@ -452,6 +454,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -542,7 +571,7 @@
 <h1 id="api-reference">API Reference</h1>
 <h2 id="entry-points">Entry Points</h2>
 <ul>
-<li><code>httpx_cache.wrap(client, *, cache=None, policy="force", ttl=None, cache_post=False, cacheable_methods=None, cacheable_status_codes=None, key_fn=None, shared=False)</code></li>
+<li><code>httpx_cache.wrap(client, *, cache=None, policy="force", ttl=None, cache_post=False, cacheable_methods=None, cacheable_status_codes=None, key_fn=None, shared=False, urls_expire_after=None, stale_if_error=False, scrub_headers=(), should_cache=None, coalesce=False, max_cacheable_bytes=None, on_hit=None, on_miss=None, on_store=None)</code></li>
 <li><code>httpx_cache.Client</code>, <code>httpx_cache.AsyncClient</code></li>
 <li><code>httpx_cache.httpx2.Client</code>, <code>httpx_cache.httpx2.AsyncClient</code></li>
 <li><code>httpx_cache.SyncCacheTransport</code>, <code>httpx_cache.AsyncCacheTransport</code></li>
@@ -552,6 +581,7 @@
 <li><code>httpx_cache.BaseCache</code></li>
 <li><code>httpx_cache.SqliteCache</code></li>
 <li><code>httpx_cache.MemoryCache</code></li>
+<li><code>httpx_cache.JsonCache</code></li>
 <li><code>httpx_cache.FileCache</code></li>
 <li><code>httpx_cache.RedisCache</code></li>
 </ul>

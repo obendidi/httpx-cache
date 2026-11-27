@@ -382,6 +382,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#resilience-coalescing-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resilience, Coalescing &amp; Filtering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#streaming-responses" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -476,6 +498,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -529,6 +578,28 @@
     <span class="md-ellipsis">
       
         Stores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resilience-coalescing-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resilience, Coalescing &amp; Filtering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
       
     </span>
   </a>
@@ -608,35 +679,51 @@
 </ul>
 <h2 id="stores">Stores</h2>
 <ul>
-<li><strong><code>SqliteCache(path=None, max_size_bytes=None, compress=True)</code></strong> (default): WAL-mode SQLite file (<code>~/.cache/httpx-cache/cache.sqlite3</code>, or <code>":memory:"</code>), indexed TTL expiry, <code>zlib</code> body compression (&gt;1 KB), LRU eviction, <code>.purge_expired()</code>.</li>
+<li><strong><code>SqliteCache(path=None, max_size_bytes=None, compress=True)</code></strong> (default): WAL-mode SQLite file (<code>~/.cache/httpx-cache/cache.sqlite3</code>, or <code>":memory:"</code>), indexed TTL expiry, <code>zlib</code> body compression (&gt;1 KB), LRU eviction, <code>.purge_expired()</code>, <code>.export_json()</code> / <code>.import_json()</code>.</li>
 <li><strong><code>MemoryCache(max_entries=None, max_size_bytes=None)</code></strong>: thread-safe in-memory LRU.</li>
+<li><strong><code>JsonCache(path)</code></strong>: single sorted, human-readable JSON file for git-diffable test/eval cassettes.</li>
 <li><strong><code>FileCache(cache_dir=None, compress=True)</code></strong>: one atomically written file per key.</li>
 <li><strong><code>RedisCache(redis_url=..., redis=..., aredis=..., namespace="httpx_cache", default_ttl=None)</code></strong>: <code>redis&gt;=5</code> sync/async backend (<code>pip install "httpx-cache[redis]"</code>).</li>
 </ul>
-<p>Every store implements <code>.get(key)</code>, <code>.set(key, entry)</code>, <code>.delete(key)</code>, <code>.clear()</code>, <code>.stats()</code>, and async <code>a*</code> variants.</p>
+<p>Every store implements <code>.get(key)</code>, <code>.set(key, entry)</code>, <code>.delete(key)</code>, <code>.keys(prefix="")</code>, <code>.delete_prefix(prefix)</code>, <code>.clear()</code>, <code>.stats()</code>, and async <code>a*</code> variants.</p>
+<h2 id="resilience-coalescing-filtering">Resilience, Coalescing &amp; Filtering</h2>
+<ul>
+<li><strong>Singleflight coalescing (<code>coalesce=True</code>)</strong>: deduplicates concurrent sync/async cache misses on the same key so only one upstream call runs.</li>
+<li><strong>Stale-if-error (<code>stale_if_error=True | seconds</code>)</strong>: returns the last expired entry (<code>response.extensions["stale"] = True</code>) if upstream raises a transport error or returns 5xx.</li>
+<li><strong>Per-request overrides (<code>extensions={"cache": {...}}</code>)</strong>: pass <code>disabled=True</code>, <code>force_refresh=True</code>, <code>ttl=...</code>, or <code>key=...</code> on any individual request.</li>
+<li><strong>Filtering &amp; scrubbing</strong>: <code>urls_expire_after={"*/auth/*": 0, "*/prices": 30}</code>, <code>should_cache=lambda req, resp: ...</code>, <code>scrub_headers=("set-cookie",)</code>, and <code>max_cacheable_bytes=...</code> (prevents OOM on large streams while keeping LLM SSE streaming cached cleanly).</li>
+<li><strong>Observability hooks</strong>: <code>on_hit(key, req)</code>, <code>on_miss(key, req)</code>, <code>on_store(key, req, entry)</code>.</li>
+</ul>
+<h2 id="cli">CLI</h2>
+<p>Inspect or manage SQLite caches from the terminal with <code>httpx-cache</code> (or <code>python -m httpx_cache</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>httpx-cache<span class="w"> </span>--db<span class="w"> </span>.cache/api.sqlite3<span class="w"> </span>stats
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>httpx-cache<span class="w"> </span>--db<span class="w"> </span>.cache/api.sqlite3<span class="w"> </span>inspect<span class="w"> </span>--prefix<span class="w"> </span><span class="s2">"POST:"</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>httpx-cache<span class="w"> </span>--db<span class="w"> </span>.cache/api.sqlite3<span class="w"> </span>purge
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>httpx-cache<span class="w"> </span>--db<span class="w"> </span>.cache/api.sqlite3<span class="w"> </span><span class="nb">export</span><span class="w"> </span>cassette.json
+</code></pre></div>
 <h2 id="streaming-responses">Streaming Responses</h2>
 <p>With <code>client.stream(...)</code>, chunks pass through untouched as you iterate. The entry is written to the cache only once the stream reaches normal EOF — aborting early never caches a partial body, and raw <code>Content-Encoding</code> wire streams are preserved without double-decoding.</p>
 <h2 id="custom-cache-keys-make_key_fn">Custom Cache Keys (<code>make_key_fn</code>)</h2>
 <p>Pass <code>key_fn</code> or use <code>httpx_cache.make_key_fn(...)</code> to strip ephemeral query parameters, hash selected headers (safe for <code>Authorization</code>), and canonicalize JSON request bodies:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">(),</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">cache_post</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">key_fn</span><span class="o">=</span><span class="n">httpx_cache</span><span class="o">.</span><span class="n">make_key_fn</span><span class="p">(</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="n">ignore_params</span><span class="o">=</span><span class="p">(</span><span class="s2">"api_key"</span><span class="p">,</span> <span class="s2">"ts"</span><span class="p">),</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="n">include_headers</span><span class="o">=</span><span class="p">(</span><span class="s2">"x-tenant"</span><span class="p">,),</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="n">normalize_json_body</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="p">),</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">httpx_cache</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">(),</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">cache_post</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">key_fn</span><span class="o">=</span><span class="n">httpx_cache</span><span class="o">.</span><span class="n">make_key_fn</span><span class="p">(</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">ignore_params</span><span class="o">=</span><span class="p">(</span><span class="s2">"api_key"</span><span class="p">,</span> <span class="s2">"ts"</span><span class="p">),</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">include_headers</span><span class="o">=</span><span class="p">(</span><span class="s2">"x-tenant"</span><span class="p">,),</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">normalize_json_body</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="p">),</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">)</span>
 </code></pre></div>
 <p>Invalidate any response directly via <code>cache.delete(response.extensions["cache_key"])</code>.</p>
 <h2 id="pytest-record-replay-fixture">Pytest Record / Replay Fixture</h2>
 <p><code>httpx-cache</code> exposes a built-in pytest plugin (<code>httpx_cache_cassette</code> + <code>--httpx-cache-record=once|replay|rewrite</code>) with zero runtime dependency on <code>pytest</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_endpoint</span><span class="p">(</span><span class="n">httpx_cache_cassette</span><span class="p">):</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">with</span> <span class="n">httpx_cache_cassette</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">resp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"https://api.example.com/items"</span><span class="p">)</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="k">assert</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_endpoint</span><span class="p">(</span><span class="n">httpx_cache_cassette</span><span class="p">):</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="k">with</span> <span class="n">httpx_cache_cassette</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="n">resp</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"https://api.example.com/items"</span><span class="p">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="k">assert</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
 </code></pre></div>
 
 
