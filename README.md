@@ -112,17 +112,36 @@ Every response sets:
 - `response.extensions["cache_key"]` (`str`) — pass directly to `cache.delete(key)` to invalidate
 - `response.extensions["revalidated"]` (`True`, when refreshed via `304 Not Modified`)
 
-Custom cache keys and streaming (`stream=True`) work out of the box:
+Custom cache keys, `make_key_fn`, and streaming (`stream=True`) work out of the box:
 
 ```python
 client = httpx_cache.wrap(
     httpx.Client(),
-    key_fn=lambda req: f"{req.method}:{req.url.path}",
+    key_fn=httpx_cache.make_key_fn(
+        ignore_params=("api_key", "ts"),
+        include_headers=("x-tenant",),
+        normalize_json_body=True,
+    ),
 )
 with client.stream("GET", "https://example.com/large") as r:
     for chunk in r.iter_bytes():
         ...  # cached only if the stream finishes completely
 ```
+
+## Pytest Record / Replay Fixture
+
+Installing `httpx-cache` registers a lightweight `pytest` plugin (`httpx_cache_cassette` fixture + `--httpx-cache-record=once|replay|rewrite`):
+
+```python
+import httpx
+
+def test_fetch_user(httpx_cache_cassette):
+    with httpx_cache_cassette.wrap(httpx.Client()) as client:
+        resp = client.get("https://api.example.com/users/1")
+        assert resp.status_code == 200
+```
+
+Run `pytest --httpx-cache-record=once` locally to record into `__cassettes__/`, `pytest --httpx-cache-record=replay` in CI to fail loudly on unrecorded calls, or `--httpx-cache-record=rewrite` to refresh cassettes.
 
 ## Explicit `httpx2` Client Subclasses
 
@@ -140,7 +159,7 @@ c2 = httpx2_cache.Client()        # httpx2.Client subclass
 
 ```bash
 uv sync --python 3.12
-uv run pytest --cov=httpx_cache
+uv run coverage run -m pytest && uv run coverage report
 uv run ruff check .
 uv run mypy httpx_cache
 ```

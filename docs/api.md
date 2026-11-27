@@ -22,3 +22,10 @@
 - `httpx_cache.CacheMissError`
 - `httpx_cache.PolicyController`
 - `httpx_cache.default_key_fn`
+- `httpx_cache.make_key_fn(*, ignore_params=(), include_headers=(), include_body=True, normalize_json_body=False, prefix="")`
+
+## Pytest Plugin
+
+- Fixture: `httpx_cache_cassette` (`.path`, `.mode`, `.policy`, `.cache`, `.wrap(client, ...)`)
+- Fixture: `httpx_cache_record_mode`
+- CLI flag: `--httpx-cache-record=once|replay|rewrite`

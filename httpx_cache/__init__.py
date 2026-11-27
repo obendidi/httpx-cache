@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from httpx_cache.cache import BaseCache, FileCache, MemoryCache, RedisCache, SqliteCache
 from httpx_cache.client import build_client_classes, wrap
-from httpx_cache.keys import default_key_fn
+from httpx_cache.keys import default_key_fn, make_key_fn
 from httpx_cache.policy import PolicyController
 from httpx_cache.transport import AsyncCacheTransport, SyncCacheTransport
 from httpx_cache.types import BackendName, CacheEntry, CacheMissError, CacheStats, KeyFn, PolicyName
@@ -31,6 +31,7 @@ __all__ = [
     "SqliteCache",
     "SyncCacheTransport",
     "default_key_fn",
+    "make_key_fn",
     "wrap",
 ]
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "httpx-cache"
-version = "1.0.0"
+version = "1.1.0"
 description = "Zero-config, minimal-dependency response caching and deterministic replay for httpx and httpx2."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -33,6 +33,9 @@ dependencies = []
 httpx = ["httpx>=0.27,<1"]
 httpx2 = ["httpx2>=2.5"]
 redis = ["redis>=5"]
+
+[project.entry-points.pytest11]
+httpx_cache = "httpx_cache.pytest_plugin"
 
 [project.urls]
 Homepage = "https://github.com/obendidi/httpx-cache"

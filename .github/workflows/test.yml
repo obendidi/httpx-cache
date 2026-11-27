@@ -40,7 +40,7 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
       - run: uv sync --python ${{ matrix.python-version }}
-      - run: uv run pytest --cov=httpx_cache --cov-report=term-missing
+      - run: uv run coverage run -m pytest && uv run coverage report
 
   test-isolated:
     name: Test ${{ matrix.backend }}-only (Python ${{ matrix.python-version }})
@@ -70,3 +70,27 @@ jobs:
           --with pytest
           --with pytest-asyncio
           pytest -v
+
+  test-redis-live:
+    name: Test live Redis (Python 3.12)
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync --python 3.12
+      - env:
+          HTTPX_CACHE_REDIS_URL: redis://localhost:6379/0
+        run: uv run pytest tests/cache/test_redis_live.py -v

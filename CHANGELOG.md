@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0
+
+- **Composable cache key helper (`make_key_fn`)**: strip ephemeral query parameters (`ignore_params`), hash selected request headers safely (`include_headers`), and canonicalize JSON request bodies (`normalize_json_body=True`).
+- **Built-in pytest record/replay plugin**: registers the `httpx_cache_cassette` fixture and `--httpx-cache-record=once|replay|rewrite` CLI option via `pytest11` entry point with zero runtime dependency on `pytest`.
+- **Live Redis CI coverage & automated MkDocs deployment**: added live `redis:7-alpine` integration tests in CI and automated GitHub Pages deployment (including `/llms.txt` at site root).
+
 ## v1.0.0
 
 - **Dual `httpx` and `httpx2` support**: `httpx_cache.wrap(client)` auto-detects `httpx` (`>=0.27,<1`), Pydantic's `httpx2` (`>=2.5`), and SDK client subclasses, allowing both libraries to share the same cache even in one process. Explicit `httpx_cache.httpx2.Client` and `AsyncClient` subclasses are also included.

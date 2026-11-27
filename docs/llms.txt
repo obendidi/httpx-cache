@@ -23,6 +23,11 @@
   - `"force"` (default): ignores `no-store`/`private`/`no-cache`, uses `ttl`, optional `cache_post=True` body-hash keying.
   - `"rfc9111"`: honors `Cache-Control`, `Expires`, `Vary`, permanent redirects, `ETag`/`Last-Modified` 304 revalidation.
   - `"replay"`: offline-only deterministic playback; ignores expiry and raises `CacheMissError(key, request)` on miss.
+- Key helpers:
+  - `httpx_cache.default_key_fn(request, *, vary_headers=())`
+  - `httpx_cache.make_key_fn(*, ignore_params=(), include_headers=(), include_body=True, normalize_json_body=False, prefix="")`
+- Pytest plugin (entry point `pytest11`, zero runtime dep):
+  - `httpx_cache_cassette` fixture (`.wrap(client, ...)`) + `--httpx-cache-record=once|replay|rewrite`
 - Metadata on every `Response`:
   - `response.extensions["from_cache"]`: `bool`
   - `response.extensions["cache_key"]`: `str`
@@ -53,4 +58,3 @@ r = client.get("https://api.example.com/items")
 - [User Guide](./guide.md)
 - [Policies & RFC 9111](./cache_control.md)
 - [API Reference](./api.md)
-- [Agent Skill](../skills/httpx-cache/SKILL.md)

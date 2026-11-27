@@ -38,15 +38,33 @@ Every store implements `.get(key)`, `.set(key, entry)`, `.delete(key)`, `.clear(
 
 With `client.stream(...)`, chunks pass through untouched as you iterate. The entry is written to the cache only once the stream reaches normal EOF — aborting early never caches a partial body, and raw `Content-Encoding` wire streams are preserved without double-decoding.
 
-## Custom Cache Keys
+## Custom Cache Keys (`make_key_fn`)
 
-Pass `key_fn` to override default `METHOD:URL[|body=<sha256>]` keying:
+Pass `key_fn` or use `httpx_cache.make_key_fn(...)` to strip ephemeral query parameters, hash selected headers (safe for `Authorization`), and canonicalize JSON request bodies:
 
 ```python
 client = httpx_cache.wrap(
     httpx.Client(),
-    key_fn=lambda req: f"{req.method}:{req.url.path}",
+    cache_post=True,
+    key_fn=httpx_cache.make_key_fn(
+        ignore_params=("api_key", "ts"),
+        include_headers=("x-tenant",),
+        normalize_json_body=True,
+    ),
 )
 ```
 
 Invalidate any response directly via `cache.delete(response.extensions["cache_key"])`.
+
+## Pytest Record / Replay Fixture
+
+`httpx-cache` exposes a built-in pytest plugin (`httpx_cache_cassette` + `--httpx-cache-record=once|replay|rewrite`) with zero runtime dependency on `pytest`:
+
+```python
+import httpx
+
+def test_endpoint(httpx_cache_cassette):
+    with httpx_cache_cassette.wrap(httpx.Client()) as client:
+        resp = client.get("https://api.example.com/items")
+        assert resp.status_code == 200
+```
