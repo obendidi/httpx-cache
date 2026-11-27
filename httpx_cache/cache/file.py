@@ -11,7 +11,7 @@ import time
 import zlib
 from pathlib import Path
 
-from httpx_cache.cache._codec import decode_entry, encode_entry
+from httpx_cache.cache._codec import decode_entry, decode_entry_with_key, encode_entry
 from httpx_cache.cache.base import BaseCache
 from httpx_cache.types import CacheEntry, CacheStats
 
@@ -75,7 +75,7 @@ class FileCache(BaseCache):
 
     def set(self, key: str, entry: CacheEntry) -> None:
         path = self._path_for_key(key)
-        payload = encode_entry(entry, compress=self.compress)
+        payload = encode_entry(entry, compress=self.compress, key=key)
         with self._lock:
             self.cache_dir.mkdir(parents=True, exist_ok=True)
             fd, tmp_name = tempfile.mkstemp(dir=self.cache_dir, suffix=".tmp")
@@ -100,6 +100,37 @@ class FileCache(BaseCache):
 
     async def adelete(self, key: str) -> bool:
         return await asyncio.to_thread(self.delete, key)
+
+    def keys(self, prefix: str = "") -> list[str]:
+        found: list[str] = []
+        with self._lock:
+            for item in self.cache_dir.glob(f"*{_FILE_SUFFIX}"):
+                try:
+                    stored_key, _ = decode_entry_with_key(item.read_bytes())
+                except (OSError, ValueError, KeyError, zlib.error, json.JSONDecodeError):
+                    continue
+                if stored_key is not None and (not prefix or stored_key.startswith(prefix)):
+                    found.append(stored_key)
+        return sorted(found)
+
+    async def akeys(self, prefix: str = "") -> list[str]:
+        return await asyncio.to_thread(self.keys, prefix)
+
+    def delete_prefix(self, prefix: str) -> int:
+        removed = 0
+        with self._lock:
+            for item in self.cache_dir.glob(f"*{_FILE_SUFFIX}"):
+                try:
+                    stored_key, _ = decode_entry_with_key(item.read_bytes())
+                except (OSError, ValueError, KeyError, zlib.error, json.JSONDecodeError):
+                    continue
+                if stored_key is not None and (not prefix or stored_key.startswith(prefix)):
+                    item.unlink(missing_ok=True)
+                    removed += 1
+        return removed
+
+    async def adelete_prefix(self, prefix: str) -> int:
+        return await asyncio.to_thread(self.delete_prefix, prefix)
 
     def clear(self) -> None:
         with self._lock:

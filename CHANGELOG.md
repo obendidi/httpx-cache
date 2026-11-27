@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.2.0
+
+- **In-flight request coalescing (`coalesce=True`)**: per-key singleflight deduplication for concurrent sync threads and async tasks, with leak-free cleanup on errors or aborted streams.
+- **Stale-if-error resilience (`stale_if_error`)**: serve the last expired cached entry (`response.extensions["stale"] = True`) on upstream 5xx responses or transport errors, with optional max-stale window.
+- **Per-request overrides & smart filtering**: support `extensions={"cache": {"disabled", "force_refresh", "ttl", "key"}}`, `should_cache(request, response)` (streaming-safe for GraphQL `200 OK` error payloads), and `urls_expire_after` `fnmatch` URL patterns (`0` = never cache).
+- **Actionable `CacheMissError`, secret scrubbing & diffable JSON cassettes**: `CacheMissError` suggests closest recorded keys (highlighting body/header mismatches on the same URL), `scrub_headers` strips sensitive headers before storage, and `JsonCache` + `SqliteCache.export_json()` / `import_json()` + `--httpx-cache-format=json` enable git-diffable test fixtures.
+- **Streaming memory guard & SSE verification**: `max_cacheable_bytes` aborts buffering mid-stream without failing downloads; verified LLM `text/event-stream` record & offline replay.
+- **Prefix invalidation & SQLite schema versioning**: added `.keys(prefix)` and `.delete_prefix(prefix)` across all 5 stores and `PRAGMA user_version = 1` in `SqliteCache`.
+- **RFC 9111 multi-variant `Vary` storage**: variants for different `Vary` request header values coexist without overwriting each other.
+- **Observability hooks, CLI & benchmarks**: added `on_hit`/`on_miss`/`on_store` callbacks, the zero-dep `httpx-cache` CLI (`stats`, `inspect`, `purge`, `clear`, `export`, `import`), and reproducible `benchmarks/bench.py` + `docs/benchmarks.md`.
+
 ## v1.1.0
 
 - **Composable cache key helper (`make_key_fn`)**: strip ephemeral query parameters (`ignore_params`), hash selected request headers safely (`include_headers`), and canonicalize JSON request bodies (`normalize_json_body=True`).

@@ -100,17 +100,52 @@ Choose **`hishel`** if you need exhaustive RFC 9111 proxy semantics. Choose **`h
 
 | Store | Persistence | Concurrency | Notes |
 | --- | --- | --- | --- |
-| `SqliteCache(path, max_size_bytes=...)` | Single WAL SQLite file (default `~/.cache/httpx-cache/cache.sqlite3`) | Thread-safe + async (`asyncio.to_thread`) | Default; indexed TTL expiry, `zlib` compression >1 KB, `.purge_expired()` |
+| `SqliteCache(path, max_size_bytes=...)` | Single WAL SQLite file (default `~/.cache/httpx-cache/cache.sqlite3`) | Thread-safe + async (`asyncio.to_thread`) | Default; indexed TTL expiry, `zlib` compression >1 KB, `.purge_expired()`, `.export_json()` / `.import_json()` |
 | `MemoryCache(max_entries=..., max_size_bytes=...)` | In-process | Thread-safe + async | O(1) LRU eviction |
+| `JsonCache(path)` | Single sorted JSON file | Thread-safe + async | Human-readable, git-diffable cassettes for tests/evals |
 | `FileCache(cache_dir=...)` | One file per key | Thread-safe + async | Atomic temp-file writes, `zlib` compression |
-| `RedisCache(redis_url=..., namespace=...)` | Redis (`pip install "httpx-cache[redis]"`) | Sync + async `redis>=5` | `SCAN`-based `.clear()` / `.stats()`, TTL passthrough |
+| `RedisCache(redis_url=..., namespace=...)` | Redis (`pip install "httpx-cache[redis]"`) | Sync + async `redis>=5` | `SCAN`-based `.keys()` / `.delete_prefix()` / `.clear()` / `.stats()`, TTL passthrough |
 
-Every cache store exposes `.get(key)`, `.set(key, entry)`, `.delete(key)`, `.clear()`, `.stats()` (`CacheStats(entries, size_bytes, hits, misses, expired)`) and async `a*` equivalents.
+Every cache store exposes `.get(key)`, `.set(key, entry)`, `.delete(key)`, `.keys(prefix="")`, `.delete_prefix(prefix)`, `.clear()`, `.stats()` (`CacheStats(entries, size_bytes, hits, misses, expired)`) and async `a*` equivalents.
 
 Every response sets:
 - `response.extensions["from_cache"]` (`bool`)
 - `response.extensions["cache_key"]` (`str`) — pass directly to `cache.delete(key)` to invalidate
 - `response.extensions["revalidated"]` (`True`, when refreshed via `304 Not Modified`)
+- `response.extensions["stale"]` (`True`, when served via `stale_if_error`)
+
+## Production & Agent Ergonomics
+
+```python
+client = httpx_cache.wrap(
+    httpx.Client(),
+    policy="force",
+    ttl=3600,
+    cache_post=True,
+    coalesce=True,                                        # singleflight: dedupe concurrent misses
+    stale_if_error=True,                                  # serve stale on 5xx / network timeout
+    urls_expire_after={"*/auth/*": 0, "*/prices": 30},    # per-URL TTLs (0 = never cache)
+    should_cache=lambda req, r: "errors" not in r.json(), # skip GraphQL 200 error payloads
+    scrub_headers=("set-cookie", "x-api-key"),            # strip secrets before writing to disk
+    max_cacheable_bytes=5 * 1024 * 1024,                  # stream huge bodies without OOM
+    on_hit=lambda key, req: ...,                          # observability hooks (also on_miss, on_store)
+)
+
+# Per-request overrides via standard httpx extensions:
+client.get("https://api.example.com/item", extensions={"cache": {"force_refresh": True}})
+client.get("https://api.example.com/live", extensions={"cache": {"disabled": True}})
+client.get("https://api.example.com/hot",  extensions={"cache": {"ttl": 15}})
+```
+
+## CLI Inspection
+
+```bash
+httpx-cache stats
+httpx-cache inspect --prefix "POST:https://api.openai.com/"
+httpx-cache purge
+httpx-cache export cassette.json
+httpx-cache clear --prefix "GET:https://example.com/"
+```
 
 Custom cache keys, `make_key_fn`, and streaming (`stream=True`) work out of the box:
 

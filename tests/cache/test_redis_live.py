@@ -42,6 +42,13 @@ def test_live_redis_sync_crud_ttl_and_namespace_isolation() -> None:
         assert g1 is not None and g1.body == b'{"a":1}'
         assert g2 is not None and g2.body == b'{"a":2}'
         assert c1.stats().entries == 1
+        assert c1.keys("k") == ["k1"]
+
+        c1.set("users:1", _entry(b"u1"))
+        c1.set("users:2", _entry(b"u2"))
+        assert c1.keys("users:") == ["users:1", "users:2"]
+        assert c1.delete_prefix("users:") == 2
+        assert c1.keys("users:") == []
 
         # Short TTL expiry on Redis server
         c1.set("short", _entry(b"bye", expires_at=time.time() + 0.15))

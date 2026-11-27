@@ -32,6 +32,7 @@ nav:
   - User Guide: guide.md
   - Policies & RFC 9111: cache_control.md
   - API Reference: api.md
+  - Benchmarks: benchmarks.md
 
 markdown_extensions:
   - admonition

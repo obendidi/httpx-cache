@@ -80,6 +80,17 @@ class MemoryCache(BaseCache):
     async def aclear(self) -> None:
         self.clear()
 
+    def keys(self, prefix: str = "") -> list[str]:
+        with self._lock:
+            return sorted(k for k in self._entries if not prefix or k.startswith(prefix))
+
+    def delete_prefix(self, prefix: str) -> int:
+        with self._lock:
+            targets = [k for k in self._entries if not prefix or k.startswith(prefix)]
+            for k in targets:
+                self._remove_locked(k)
+            return len(targets)
+
     def purge_expired(self) -> int:
         """Remove all expired entries and return how many were removed."""
         now = time.time()

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import fnmatch
+import hashlib
 import logging
 import time
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import timedelta, timezone
 from email.utils import parsedate_to_datetime
 from typing import Any, Literal
@@ -15,8 +17,21 @@ DEFAULT_CACHEABLE_METHODS: tuple[str, ...] = ("GET", "HEAD")
 DEFAULT_CACHEABLE_STATUS_CODES: tuple[int, ...] = (200, 203, 204, 300, 301, 308)
 _PERMANENT_REDIRECT_STATUSES = frozenset((301, 308))
 _BODY_LESS_METHODS = frozenset(("GET", "HEAD", "OPTIONS", "TRACE"))
+_UNSET = object()
 
 CacheDecision = Literal["fresh", "revalidate", "stale"]
+
+
+def _normalize_ttl(value: float | timedelta | None) -> float | None:
+    if isinstance(value, timedelta):
+        seconds: float | None = value.total_seconds()
+    elif value is not None:
+        seconds = float(value)
+    else:
+        seconds = None
+    if seconds is not None and seconds < 0:
+        raise ValueError(f"ttl must be non-negative, got {seconds}")
+    return seconds
 
 
 def parse_cache_control(headers: Any) -> dict[str, str | None]:
@@ -91,13 +106,23 @@ def _entry_has_validators(entry: CacheEntry) -> bool:
     )
 
 
-def _vary_header_names(headers: Any) -> list[str]:
+def _vary_header_names(headers: Any) -> tuple[str, ...]:
     names: list[str] = []
     for raw in headers.get_list("vary", split_commas=True):
         token = raw.strip().lower()
         if token and token not in names:
             names.append(token)
-    return names
+    return tuple(sorted(names))
+
+
+def vary_variant_key(base_key: str, request: Any, vary_headers: Sequence[str]) -> str:
+    """Derive a deterministic variant storage key for an RFC 9111 ``Vary`` response."""
+    pairs = [
+        f"{name}={','.join(request.headers.get_list(name))}"
+        for name in sorted({h.lower() for h in vary_headers})
+    ]
+    digest = hashlib.sha256("\n".join(pairs).encode("utf-8")).hexdigest()[:16]
+    return f"{base_key}|vary={digest}"
 
 
 class PolicyController:
@@ -112,6 +137,9 @@ class PolicyController:
         cacheable_methods: Sequence[str] | None = None,
         cacheable_status_codes: Sequence[int] | None = None,
         shared: bool = False,
+        urls_expire_after: Mapping[str, float | timedelta | None] | None = None,
+        stale_if_error: bool | float | timedelta = False,
+        scrub_headers: Sequence[str] = (),
     ) -> None:
         if policy not in ("force", "rfc9111", "replay"):
             raise ValueError(
@@ -119,17 +147,7 @@ class PolicyController:
             )
         self.policy: PolicyName = policy
         self.shared = shared
-
-        if isinstance(ttl, timedelta):
-            ttl_seconds: float | None = ttl.total_seconds()
-        elif ttl is not None:
-            ttl_seconds = float(ttl)
-        else:
-            ttl_seconds = None
-
-        if ttl_seconds is not None and ttl_seconds < 0:
-            raise ValueError(f"ttl must be non-negative, got {ttl_seconds}")
-        self.ttl: float | None = ttl_seconds
+        self.ttl: float | None = _normalize_ttl(ttl)
 
         methods = (
             tuple(m.upper() for m in cacheable_methods)
@@ -145,6 +163,77 @@ class PolicyController:
             else DEFAULT_CACHEABLE_STATUS_CODES
         )
 
+        self.urls_expire_after: tuple[tuple[str, float | None], ...] = tuple(
+            (pattern, _normalize_ttl(val))
+            for pattern, val in (urls_expire_after.items() if urls_expire_after else ())
+        )
+
+        if isinstance(stale_if_error, bool):
+            self.stale_if_error_enabled = stale_if_error
+            self.stale_if_error_window: float | None = None
+        else:
+            window = _normalize_ttl(stale_if_error)
+            self.stale_if_error_enabled = True
+            self.stale_if_error_window = window
+
+        self.scrub_headers: frozenset[str] = frozenset(h.lower() for h in scrub_headers)
+
+    def resolve_request_ttl(
+        self,
+        request: Any,
+        *,
+        override_ttl: Any = _UNSET,
+    ) -> tuple[bool, float | None]:
+        """Resolve ``(cache_allowed, ttl_seconds)`` for a request.
+
+        Precedence: per-request extension ``ttl`` > ``urls_expire_after`` > default ``self.ttl``.
+        A resolved TTL of ``0`` disables caching for that request.
+        """
+        if override_ttl is not _UNSET:
+            resolved = _normalize_ttl(override_ttl)
+            if resolved == 0.0:
+                return False, 0.0
+            return True, resolved
+
+        if self.urls_expire_after:
+            url_str = str(request.url)
+            url_path = str(getattr(request.url, "path", ""))
+            for pattern, pattern_ttl in self.urls_expire_after:
+                if fnmatch.fnmatchcase(url_str, pattern) or (
+                    url_path and fnmatch.fnmatchcase(url_path, pattern)
+                ):
+                    if pattern_ttl == 0.0:
+                        return False, 0.0
+                    return True, pattern_ttl
+
+        return True, self.ttl
+
+    def can_serve_stale_on_error(
+        self,
+        entry: CacheEntry,
+        *,
+        now: float | None = None,
+    ) -> bool:
+        """Return True if a stale entry is eligible to serve on upstream error."""
+        if not self.stale_if_error_enabled:
+            return False
+        if self.stale_if_error_window is None:
+            return True
+        if entry.expires_at is None:
+            return True
+        current = time.time() if now is None else now
+        stale_for = max(0.0, current - entry.expires_at)
+        return stale_for <= self.stale_if_error_window
+
+    def vary_headers_for_response(self, response: Any) -> tuple[str, ...]:
+        """Return normalized Vary header names when using RFC 9111 policy."""
+        if self.policy != "rfc9111":
+            return ()
+        names = _vary_header_names(response.headers)
+        if "*" in names:
+            return ()
+        return names
+
     def needs_request_body(self, request: Any) -> bool:
         """Return True if the request body should be read before computing the cache key."""
         method = str(request.method).upper()
@@ -154,7 +243,7 @@ class PolicyController:
             return True
         return method in self.cacheable_methods
 
-    def should_lookup(self, request: Any) -> bool:
+    def should_lookup(self, request: Any, *, override_ttl: Any = _UNSET) -> bool:
         """Return True if the transport should query the cache for this request."""
         if self.policy == "replay":
             return True
@@ -162,13 +251,16 @@ class PolicyController:
             return False
         if str(request.method).upper() not in self.cacheable_methods:
             return False
+        allowed, _ = self.resolve_request_ttl(request, override_ttl=override_ttl)
+        if not allowed:
+            return False
         if self.policy == "rfc9111":
             req_cc = parse_cache_control(request.headers)
             if "no-store" in req_cc:
                 return False
         return True
 
-    def should_store(self, request: Any, response: Any) -> bool:
+    def should_store(self, request: Any, response: Any, *, override_ttl: Any = _UNSET) -> bool:
         """Return True if the response may be written to the cache."""
         if self.policy == "replay":
             return False
@@ -177,6 +269,9 @@ class PolicyController:
         if str(request.method).upper() not in self.cacheable_methods:
             return False
         if int(response.status_code) not in self.cacheable_status_codes:
+            return False
+        allowed, _ = self.resolve_request_ttl(request, override_ttl=override_ttl)
+        if not allowed:
             return False
         if self.policy == "force":
             return True
@@ -248,6 +343,13 @@ class PolicyController:
             headers["If-Modified-Since"] = last_modified
         return headers
 
+    def _filter_headers(self, raw_items: Sequence[tuple[str, str]]) -> tuple[tuple[str, str], ...]:
+        if not self.scrub_headers:
+            return tuple((str(k), str(v)) for k, v in raw_items)
+        return tuple(
+            (str(k), str(v)) for k, v in raw_items if str(k).lower() not in self.scrub_headers
+        )
+
     def build_entry(
         self,
         request: Any,
@@ -256,10 +358,11 @@ class PolicyController:
         body: bytes,
         raw_stream: bool,
         now: float | None = None,
+        override_ttl: Any = _UNSET,
     ) -> CacheEntry:
         """Create a CacheEntry from a live response and request."""
         current = time.time() if now is None else now
-        headers = tuple((str(k), str(v)) for k, v in response.headers.multi_items())
+        headers = self._filter_headers(response.headers.multi_items())
         http_version = getattr(response, "http_version", "HTTP/1.1") or "HTTP/1.1"
         encoding = getattr(response, "encoding", None)
         metadata: dict[str, Any] = {"raw_stream": raw_stream}
@@ -271,10 +374,12 @@ class PolicyController:
                     name: ",".join(request.headers.get_list(name)) for name in vary_names
                 }
 
+        _, effective_ttl = self.resolve_request_ttl(request, override_ttl=override_ttl)
         expires_at = self._compute_expires_at(
             status_code=int(response.status_code),
             headers=headers,
             created_at=current,
+            effective_ttl=effective_ttl,
         )
         return CacheEntry(
             status_code=int(response.status_code),
@@ -294,14 +399,17 @@ class PolicyController:
         response_304: Any,
         *,
         now: float | None = None,
+        override_ttl: Any = _UNSET,
     ) -> CacheEntry:
         """Merge headers from a 304 Not Modified response into an existing cached entry."""
         current = time.time() if now is None else now
-        updated_items = [(str(k), str(v)) for k, v in response_304.headers.multi_items()]
+        updated_items = list(self._filter_headers(response_304.headers.multi_items()))
         updated_keys = {k.lower() for k, _ in updated_items}
 
         merged_headers = [
-            (k, v) for k, v in old_entry.headers if k.lower() not in updated_keys
+            (k, v)
+            for k, v in old_entry.headers
+            if k.lower() not in updated_keys and k.lower() not in self.scrub_headers
         ]
         merged_headers.extend(updated_items)
         headers_tuple = tuple(merged_headers)
@@ -313,10 +421,12 @@ class PolicyController:
                 name: ",".join(request.headers.get_list(name)) for name in vary_names
             }
 
+        _, effective_ttl = self.resolve_request_ttl(request, override_ttl=override_ttl)
         expires_at = self._compute_expires_at(
             status_code=old_entry.status_code,
             headers=headers_tuple,
             created_at=current,
+            effective_ttl=effective_ttl,
         )
         return CacheEntry(
             status_code=old_entry.status_code,
@@ -335,18 +445,17 @@ class PolicyController:
         status_code: int,
         headers: tuple[tuple[str, str], ...],
         created_at: float,
+        effective_ttl: float | None,
     ) -> float | None:
         if self.policy == "force":
-            return None if self.ttl is None else created_at + self.ttl
+            return None if effective_ttl is None else created_at + effective_ttl
 
-        # For RFC 9111, keep entries with ETag/Last-Modified in the store for 304 revalidation
-        # unless an explicit store ttl cap was configured.
         has_validators = (
             _entry_headers_get(headers, "etag") is not None
             or _entry_headers_get(headers, "last-modified") is not None
         )
         if has_validators:
-            return None if self.ttl is None else created_at + self.ttl
+            return None if effective_ttl is None else created_at + effective_ttl
 
         resp_cc = _entry_cache_control(headers)
         temp_entry = CacheEntry(
@@ -355,19 +464,21 @@ class PolicyController:
             body=b"",
             created_at=created_at,
         )
-        lifetime = self._rfc9111_freshness_lifetime(temp_entry, resp_cc)
+        lifetime = self._rfc9111_freshness_lifetime(temp_entry, resp_cc, fallback_ttl=effective_ttl)
         if lifetime == float("inf"):
-            return None if self.ttl is None else created_at + self.ttl
+            return None if effective_ttl is None else created_at + effective_ttl
         if lifetime <= 0:
             return created_at
-        if self.ttl is not None:
-            lifetime = min(lifetime, self.ttl)
+        if effective_ttl is not None:
+            lifetime = min(lifetime, effective_ttl)
         return created_at + lifetime
 
     def _rfc9111_freshness_lifetime(
         self,
         entry: CacheEntry,
         resp_cc: dict[str, str | None],
+        *,
+        fallback_ttl: float | None = None,
     ) -> float:
         if self.shared:
             s_maxage = _parse_non_negative_int(resp_cc.get("s-maxage"))
@@ -395,8 +506,9 @@ class PolicyController:
         if last_modified_ts is not None and ref_date > last_modified_ts:
             return (ref_date - last_modified_ts) * 0.1
 
-        if self.ttl is not None:
-            return self.ttl
+        ttl_to_use = self.ttl if fallback_ttl is None else fallback_ttl
+        if ttl_to_use is not None:
+            return ttl_to_use
         return 0.0
 
     def _rfc9111_age(self, entry: CacheEntry, now: float) -> float:

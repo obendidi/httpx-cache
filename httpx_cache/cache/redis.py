@@ -84,8 +84,23 @@ class RedisCache(BaseCache):
     def _namespaced_key(self, key: str) -> str:
         return f"{self.namespace}:{key}" if self.namespace else key
 
-    def _scan_pattern(self) -> str:
-        return f"{self.namespace}:*" if self.namespace else "*"
+    def _strip_namespace(self, raw_key: Any) -> str:
+        text = raw_key.decode("utf-8") if isinstance(raw_key, bytes) else str(raw_key)
+        ns_prefix = f"{self.namespace}:"
+        if self.namespace and text.startswith(ns_prefix):
+            return text[len(ns_prefix) :]
+        return text
+
+    def _scan_pattern(self, prefix: str = "") -> str:
+        escaped = (
+            prefix.replace("\\", "\\\\")
+            .replace("*", "\\*")
+            .replace("?", "\\?")
+            .replace("[", "\\[")
+        )
+        if self.namespace:
+            return f"{self.namespace}:{escaped}*"
+        return f"{escaped}*"
 
     def _ttl_ms(self, entry: CacheEntry) -> int | None:
         if entry.expires_at is not None:
@@ -154,6 +169,48 @@ class RedisCache(BaseCache):
     async def adelete(self, key: str) -> bool:
         removed = int(await self.aredis.delete(self._namespaced_key(key)))
         return removed > 0
+
+    def keys(self, prefix: str = "") -> list[str]:
+        found = [
+            self._strip_namespace(rkey)
+            for rkey in self.redis.scan_iter(match=self._scan_pattern(prefix), count=200)
+        ]
+        return sorted(k for k in found if not prefix or k.startswith(prefix))
+
+    async def akeys(self, prefix: str = "") -> list[str]:
+        found = [
+            self._strip_namespace(rkey)
+            async for rkey in self.aredis.scan_iter(match=self._scan_pattern(prefix), count=200)
+        ]
+        return sorted(k for k in found if not prefix or k.startswith(prefix))
+
+    def delete_prefix(self, prefix: str) -> int:
+        batch: list[Any] = []
+        removed = 0
+        for rkey in self.redis.scan_iter(match=self._scan_pattern(prefix), count=200):
+            if prefix and not self._strip_namespace(rkey).startswith(prefix):
+                continue
+            batch.append(rkey)
+            if len(batch) >= 200:
+                removed += int(self.redis.delete(*batch))
+                batch.clear()
+        if batch:
+            removed += int(self.redis.delete(*batch))
+        return removed
+
+    async def adelete_prefix(self, prefix: str) -> int:
+        batch: list[Any] = []
+        removed = 0
+        async for rkey in self.aredis.scan_iter(match=self._scan_pattern(prefix), count=200):
+            if prefix and not self._strip_namespace(rkey).startswith(prefix):
+                continue
+            batch.append(rkey)
+            if len(batch) >= 200:
+                removed += int(await self.aredis.delete(*batch))
+                batch.clear()
+        if batch:
+            removed += int(await self.aredis.delete(*batch))
+        return removed
 
     def clear(self) -> None:
         batch: list[Any] = []
