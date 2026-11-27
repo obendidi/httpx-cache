@@ -9,11 +9,13 @@ import zlib
 from pathlib import Path
 from typing import Any
 
+from httpx_cache.cache._codec import entry_from_json_dict, entry_to_json_dict
 from httpx_cache.cache.base import BaseCache
 from httpx_cache.types import CacheEntry, CacheStats
 
 DEFAULT_SQLITE_PATH = Path.home() / ".cache" / "httpx-cache" / "cache.sqlite3"
 _COMPRESS_THRESHOLD_BYTES = 1024
+SCHEMA_VERSION = 1
 
 _SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS entries (
@@ -35,6 +37,11 @@ CREATE INDEX IF NOT EXISTS idx_entries_expires_at
 CREATE INDEX IF NOT EXISTS idx_entries_last_accessed
     ON entries(last_accessed);
 """
+
+
+def _like_prefix_pattern(prefix: str) -> str:
+    escaped = prefix.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"{escaped}%"
 
 
 class SqliteCache(BaseCache):
@@ -86,6 +93,7 @@ class SqliteCache(BaseCache):
             self._conn.execute("PRAGMA synchronous=NORMAL;")
             self._conn.execute(f"PRAGMA busy_timeout={int(busy_timeout_ms)};")
             self._conn.executescript(_SCHEMA_SQL)
+            self._conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION};")
             self._conn.commit()
 
     def get(self, key: str, *, ignore_expiry: bool = False) -> CacheEntry | None:
@@ -131,19 +139,16 @@ class SqliteCache(BaseCache):
             self._conn.commit()
             self._hits += 1
 
-        body = zlib.decompress(raw_body) if compressed else bytes(raw_body)
-        headers_list: list[list[str]] = json.loads(headers_json)
-        headers = tuple((k, v) for k, v in headers_list)
-        metadata: dict[str, Any] = json.loads(metadata_json) if metadata_json else {}
-        return CacheEntry(
+        return self._row_to_entry(
             status_code=status_code,
-            headers=headers,
-            body=body,
+            headers_json=headers_json,
+            raw_body=raw_body,
+            compressed=compressed,
             http_version=http_version,
             encoding=encoding,
+            metadata_json=metadata_json,
             created_at=created_at,
             expires_at=expires_at,
-            metadata=metadata,
         )
 
     async def aget(self, key: str, *, ignore_expiry: bool = False) -> CacheEntry | None:
@@ -218,6 +223,37 @@ class SqliteCache(BaseCache):
     async def adelete(self, key: str) -> bool:
         return await asyncio.to_thread(self.delete, key)
 
+    def keys(self, prefix: str = "") -> list[str]:
+        with self._lock:
+            self._ensure_open()
+            if prefix:
+                rows = self._conn.execute(
+                    "SELECT key FROM entries WHERE key LIKE ? ESCAPE '\\' ORDER BY key ASC",
+                    (_like_prefix_pattern(prefix),),
+                ).fetchall()
+            else:
+                rows = self._conn.execute("SELECT key FROM entries ORDER BY key ASC").fetchall()
+            return [str(r[0]) for r in rows]
+
+    async def akeys(self, prefix: str = "") -> list[str]:
+        return await asyncio.to_thread(self.keys, prefix)
+
+    def delete_prefix(self, prefix: str) -> int:
+        with self._lock:
+            self._ensure_open()
+            if prefix:
+                cursor = self._conn.execute(
+                    "DELETE FROM entries WHERE key LIKE ? ESCAPE '\\'",
+                    (_like_prefix_pattern(prefix),),
+                )
+            else:
+                cursor = self._conn.execute("DELETE FROM entries")
+            self._conn.commit()
+            return max(0, cursor.rowcount)
+
+    async def adelete_prefix(self, prefix: str) -> int:
+        return await asyncio.to_thread(self.delete_prefix, prefix)
+
     def clear(self) -> None:
         with self._lock:
             self._ensure_open()
@@ -238,6 +274,51 @@ class SqliteCache(BaseCache):
 
     async def apurge_expired(self) -> int:
         return await asyncio.to_thread(self.purge_expired)
+
+    def export_json(self, output_path: str | Path) -> int:
+        """Export all cached entries to a sorted, diff-friendly JSON file."""
+        target = Path(output_path).expanduser()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        exported: dict[str, Any] = {}
+        with self._lock:
+            self._ensure_open()
+            rows = self._conn.execute(
+                """
+                SELECT key, status_code, headers_json, body, compressed, http_version,
+                       encoding, metadata_json, created_at, expires_at
+                FROM entries
+                ORDER BY key ASC
+                """
+            ).fetchall()
+        for row in rows:
+            entry = self._row_to_entry(
+                status_code=row[1],
+                headers_json=row[2],
+                raw_body=row[3],
+                compressed=row[4],
+                http_version=row[5],
+                encoding=row[6],
+                metadata_json=row[7],
+                created_at=row[8],
+                expires_at=row[9],
+            )
+            exported[str(row[0])] = entry_to_json_dict(entry)
+        target.write_text(
+            json.dumps({"version": 1, "entries": exported}, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        return len(exported)
+
+    def import_json(self, input_path: str | Path) -> int:
+        """Import entries from a JSON file produced by :meth:`export_json` or ``JsonCache``."""
+        source = Path(input_path).expanduser()
+        payload: dict[str, Any] = json.loads(source.read_text(encoding="utf-8"))
+        entries: dict[str, Any] = payload.get("entries", payload)
+        count = 0
+        for key, item in entries.items():
+            self.set(str(key), entry_from_json_dict(item))
+            count += 1
+        return count
 
     def stats(self) -> CacheStats:
         with self._lock:
@@ -270,6 +351,34 @@ class SqliteCache(BaseCache):
     def _ensure_open(self) -> None:
         if self._closed:
             raise RuntimeError("SqliteCache is closed.")
+
+    @staticmethod
+    def _row_to_entry(
+        *,
+        status_code: int,
+        headers_json: str,
+        raw_body: bytes,
+        compressed: int,
+        http_version: str,
+        encoding: str | None,
+        metadata_json: str,
+        created_at: float,
+        expires_at: float | None,
+    ) -> CacheEntry:
+        body = zlib.decompress(raw_body) if compressed else bytes(raw_body)
+        headers_list: list[list[str]] = json.loads(headers_json)
+        headers = tuple((k, v) for k, v in headers_list)
+        metadata: dict[str, Any] = json.loads(metadata_json) if metadata_json else {}
+        return CacheEntry(
+            status_code=status_code,
+            headers=headers,
+            body=body,
+            http_version=http_version,
+            encoding=encoding,
+            created_at=created_at,
+            expires_at=expires_at,
+            metadata=metadata,
+        )
 
     def _purge_expired_locked(self, now: float) -> int:
         cursor = self._conn.execute(

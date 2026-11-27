@@ -52,6 +52,30 @@ class BaseCache(ABC):
     async def astats(self) -> CacheStats:
         """Async equivalent of :meth:`stats`."""
 
+    def keys(self, prefix: str = "") -> list[str]:
+        """Return cached keys matching ``prefix`` (or all keys if empty)."""
+        return []
+
+    async def akeys(self, prefix: str = "") -> list[str]:
+        """Async equivalent of :meth:`keys`."""
+        return self.keys(prefix)
+
+    def delete_prefix(self, prefix: str) -> int:
+        """Delete all entries whose keys start with ``prefix``. Returns count removed."""
+        removed = 0
+        for key in self.keys(prefix):
+            if self.delete(key):
+                removed += 1
+        return removed
+
+    async def adelete_prefix(self, prefix: str) -> int:
+        """Async equivalent of :meth:`delete_prefix`."""
+        removed = 0
+        for key in await self.akeys(prefix):
+            if await self.adelete(key):
+                removed += 1
+        return removed
+
     def close(self) -> None:  # noqa: B027
         """Release any underlying resources."""
 

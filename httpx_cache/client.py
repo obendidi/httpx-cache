@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import timedelta
 from typing import Any, TypeVar
 
@@ -8,7 +8,15 @@ from httpx_cache._backend import Backend, detect_backend_from_obj, get_backend
 from httpx_cache.cache.base import BaseCache
 from httpx_cache.cache.sqlite import SqliteCache
 from httpx_cache.transport import AsyncCacheTransport, SyncCacheTransport
-from httpx_cache.types import BackendName, KeyFn, PolicyName
+from httpx_cache.types import (
+    BackendName,
+    CacheHitHook,
+    CacheMissHook,
+    CacheStoreHook,
+    KeyFn,
+    PolicyName,
+    ShouldCacheFn,
+)
 
 TClient = TypeVar("TClient")
 
@@ -24,6 +32,15 @@ def wrap(
     cacheable_status_codes: Sequence[int] | None = None,
     key_fn: KeyFn | None = None,
     shared: bool = False,
+    urls_expire_after: Mapping[str, float | timedelta | None] | None = None,
+    stale_if_error: bool | float | timedelta = False,
+    scrub_headers: Sequence[str] = (),
+    should_cache: ShouldCacheFn | None = None,
+    coalesce: bool = False,
+    max_cacheable_bytes: int | None = None,
+    on_hit: CacheHitHook | None = None,
+    on_miss: CacheMissHook | None = None,
+    on_store: CacheStoreHook | None = None,
 ) -> TClient:
     """Wrap an existing ``httpx`` or ``httpx2`` Client/AsyncClient with caching in place.
 
@@ -56,6 +73,15 @@ def wrap(
         "cacheable_status_codes": cacheable_status_codes,
         "key_fn": key_fn,
         "shared": shared,
+        "urls_expire_after": urls_expire_after,
+        "stale_if_error": stale_if_error,
+        "scrub_headers": scrub_headers,
+        "should_cache": should_cache,
+        "coalesce": coalesce,
+        "max_cacheable_bytes": max_cacheable_bytes,
+        "on_hit": on_hit,
+        "on_miss": on_miss,
+        "on_store": on_store,
         "backend": backend.name,
     }
 
@@ -109,6 +135,15 @@ def build_client_classes(backend_name: BackendName | None = None) -> tuple[type[
             cacheable_status_codes: Sequence[int] | None = None,
             key_fn: KeyFn | None = None,
             shared: bool = False,
+            urls_expire_after: Mapping[str, float | timedelta | None] | None = None,
+            stale_if_error: bool | float | timedelta = False,
+            scrub_headers: Sequence[str] = (),
+            should_cache: ShouldCacheFn | None = None,
+            coalesce: bool = False,
+            max_cacheable_bytes: int | None = None,
+            on_hit: CacheHitHook | None = None,
+            on_miss: CacheMissHook | None = None,
+            on_store: CacheStoreHook | None = None,
             **kwargs: Any,
         ) -> None:
             super().__init__(*args, **kwargs)
@@ -128,6 +163,15 @@ def build_client_classes(backend_name: BackendName | None = None) -> tuple[type[
                     cacheable_status_codes=cacheable_status_codes,
                     key_fn=key_fn,
                     shared=shared,
+                    urls_expire_after=urls_expire_after,
+                    stale_if_error=stale_if_error,
+                    scrub_headers=scrub_headers,
+                    should_cache=should_cache,
+                    coalesce=coalesce,
+                    max_cacheable_bytes=max_cacheable_bytes,
+                    on_hit=on_hit,
+                    on_miss=on_miss,
+                    on_store=on_store,
                 )
                 if cache is None and isinstance(self._transport, SyncCacheTransport):
                     self._transport._owns_cache = True
@@ -146,6 +190,15 @@ def build_client_classes(backend_name: BackendName | None = None) -> tuple[type[
             cacheable_status_codes: Sequence[int] | None = None,
             key_fn: KeyFn | None = None,
             shared: bool = False,
+            urls_expire_after: Mapping[str, float | timedelta | None] | None = None,
+            stale_if_error: bool | float | timedelta = False,
+            scrub_headers: Sequence[str] = (),
+            should_cache: ShouldCacheFn | None = None,
+            coalesce: bool = False,
+            max_cacheable_bytes: int | None = None,
+            on_hit: CacheHitHook | None = None,
+            on_miss: CacheMissHook | None = None,
+            on_store: CacheStoreHook | None = None,
             **kwargs: Any,
         ) -> None:
             super().__init__(*args, **kwargs)
@@ -165,6 +218,15 @@ def build_client_classes(backend_name: BackendName | None = None) -> tuple[type[
                     cacheable_status_codes=cacheable_status_codes,
                     key_fn=key_fn,
                     shared=shared,
+                    urls_expire_after=urls_expire_after,
+                    stale_if_error=stale_if_error,
+                    scrub_headers=scrub_headers,
+                    should_cache=should_cache,
+                    coalesce=coalesce,
+                    max_cacheable_bytes=max_cacheable_bytes,
+                    on_hit=on_hit,
+                    on_miss=on_miss,
+                    on_store=on_store,
                 )
                 if cache is None and isinstance(self._transport, AsyncCacheTransport):
                     self._transport._owns_cache = True

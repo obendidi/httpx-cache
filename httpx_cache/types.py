@@ -1,13 +1,18 @@
 from __future__ import annotations
 
+import difflib
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
 PolicyName = Literal["force", "rfc9111", "replay"]
 BackendName = Literal["httpx", "httpx2"]
 KeyFn = Callable[[Any], str]
+ShouldCacheFn = Callable[[Any, Any], bool]
+CacheHitHook = Callable[[str, Any], None]
+CacheMissHook = Callable[[str, Any], None]
+CacheStoreHook = Callable[[str, Any, "CacheEntry"], None]
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,12 +53,44 @@ class CacheStats:
     expired: int
 
 
+def _suggest_closest_keys(
+    key: str,
+    candidates: Sequence[str],
+    *,
+    limit: int = 3,
+) -> tuple[str, ...]:
+    if not candidates:
+        return ()
+    base = key.split("|", 1)[0]
+    same_base = [c for c in candidates if c != key and c.split("|", 1)[0] == base]
+    if same_base:
+        return tuple(same_base[:limit])
+    return tuple(difflib.get_close_matches(key, candidates, n=limit, cutoff=0.4))
+
+
 class CacheMissError(LookupError):
     """Raised in ``policy="replay"`` mode when a request is not found in the cache."""
 
-    def __init__(self, key: str, request: Any) -> None:
+    def __init__(
+        self,
+        key: str,
+        request: Any,
+        *,
+        closest_keys: Sequence[str] = (),
+    ) -> None:
         self.key = key
         self.request = request
+        self.closest_keys: tuple[str, ...] = tuple(closest_keys)
         method = getattr(request, "method", "?")
         url = getattr(request, "url", "?")
-        super().__init__(f"Cache miss in replay mode for {method} {url} (key={key!r})")
+        msg = f"Cache miss in replay mode for {method} {url} (key={key!r})"
+        if self.closest_keys:
+            base = key.split("|", 1)[0]
+            if any(c.split("|", 1)[0] == base for c in self.closest_keys):
+                msg += (
+                    ". Closest recorded key(s) share the same method/URL "
+                    f"(different body or headers): {', '.join(repr(c) for c in self.closest_keys)}"
+                )
+            else:
+                msg += f". Closest recorded key(s): {', '.join(repr(c) for c in self.closest_keys)}"
+        super().__init__(msg)

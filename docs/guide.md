@@ -27,12 +27,32 @@ The same call works unchanged with `httpx.AsyncClient`, `httpx2.Client`, `httpx2
 
 ## Stores
 
-- **`SqliteCache(path=None, max_size_bytes=None, compress=True)`** (default): WAL-mode SQLite file (`~/.cache/httpx-cache/cache.sqlite3`, or `":memory:"`), indexed TTL expiry, `zlib` body compression (>1 KB), LRU eviction, `.purge_expired()`.
+- **`SqliteCache(path=None, max_size_bytes=None, compress=True)`** (default): WAL-mode SQLite file (`~/.cache/httpx-cache/cache.sqlite3`, or `":memory:"`), indexed TTL expiry, `zlib` body compression (>1 KB), LRU eviction, `.purge_expired()`, `.export_json()` / `.import_json()`.
 - **`MemoryCache(max_entries=None, max_size_bytes=None)`**: thread-safe in-memory LRU.
+- **`JsonCache(path)`**: single sorted, human-readable JSON file for git-diffable test/eval cassettes.
 - **`FileCache(cache_dir=None, compress=True)`**: one atomically written file per key.
 - **`RedisCache(redis_url=..., redis=..., aredis=..., namespace="httpx_cache", default_ttl=None)`**: `redis>=5` sync/async backend (`pip install "httpx-cache[redis]"`).
 
-Every store implements `.get(key)`, `.set(key, entry)`, `.delete(key)`, `.clear()`, `.stats()`, and async `a*` variants.
+Every store implements `.get(key)`, `.set(key, entry)`, `.delete(key)`, `.keys(prefix="")`, `.delete_prefix(prefix)`, `.clear()`, `.stats()`, and async `a*` variants.
+
+## Resilience, Coalescing & Filtering
+
+- **Singleflight coalescing (`coalesce=True`)**: deduplicates concurrent sync/async cache misses on the same key so only one upstream call runs.
+- **Stale-if-error (`stale_if_error=True | seconds`)**: returns the last expired entry (`response.extensions["stale"] = True`) if upstream raises a transport error or returns 5xx.
+- **Per-request overrides (`extensions={"cache": {...}}`)**: pass `disabled=True`, `force_refresh=True`, `ttl=...`, or `key=...` on any individual request.
+- **Filtering & scrubbing**: `urls_expire_after={"*/auth/*": 0, "*/prices": 30}`, `should_cache=lambda req, resp: ...`, `scrub_headers=("set-cookie",)`, and `max_cacheable_bytes=...` (prevents OOM on large streams while keeping LLM SSE streaming cached cleanly).
+- **Observability hooks**: `on_hit(key, req)`, `on_miss(key, req)`, `on_store(key, req, entry)`.
+
+## CLI
+
+Inspect or manage SQLite caches from the terminal with `httpx-cache` (or `python -m httpx_cache`):
+
+```bash
+httpx-cache --db .cache/api.sqlite3 stats
+httpx-cache --db .cache/api.sqlite3 inspect --prefix "POST:"
+httpx-cache --db .cache/api.sqlite3 purge
+httpx-cache --db .cache/api.sqlite3 export cassette.json
+```
 
 ## Streaming Responses
 
