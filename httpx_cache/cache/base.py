@@ -1,94 +1,82 @@
-import typing as tp
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
-import httpx
+from abc import ABC, abstractmethod
+from types import TracebackType
+from typing import TypeVar
+
+from httpx_cache.types import CacheEntry, CacheStats
+
+_TCache = TypeVar("_TCache", bound="BaseCache")
 
 
 class BaseCache(ABC):
-    @abstractmethod
-    def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        """Get cached response from Cache.
-
-        We use the httpx.Request.url as key.
-
-        Args:
-            request: httpx.Request
-
-        Returns:
-            tp.Optional[httpx.Response]
-        """
+    """Abstract base class for string-keyed response cache stores."""
 
     @abstractmethod
-    async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        """(Async) Get cached response from Cache.
-
-        We use the httpx.Request.url as key.
-
-        Args:
-            request: httpx.Request
-
-        Returns:
-            tp.Optional[httpx.Response]
-        """
+    def get(self, key: str, *, ignore_expiry: bool = False) -> CacheEntry | None:
+        """Fetch a cached entry by key, returning None on miss or expiry."""
 
     @abstractmethod
-    def set(
-        self,
-        *,
-        request: httpx.Request,
-        response: httpx.Response,
-        content: tp.Optional[bytes] = None,
-    ) -> None:
-        """Set new response entry in cache.
-
-        In case the response does not yet have a '_content' property, content should
-        be provided in the optional 'content' kwarg (usually using a callback)
-
-        Args:
-            request: httpx.Request
-            response: httpx.Response, to cache
-            content (bytes, optional): Defaults to None, should be provided in case
-                response that not have yet content.
-        """
+    async def aget(self, key: str, *, ignore_expiry: bool = False) -> CacheEntry | None:
+        """Async equivalent of :meth:`get`."""
 
     @abstractmethod
-    async def aset(
-        self,
-        *,
-        request: httpx.Request,
-        response: httpx.Response,
-        content: tp.Optional[bytes] = None,
-    ) -> None:
-        """(Async) Set new response entry in cache.
-
-        In case the response does not yet have a '_content' property, content should
-        be provided in the optional 'content' kwarg (usually using a callback)
-
-        Args:
-            request: httpx.Request
-            response: httpx.Response, to cache
-            content (bytes, optional): Defaults to None, should be provided in case
-                response that not have yet content.
-        """
+    def set(self, key: str, entry: CacheEntry) -> None:
+        """Store or overwrite an entry under ``key``."""
 
     @abstractmethod
-    def delete(self, request: httpx.Request) -> None:
-        """Delete an entry from cache.
-
-        Args:
-            request: httpx.Request
-        """
+    async def aset(self, key: str, entry: CacheEntry) -> None:
+        """Async equivalent of :meth:`set`."""
 
     @abstractmethod
-    async def adelete(self, request: httpx.Request) -> None:
-        """(Async) Delete an entry from cache.
+    def delete(self, key: str) -> bool:
+        """Remove ``key`` from the cache. Returns True if an entry was removed."""
 
-        Args:
-            request: httpx.Request
-        """
+    @abstractmethod
+    async def adelete(self, key: str) -> bool:
+        """Async equivalent of :meth:`delete`."""
 
-    def close(self) -> None:
-        """Close cache."""
+    @abstractmethod
+    def clear(self) -> None:
+        """Delete all entries from the cache."""
+
+    @abstractmethod
+    async def aclear(self) -> None:
+        """Async equivalent of :meth:`clear`."""
+
+    @abstractmethod
+    def stats(self) -> CacheStats:
+        """Return current cache entry/size/hit/miss/expired counters."""
+
+    @abstractmethod
+    async def astats(self) -> CacheStats:
+        """Async equivalent of :meth:`stats`."""
+
+    def close(self) -> None:  # noqa: B027
+        """Release any underlying resources."""
 
     async def aclose(self) -> None:
-        """(Async) Close cache."""
+        """Async equivalent of :meth:`close`."""
+        self.close()
+
+    def __enter__(self: _TCache) -> _TCache:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        self.close()
+
+    async def __aenter__(self: _TCache) -> _TCache:
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        await self.aclose()

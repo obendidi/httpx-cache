@@ -1,57 +1,28 @@
-# HTTPX-CACHE
+# httpx-cache
 
-httpx-cache is an implementation of the caching algorithms in [httplib2](https://github.com/httplib2/httplib2) and [CacheControl](https://github.com/ionrock/cachecontrol) for use with [httpx](https://github.com/encode/httpx) transport object.
-
-It is is heavily insipired by:
-
-- [https://github.com/ionrock/cachecontrol](https://github.com/ionrock/cachecontrol)
-- [https://github.com/johtso/httpx-caching](https://github.com/johtso/httpx-caching)
+Zero-config, minimal-dependency response caching and deterministic replay for `httpx` and `httpx2`.
 
 ## Installation
 
-Install with pip:
-
-```sh
-$ pip install httpx-cache
+```bash
+pip install httpx-cache            # when httpx or httpx2 is already installed
+pip install "httpx-cache[httpx]"   # install with httpx
+pip install "httpx-cache[httpx2]"  # install with httpx2
+pip install "httpx-cache[redis]"   # install with RedisCache support
 ```
 
-To use `RedisCache`, install with `redis` extra:
-
-```sh
-$ pip install httpx-cache[redis]
-```
-
-Requires Python 3.6+ and HTTPX 0.21+.
+Requires Python 3.10+ (`httpx2>=2.15` requires Python 3.11+).
 
 ## Quickstart
 
-### Usage with Client
+```python
+import httpx, httpx_cache
 
-```py
-import httpx_cache
-
-with httpx_cache.Client() as client:
-  response = client.get("https://httpbin.org/get")
+client = httpx_cache.wrap(httpx.Client(), policy="force", ttl=3600)
+r1 = client.get("https://httpbin.org/get")
+r2 = client.get("https://httpbin.org/get")
+assert r1.extensions["from_cache"] is False
+assert r2.extensions["from_cache"] is True
 ```
 
-### Usage with AsyncClient
-
-```py
-import httpx_cache
-
-async with httpx_cache.AsyncClient() as client:
-  response = await client.get("https://httpbin.org/get")
-```
-
-When using `httpx-cache.Client`/`httpx_cache.AsyncClient`, the interface and features (except caching) are exactly the same as `httpx.Client`/`httpx.AsyncClient`
-
-> Read the [User Guide](./guide.md) for a complete walk-through.
-
-## Supported Cache Types and Serializers
-
-|     Serializer       |      DictCache     |     FileCache      |     RedisCache     |
-| -------------------- | ------------------ | ------------------ | ------------------ |
-| DictSerializer       | :white_check_mark: |       :x:          |       :x:          |
-| StringJsonSerializer | :white_check_mark: |       :x:          |       :x:          |
-| BytesJsonSerializer  | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| MsgPackSerializer    | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+See the [User Guide](./guide.md), [Policies & RFC 9111](./cache_control.md), [API Reference](./api.md), and [llms.txt](./llms.txt).
