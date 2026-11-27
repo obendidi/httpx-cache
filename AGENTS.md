@@ -6,7 +6,7 @@ Zero-config, zero-extra-dependency response caching and deterministic replay lay
 
 - Install dev env: `uv sync --python 3.12`
 - Test (both `httpx` & `httpx2`): `uv run pytest`
-- Test with coverage: `uv run pytest --cov=httpx_cache`
+- Test with coverage: `uv run coverage run -m pytest && uv run coverage report`
 - Lint: `uv run ruff check .`
 - Typecheck (strict, Py 3.10 target): `uv run mypy httpx_cache`
 - Build sdist/wheel: `uv build`

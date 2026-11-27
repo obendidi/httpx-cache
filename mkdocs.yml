@@ -1,5 +1,5 @@
-site_name: HTTPX-CACHE
-site_description: Simple caching transport for httpx.
+site_name: httpx-cache
+site_description: Zero-config, minimal-dependency response caching and deterministic replay for httpx and httpx2.
 site_url: https://obendidi.github.io/httpx-cache/
 
 repo_name: obendidi/httpx-cache
@@ -7,27 +7,37 @@ repo_url: https://github.com/obendidi/httpx-cache
 edit_uri: ""
 
 theme:
-  name: "material"
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - navigation.instant
 
 nav:
-  - Introduction: "index.md"
-  - User Guide: "guide.md"
-  - Cache Control: "cache_control.md"
-  - Developer Interface: "api.md"
+  - Home: index.md
+  - User Guide: guide.md
+  - Policies & RFC 9111: cache_control.md
+  - API Reference: api.md
 
 markdown_extensions:
   - admonition
-  - codehilite:
-      css_class: highlight
-  - mkautodoc
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets:
-      check_paths: true
   - pymdownx.superfences
 
 extra_css:
