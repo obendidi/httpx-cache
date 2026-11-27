@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-merge-conflict
@@ -8,12 +8,8 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-ast
-  - repo: https://github.com/psf/black
-    rev: 23.3.0
-    hooks:
-      - id: black
-        args: [--config=pyproject.toml]
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.260
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
     hooks:
       - id: ruff
+      - id: ruff-format

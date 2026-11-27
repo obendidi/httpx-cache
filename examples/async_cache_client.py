@@ -1,25 +1,20 @@
-import logging
+import asyncio
 
-import anyio
-from rich.logging import RichHandler
+import httpx
 
 import httpx_cache
 
-logging.basicConfig(
-    level="DEBUG", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
-)
-logger = logging.getLogger("httpx_cache.example")
+
+async def main() -> None:
+    cache = httpx_cache.SqliteCache(":memory:")
+    async with httpx_cache.wrap(httpx.AsyncClient(), cache=cache, policy="force", ttl=60) as client:
+        r1 = await client.get("https://httpbin.org/get")
+        r2 = await client.get("https://httpbin.org/get")
+        print("first from_cache:", r1.extensions["from_cache"])
+        print("second from_cache:", r2.extensions["from_cache"])
+        print("stats:", await cache.astats())
+    await cache.aclose()
 
 
-async def main():
-    async with httpx_cache.AsyncClient(
-        base_url="https://httpbin.org/",
-        cache=httpx_cache.DictCache(serializer=httpx_cache.DictSerializer()),
-    ) as client:
-        logger.info("Running first request ...")
-        await client.get("/get", params={"num": "1"})
-        logger.info("Running second request ...")
-        await client.get("/get", params={"num": "1"})
-
-
-anyio.run(main)
+if __name__ == "__main__":
+    asyncio.run(main())

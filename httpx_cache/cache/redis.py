@@ -1,133 +1,224 @@
-import typing as tp
+from __future__ import annotations
+
+import math
+import threading
+import time
 from datetime import timedelta
+from typing import Any
 
-import httpx
-from aiorwlock import RWLock as AsyncRWLock
-from fasteners import ReaderWriterLock as RWLock
-from redis import Redis
-from redis.asyncio import Redis as AsyncRedis
-
+from httpx_cache.cache._codec import decode_entry, encode_entry
 from httpx_cache.cache.base import BaseCache
-from httpx_cache.serializer.base import BaseSerializer
-from httpx_cache.serializer.common import MsgPackSerializer
-from httpx_cache.utils import get_cache_key
+from httpx_cache.types import CacheEntry, CacheStats
 
-__all__ = ["RedisCache"]
+
+def _import_redis() -> tuple[type[Any], type[Any]]:
+    try:
+        from redis import Redis
+        from redis.asyncio import Redis as AsyncRedis
+    except ImportError as exc:
+        raise ImportError(
+            "RedisCache requires the optional 'redis' dependency. "
+            "Install it with: pip install 'httpx-cache[redis]'"
+        ) from exc
+    return Redis, AsyncRedis
 
 
 class RedisCache(BaseCache):
-    """Redis cache that stores cached responses in Redis.
-
-    Uses a lock/async_lock to make sure each get/set/delete operation is safe.
-
-    You can either provide an instance of 'Redis'/'AsyncRedis' or a redis url to
-    have RedisCache create the connection for you.
-
-    Args:
-        serializer: Optional serializer for the data to cache, defaults to:
-            httpx_cache.MsgPackSerializer
-        namespace: Optional namespace for the cache keys, defaults to "httpx_cache"
-        redis_url: Optional redis url, defaults to empty string
-        redis: Optional redis instance, defaults to None
-        aredis: Optional async redis instance, defaults to None
-        default_ttl: Optional default ttl for cached responses, defaults to None
-    """
-
-    lock = RWLock()
+    """Redis-backed response cache supporting sync and async ``redis>=5`` clients."""
 
     def __init__(
         self,
-        serializer: tp.Optional[BaseSerializer] = None,
+        *,
+        redis_url: str | None = None,
+        redis: Any | None = None,
+        aredis: Any | None = None,
         namespace: str = "httpx_cache",
-        redis_url: str = "",
-        redis: tp.Optional["Redis[bytes]"] = None,
-        aredis: tp.Optional["AsyncRedis[bytes]"] = None,
-        default_ttl: tp.Optional[timedelta] = None,
+        default_ttl: float | timedelta | None = None,
+        compress: bool = True,
     ) -> None:
-        self.namespace = namespace
-        # redis connection is lazy loaded
-        self.redis = redis or Redis.from_url(redis_url)
-        self.aredis = aredis or AsyncRedis.from_url(redis_url)
-        self.serializer = serializer or MsgPackSerializer()
-        self.default_ttl = default_ttl
-        if not isinstance(self.serializer, BaseSerializer):
-            raise TypeError(
-                "Expected serializer of type 'httpx_cache.BaseSerializer', "
-                f"got {type(self.serializer)}"
-            )
+        if redis is None and aredis is None and not redis_url:
+            redis_url = "redis://localhost:6379/0"
 
-        self._async_lock: tp.Optional[AsyncRWLock] = None
+        if isinstance(default_ttl, timedelta):
+            ttl_seconds: float | None = default_ttl.total_seconds()
+        elif default_ttl is not None:
+            ttl_seconds = float(default_ttl)
+        else:
+            ttl_seconds = None
+        if ttl_seconds is not None and ttl_seconds <= 0:
+            raise ValueError(f"default_ttl must be positive, got {ttl_seconds}")
+
+        self.redis_url = redis_url
+        self.namespace = namespace
+        self.default_ttl = ttl_seconds
+        self.compress = compress
+
+        self._redis: Any | None = redis
+        self._aredis: Any | None = aredis
+        self._owns_redis = redis is None
+        self._owns_aredis = aredis is None
+
+        self._counter_lock = threading.Lock()
+        self._hits = 0
+        self._misses = 0
+        self._expired = 0
 
     @property
-    def async_lock(self) -> AsyncRWLock:
-        if self._async_lock is None:
-            self._async_lock = AsyncRWLock()
-        return self._async_lock
+    def redis(self) -> Any:
+        if self._redis is None:
+            if not self.redis_url:
+                raise RuntimeError("No sync Redis client or redis_url configured.")
+            redis_cls, _ = _import_redis()
+            self._redis = redis_cls.from_url(self.redis_url)
+        return self._redis
 
-    def _get_namespaced_cache_key(self, request: httpx.Request) -> str:
-        key = get_cache_key(request)
-        if self.namespace:
-            key = f"{self.namespace}:{key}"
-        return key
+    @property
+    def aredis(self) -> Any:
+        if self._aredis is None:
+            if not self.redis_url:
+                raise RuntimeError("No async Redis client or redis_url configured.")
+            _, async_redis_cls = _import_redis()
+            self._aredis = async_redis_cls.from_url(self.redis_url)
+        return self._aredis
 
-    def get(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        key = self._get_namespaced_cache_key(request)
-        with self.lock.read_lock():
-            cached = self.redis.get(key)
-        if cached is not None:
-            return self.serializer.loads(cached=cached, request=request)
+    def _namespaced_key(self, key: str) -> str:
+        return f"{self.namespace}:{key}" if self.namespace else key
+
+    def _scan_pattern(self) -> str:
+        return f"{self.namespace}:*" if self.namespace else "*"
+
+    def _ttl_ms(self, entry: CacheEntry) -> int | None:
+        if entry.expires_at is not None:
+            remaining = entry.expires_at - time.time()
+            return max(1, math.ceil(remaining * 1000))
+        if self.default_ttl is not None:
+            return max(1, math.ceil(self.default_ttl * 1000))
         return None
 
-    async def aget(self, request: httpx.Request) -> tp.Optional[httpx.Response]:
-        key = self._get_namespaced_cache_key(request)
-        async with self.async_lock.reader:
-            cached_data = await self.aredis.get(key)
-        if cached_data is not None:
-            return self.serializer.loads(cached=cached_data, request=request)
-        return None
+    def get(self, key: str, *, ignore_expiry: bool = False) -> CacheEntry | None:
+        raw = self.redis.get(self._namespaced_key(key))
+        if raw is None:
+            with self._counter_lock:
+                self._misses += 1
+            return None
+        entry = decode_entry(bytes(raw))
+        if not ignore_expiry and entry.is_expired():
+            self.redis.delete(self._namespaced_key(key))
+            with self._counter_lock:
+                self._expired += 1
+                self._misses += 1
+            return None
+        with self._counter_lock:
+            self._hits += 1
+        return entry
 
-    def set(
-        self,
-        *,
-        request: httpx.Request,
-        response: httpx.Response,
-        content: tp.Optional[bytes] = None,
-    ) -> None:
-        key = self._get_namespaced_cache_key(request)
-        to_cache = self.serializer.dumps(response=response, content=content)
-        with self.lock.write_lock():
-            if self.default_ttl:
-                self.redis.setex(key, self.default_ttl, to_cache)
-            else:
-                self.redis.set(key, to_cache)
+    async def aget(self, key: str, *, ignore_expiry: bool = False) -> CacheEntry | None:
+        raw = await self.aredis.get(self._namespaced_key(key))
+        if raw is None:
+            with self._counter_lock:
+                self._misses += 1
+            return None
+        entry = decode_entry(bytes(raw))
+        if not ignore_expiry and entry.is_expired():
+            await self.aredis.delete(self._namespaced_key(key))
+            with self._counter_lock:
+                self._expired += 1
+                self._misses += 1
+            return None
+        with self._counter_lock:
+            self._hits += 1
+        return entry
 
-    async def aset(
-        self,
-        *,
-        request: httpx.Request,
-        response: httpx.Response,
-        content: tp.Optional[bytes] = None,
-    ) -> None:
-        to_cache = self.serializer.dumps(response=response, content=content)
-        key = self._get_namespaced_cache_key(request)
-        async with self.async_lock.writer:
-            if self.default_ttl:
-                await self.aredis.setex(key, self.default_ttl, to_cache)
-            else:
-                await self.aredis.set(key, to_cache)
+    def set(self, key: str, entry: CacheEntry) -> None:
+        rkey = self._namespaced_key(key)
+        payload = encode_entry(entry, compress=self.compress)
+        ttl_ms = self._ttl_ms(entry)
+        if ttl_ms is not None:
+            self.redis.set(rkey, payload, px=ttl_ms)
+        else:
+            self.redis.set(rkey, payload)
 
-    def delete(self, request: httpx.Request) -> None:
-        key = self._get_namespaced_cache_key(request)
-        with self.lock.write_lock():
-            self.redis.delete(key)
+    async def aset(self, key: str, entry: CacheEntry) -> None:
+        rkey = self._namespaced_key(key)
+        payload = encode_entry(entry, compress=self.compress)
+        ttl_ms = self._ttl_ms(entry)
+        if ttl_ms is not None:
+            await self.aredis.set(rkey, payload, px=ttl_ms)
+        else:
+            await self.aredis.set(rkey, payload)
 
-    async def adelete(self, request: httpx.Request) -> None:
-        key = self._get_namespaced_cache_key(request)
-        async with self.async_lock.writer:
-            await self.aredis.delete(key)
+    def delete(self, key: str) -> bool:
+        removed = int(self.redis.delete(self._namespaced_key(key)))
+        return removed > 0
+
+    async def adelete(self, key: str) -> bool:
+        removed = int(await self.aredis.delete(self._namespaced_key(key)))
+        return removed > 0
+
+    def clear(self) -> None:
+        batch: list[Any] = []
+        for rkey in self.redis.scan_iter(match=self._scan_pattern(), count=200):
+            batch.append(rkey)
+            if len(batch) >= 200:
+                self.redis.delete(*batch)
+                batch.clear()
+        if batch:
+            self.redis.delete(*batch)
+
+    async def aclear(self) -> None:
+        batch: list[Any] = []
+        async for rkey in self.aredis.scan_iter(match=self._scan_pattern(), count=200):
+            batch.append(rkey)
+            if len(batch) >= 200:
+                await self.aredis.delete(*batch)
+                batch.clear()
+        if batch:
+            await self.aredis.delete(*batch)
+
+    def stats(self) -> CacheStats:
+        entries = 0
+        size_bytes = 0
+        for rkey in self.redis.scan_iter(match=self._scan_pattern(), count=200):
+            entries += 1
+            raw = self.redis.get(rkey)
+            if raw is not None:
+                size_bytes += len(raw)
+        with self._counter_lock:
+            return CacheStats(
+                entries=entries,
+                size_bytes=size_bytes,
+                hits=self._hits,
+                misses=self._misses,
+                expired=self._expired,
+            )
+
+    async def astats(self) -> CacheStats:
+        entries = 0
+        size_bytes = 0
+        async for rkey in self.aredis.scan_iter(match=self._scan_pattern(), count=200):
+            entries += 1
+            raw = await self.aredis.get(rkey)
+            if raw is not None:
+                size_bytes += len(raw)
+        with self._counter_lock:
+            return CacheStats(
+                entries=entries,
+                size_bytes=size_bytes,
+                hits=self._hits,
+                misses=self._misses,
+                expired=self._expired,
+            )
 
     def close(self) -> None:
-        self.redis.close()
+        if self._owns_redis and self._redis is not None:
+            self._redis.close()
+            self._redis = None
 
     async def aclose(self) -> None:
-        await self.aredis.close()
+        if self._owns_aredis and self._aredis is not None:
+            if hasattr(self._aredis, "aclose"):
+                await self._aredis.aclose()
+            else:
+                await self._aredis.close()
+            self._aredis = None
+        self.close()

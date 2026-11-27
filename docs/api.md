@@ -1,61 +1,24 @@
-# API documentation
+# API Reference
 
-## Client
+## Entry Points
 
-::: httpx_cache.Client
-    :docstring:
-    :members:
+- `httpx_cache.wrap(client, *, cache=None, policy="force", ttl=None, cache_post=False, cacheable_methods=None, cacheable_status_codes=None, key_fn=None, shared=False)`
+- `httpx_cache.Client`, `httpx_cache.AsyncClient`
+- `httpx_cache.httpx2.Client`, `httpx_cache.httpx2.AsyncClient`
+- `httpx_cache.SyncCacheTransport`, `httpx_cache.AsyncCacheTransport`
 
-::: httpx_cache.AsyncClient
-    :docstring:
-    :members:
+## Stores
 
-## Transport
+- `httpx_cache.BaseCache`
+- `httpx_cache.SqliteCache`
+- `httpx_cache.MemoryCache`
+- `httpx_cache.FileCache`
+- `httpx_cache.RedisCache`
 
-::: httpx_cache.CacheControlTransport
-    :docstring:
-    :members:
+## Models, Keys & Exceptions
 
-::: httpx_cache.AsyncCacheControlTransport
-    :docstring:
-    :members:
-
-## CacheControl
-
-::: httpx_cache.CacheControl
-    :docstring:
-    :members:
-
-## Cache
-
-::: httpx_cache.DictCache
-    :docstring:
-    :members:
-
-::: httpx_cache.FileCache
-    :docstring:
-    :members:
-
-::: httpx_cache.cache.redis.RedisCache
-    :docstring:
-    :members:
-
-!!! **Note** FileCache and RedisCache only supports `httpx_cache.MsgPackSerializer` and `httpx_cache.BytesJsonSerializer` serializers.
-
-## Serializer
-
-::: httpx_cache.DictSerializer
-    :docstring:
-    :members:
-
-::: httpx_cache.StringJsonSerializer
-    :docstring:
-    :members:
-
-::: httpx_cache.BytesJsonSerializer
-    :docstring:
-    :members:
-
-::: httpx_cache.MsgPackSerializer
-    :docstring:
-    :members:
+- `httpx_cache.CacheEntry`
+- `httpx_cache.CacheStats`
+- `httpx_cache.CacheMissError`
+- `httpx_cache.PolicyController`
+- `httpx_cache.default_key_fn`

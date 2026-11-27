@@ -1,4 +1,4 @@
-name: Test
+name: CI
 
 on:
   push:
@@ -9,42 +9,64 @@ on:
       - main
 
 concurrency:
-  group: test-${{ github.head_ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PYTHONUNBUFFERED: "1"
-  FORCE_COLOR: "1"
-
 jobs:
-  test:
+  lint:
+    name: Lint & typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync --python 3.12
+      - run: uv run ruff check .
+      - run: uv run mypy httpx_cache
+
+  test-dual:
+    name: Test dual (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
       fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
         with:
+          enable-cache: true
           python-version: ${{ matrix.python-version }}
+      - run: uv sync --python ${{ matrix.python-version }}
+      - run: uv run pytest --cov=httpx_cache --cov-report=term-missing
 
-      - name: Install Hatch
-        run: pip install --upgrade --pre hatch
-
-      # run linter only on 1 py version
-      - if: matrix.python-version == '3.11'
-        name: Lint
-        run: hatch run dev:lint
-
-      - name: Run tests
-        run: hatch run dev:test
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v2
+  test-isolated:
+    name: Test ${{ matrix.backend }}-only (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python-version: "3.10"
+            backend: httpx
+          - python-version: "3.12"
+            backend: httpx
+          - python-version: "3.11"
+            backend: httpx2
+          - python-version: "3.13"
+            backend: httpx2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          fail_ci_if_error: true
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+      - run: >
+          uv run --isolated --no-dev
+          --python ${{ matrix.python-version }}
+          --extra ${{ matrix.backend }}
+          --with pytest
+          --with pytest-asyncio
+          pytest -v
